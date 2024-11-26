@@ -1,5 +1,5 @@
-import { PetColor, PetSize, PetSpeed } from '../common/types';
-import { IPetType } from './states';
+import { PokemonColor, PokemonSize, PokemonSpeed } from '../common/types';
+import { IPokemonType } from './states';
 import { ISequenceTree } from './sequences';
 import {
     States,
@@ -24,14 +24,14 @@ export class InvalidStateError extends Error {
     }
 }
 
-export abstract class BasePetType implements IPetType {
+export abstract class BasePetType implements IPokemonType {
     label: string = 'base';
     static count: number = 0;
     sequence: ISequenceTree = {
         startingState: States.sitIdle,
         sequenceStates: [],
     };
-    static possibleColors: PetColor[];
+    static possibleColors: PokemonColor[];
     currentState: IState;
     currentStateEnum: States;
     holdState: IState | undefined;
@@ -43,16 +43,16 @@ export abstract class BasePetType implements IPetType {
     private _bottom: number;
     petRoot: string;
     _floor: number;
-    _friend: IPetType | undefined;
+    _friend: IPokemonType | undefined;
     private _name: string;
     private _speed: number;
-    private _size: PetSize;
+    private _size: PokemonSize;
 
     constructor(
         spriteElement: HTMLImageElement,
         collisionElement: HTMLDivElement,
         speechElement: HTMLDivElement,
-        size: PetSize,
+        size: PokemonSize,
         left: number,
         bottom: number,
         petRoot: string,
@@ -79,7 +79,7 @@ export abstract class BasePetType implements IPetType {
         (this.constructor as any).count += 1;
     }
 
-    initSprite(petSize: PetSize, left: number, bottom: number) {
+    initSprite(petSize: PokemonSize, left: number, bottom: number) {
         this.el.style.left = `${left}px`;
         this.el.style.bottom = `${bottom}px`;
         this.el.style.width = 'auto';
@@ -91,9 +91,7 @@ export abstract class BasePetType implements IPetType {
         this.collision.style.width = `${this.calculateSpriteWidth(petSize)}px`;
         this.collision.style.height = `${this.calculateSpriteWidth(petSize)}px`;
         this.speech.style.left = `${left}px`;
-        this.speech.style.bottom = `${
-            bottom + this.calculateSpriteWidth(petSize)
-        }px`;
+        this.speech.style.bottom = `${bottom + this.calculateSpriteWidth(petSize)}px`;
         this.hideSpeechBubble();
     }
 
@@ -109,19 +107,18 @@ export abstract class BasePetType implements IPetType {
         this.collision.style.left = `${this._left}px`;
         this.collision.style.bottom = `${this._bottom}px`;
         this.speech.style.left = `${this._left}px`;
-        this.speech.style.bottom = `${
-            this._bottom + this.calculateSpriteWidth(this._size)
-        }px`;
+        this.speech.style.bottom = `${this._bottom + this.calculateSpriteWidth(this._size)
+            }px`;
     }
 
-    calculateSpriteWidth(size: PetSize): number {
-        if (size === PetSize.nano) {
+    calculateSpriteWidth(size: PokemonSize): number {
+        if (size === PokemonSize.nano) {
             return 30;
-        } else if (size === PetSize.small) {
+        } else if (size === PokemonSize.small) {
             return 40;
-        } else if (size === PetSize.medium) {
+        } else if (size === PokemonSize.medium) {
             return 55;
-        } else if (size === PetSize.large) {
+        } else if (size === PokemonSize.large) {
             return 110;
         } else {
             return 30; // Shrug
@@ -169,10 +166,10 @@ export abstract class BasePetType implements IPetType {
     }
 
     get isMoving(): boolean {
-        return this._speed !== PetSpeed.still;
+        return this._speed !== PokemonSpeed.still;
     }
 
-    recoverFriend(friend: IPetType) {
+    recoverFriend(friend: IPokemonType) {
         // Recover friends..
         this._friend = friend;
     }
@@ -317,7 +314,7 @@ export abstract class BasePetType implements IPetType {
         return this._friend !== undefined;
     }
 
-    get friend(): IPetType | undefined {
+    get friend(): IPokemonType | undefined {
         return this._friend;
     }
 
@@ -325,7 +322,7 @@ export abstract class BasePetType implements IPetType {
         return this._name;
     }
 
-    makeFriendsWith(friend: IPetType): boolean {
+    makeFriendsWith(friend: IPokemonType): boolean {
         this._friend = friend;
         console.log(this.name, ": I'm now friends ❤️ with ", friend.name);
         return true;

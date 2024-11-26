@@ -1,14 +1,14 @@
 // This script will be run within the webview itself
 import { randomName } from '../common/names';
 import {
-    PetSize,
-    PetColor,
-    PetType,
+    PokemonSize,
+    PokemonColor,
+    PokemonType,
     Theme,
     ColorThemeKind,
     WebviewMessage,
 } from '../common/types';
-import { IPetType } from './states';
+import { IPokemonType } from './states';
 import {
     createPet,
     PetCollection,
@@ -32,55 +32,55 @@ declare global {
 export var allPets: IPetCollection = new PetCollection();
 var petCounter: number;
 
-function calculateBallRadius(size: PetSize): number {
-    if (size === PetSize.nano) {
+function calculateBallRadius(size: PokemonSize): number {
+    if (size === PokemonSize.nano) {
         return 2;
-    } else if (size === PetSize.small) {
+    } else if (size === PokemonSize.small) {
         return 3;
-    } else if (size === PetSize.medium) {
+    } else if (size === PokemonSize.medium) {
         return 4;
-    } else if (size === PetSize.large) {
+    } else if (size === PokemonSize.large) {
         return 8;
     } else {
         return 1; // Shrug
     }
 }
 
-function calculateFloor(size: PetSize, theme: Theme): number {
+function calculateFloor(size: PokemonSize, theme: Theme): number {
     switch (theme) {
         case Theme.forest:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 30;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 40;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 65;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 23;
             }
         case Theme.castle:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 60;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 80;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 120;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 45;
             }
         case Theme.beach:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 60;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 80;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 120;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 45;
             }
@@ -102,7 +102,7 @@ function handleMouseOver(e: MouseEvent) {
 
 function startAnimations(
     collision: HTMLDivElement,
-    pet: IPetType,
+    pet: IPokemonType,
     stateApi?: VscodeStateApi,
 ) {
     if (!stateApi) {
@@ -124,10 +124,10 @@ function startAnimations(
 }
 
 function addPetToPanel(
-    petType: PetType,
+    petType: PokemonType,
     basePetUri: string,
-    petColor: PetColor,
-    petSize: PetSize,
+    petColor: PokemonColor,
+    petSize: PokemonSize,
     left: number,
     bottom: number,
     floor: number,
@@ -215,7 +215,7 @@ export function saveState(stateApi?: VscodeStateApi) {
 
 function recoverState(
     basePetUri: string,
-    petSize: PetSize,
+    petSize: PokemonSize,
     floor: number,
     stateApi?: VscodeStateApi,
 ) {
@@ -233,7 +233,7 @@ function recoverState(
         }
     }
 
-    var recoveryMap: Map<IPetType, PetElementState> = new Map();
+    var recoveryMap: Map<IPokemonType, PetElementState> = new Map();
     state?.petStates?.forEach((p) => {
         // Fixes a bug related to duck animations
         if ((p.petType as string) === 'rubber duck') {
@@ -242,14 +242,14 @@ function recoverState(
 
         try {
             var newPet = addPetToPanel(
-                p.petType ?? PetType.cat,
+                p.petType ?? PokemonType.dragonite,
                 basePetUri,
-                p.petColor ?? PetColor.brown,
+                p.petColor ?? PokemonColor.default,
                 petSize,
                 parseInt(p.elLeft ?? '0'),
                 parseInt(p.elBottom ?? '0'),
                 floor,
-                p.petName ?? randomName(p.petType ?? PetType.cat),
+                p.petName ?? randomName(p.petType ?? PokemonType.dragonite),
                 stateApi,
             );
             allPets.push(newPet);
@@ -303,9 +303,9 @@ export function petPanelApp(
     basePetUri: string,
     theme: Theme,
     themeKind: ColorThemeKind,
-    petColor: PetColor,
-    petSize: PetSize,
-    petType: PetType,
+    petColor: PokemonColor,
+    petSize: PokemonSize,
+    petType: PokemonType,
     throwBallWithMouse: boolean,
     stateApi?: VscodeStateApi,
 ) {
@@ -360,66 +360,66 @@ export function petPanelApp(
         ballState = new BallState(100, 100, 4, 5);
     }
 
-    function dynamicThrowOn() {
-        let startMouseX: number;
-        let startMouseY: number;
-        let endMouseX: number;
-        let endMouseY: number;
-        console.log('Enabling dynamic throw');
-        window.onmousedown = (e) => {
-            if (ballState) {
-                ballState.paused = true;
-            }
-            if (canvas) {
-                canvas.style.display = 'block';
-            }
-            endMouseX = e.clientX;
-            endMouseY = e.clientY;
-            startMouseX = e.clientX;
-            startMouseY = e.clientY;
-            ballState = new BallState(e.clientX, e.clientY, 0, 0);
+    // function dynamicThrowOn() {
+    //     let startMouseX: number;
+    //     let startMouseY: number;
+    //     let endMouseX: number;
+    //     let endMouseY: number;
+    //     console.log('Enabling dynamic throw');
+    //     window.onmousedown = (e) => {
+    //         if (ballState) {
+    //             ballState.paused = true;
+    //         }
+    //         if (canvas) {
+    //             canvas.style.display = 'block';
+    //         }
+    //         endMouseX = e.clientX;
+    //         endMouseY = e.clientY;
+    //         startMouseX = e.clientX;
+    //         startMouseY = e.clientY;
+    //         ballState = new BallState(e.clientX, e.clientY, 0, 0);
 
-            allPets.pets.forEach((petEl) => {
-                if (petEl.pet.canChase) {
-                    petEl.pet.chase(ballState, canvas);
-                }
-            });
-            ballState.paused = true;
+    //         allPets.pets.forEach((petEl) => {
+    //             if (petEl.pet.canChase) {
+    //                 petEl.pet.chase(ballState, canvas);
+    //             }
+    //         });
+    //         ballState.paused = true;
 
-            drawBall();
+    //         drawBall();
 
-            window.onmousemove = (ev) => {
-                ev.preventDefault();
-                if (ballState) {
-                    ballState.paused = true;
-                }
-                startMouseX = endMouseX;
-                startMouseY = endMouseY;
-                endMouseX = ev.clientX;
-                endMouseY = ev.clientY;
-                ballState = new BallState(ev.clientX, ev.clientY, 0, 0);
-                drawBall();
-            };
-            window.onmouseup = (ev) => {
-                ev.preventDefault();
-                window.onmouseup = null;
-                window.onmousemove = null;
+    //         window.onmousemove = (ev) => {
+    //             ev.preventDefault();
+    //             if (ballState) {
+    //                 ballState.paused = true;
+    //             }
+    //             startMouseX = endMouseX;
+    //             startMouseY = endMouseY;
+    //             endMouseX = ev.clientX;
+    //             endMouseY = ev.clientY;
+    //             ballState = new BallState(ev.clientX, ev.clientY, 0, 0);
+    //             drawBall();
+    //         };
+    //         window.onmouseup = (ev) => {
+    //             ev.preventDefault();
+    //             window.onmouseup = null;
+    //             window.onmousemove = null;
 
-                ballState = new BallState(
-                    endMouseX,
-                    endMouseY,
-                    endMouseX - startMouseX,
-                    endMouseY - startMouseY,
-                );
-                allPets.pets.forEach((petEl) => {
-                    if (petEl.pet.canChase) {
-                        petEl.pet.chase(ballState, canvas);
-                    }
-                });
-                throwBall();
-            };
-        };
-    }
+    //             ballState = new BallState(
+    //                 endMouseX,
+    //                 endMouseY,
+    //                 endMouseX - startMouseX,
+    //                 endMouseY - startMouseY,
+    //             );
+    //             allPets.pets.forEach((petEl) => {
+    //                 if (petEl.pet.canChase) {
+    //                     petEl.pet.chase(ballState, canvas);
+    //                 }
+    //             });
+    //             throwBall();
+    //         };
+    //     };
+    // }
     function dynamicThrowOff() {
         console.log('Disabling dynamic throw');
         window.onmousedown = null;
@@ -510,32 +510,32 @@ export function petPanelApp(
 
     initCanvas();
 
-    if (throwBallWithMouse) {
-        dynamicThrowOn();
-    } else {
-        dynamicThrowOff();
-    }
+    // if (throwBallWithMouse) {
+    //     dynamicThrowOn();
+    // } else {
+    //     dynamicThrowOff();
+    // }
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
-            case 'throw-with-mouse':
-                if (message.enabled) {
-                    dynamicThrowOn();
-                } else {
-                    dynamicThrowOff();
-                }
-                break;
-            case 'throw-ball':
-                resetBall();
-                throwBall();
-                allPets.pets.forEach((petEl) => {
-                    if (petEl.pet.canChase) {
-                        petEl.pet.chase(ballState, canvas);
-                    }
-                });
-                break;
+            // case 'throw-with-mouse':
+            //     if (message.enabled) {
+            //         dynamicThrowOn();
+            //     } else {
+            //         dynamicThrowOff();
+            //     }
+            //     break;
+            // case 'throw-ball':
+            //     resetBall();
+            //     throwBall();
+            //     allPets.pets.forEach((petEl) => {
+            //         if (petEl.pet.canChase) {
+            //             petEl.pet.chase(ballState, canvas);
+            //         }
+            //     });
+            //     break;
             case 'spawn-pet':
                 allPets.push(
                     addPetToPanel(

@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import { ColorThemeKind } from 'vscode';
 import {
-    PetSize,
-    PetColor,
-    PetType,
+    PokemonSize,
+    PokemonColor,
+    PokemonType,
     ExtPosition,
     Theme,
     WebviewMessage,
     ALL_COLORS,
-    ALL_PETS,
+    ALL_POKEMON,
     ALL_SCALES,
     ALL_THEMES,
 } from '../common/types';
@@ -16,13 +16,13 @@ import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pets';
 
-const EXTRA_PETS_KEY = 'vscode-pets.extra-pets';
-const EXTRA_PETS_KEY_TYPES = EXTRA_PETS_KEY + '.types';
-const EXTRA_PETS_KEY_COLORS = EXTRA_PETS_KEY + '.colors';
-const EXTRA_PETS_KEY_NAMES = EXTRA_PETS_KEY + '.names';
-const DEFAULT_PET_SCALE = PetSize.nano;
-const DEFAULT_COLOR = PetColor.brown;
-const DEFAULT_PET_TYPE = PetType.cat;
+const EXTRA_POKEMON_KEY = 'vscode-pets.extra-pets';
+const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
+const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
+const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
+const DEFAULT_POKEMON_SCALE = PokemonSize.nano;
+const DEFAULT_COLOR = PokemonColor.default;
+const DEFAULT_POKEMON_TYPE = PokemonType.dragonite;
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
 
@@ -49,12 +49,12 @@ class PetQuickPickItem implements vscode.QuickPickItem {
 
 let webviewViewProvider: PetWebviewViewProvider;
 
-function getConfiguredSize(): PetSize {
+function getConfiguredSize(): PokemonSize {
     var size = vscode.workspace
         .getConfiguration('vscode-pets')
-        .get<PetSize>('petSize', DEFAULT_PET_SCALE);
+        .get<PokemonSize>('petSize', DEFAULT_POKEMON_SCALE);
     if (ALL_SCALES.lastIndexOf(size) === -1) {
-        size = DEFAULT_PET_SCALE;
+        size = DEFAULT_POKEMON_SCALE;
     }
     return size;
 }
@@ -101,12 +101,12 @@ async function updateExtensionPositionContext() {
 }
 
 export class PetSpecification {
-    color: PetColor;
-    type: PetType;
-    size: PetSize;
+    color: PokemonColor;
+    type: PokemonType;
+    size: PokemonSize;
     name: string;
 
-    constructor(color: PetColor, type: PetType, size: PetSize, name?: string) {
+    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string) {
         this.color = color;
         this.type = type;
         this.size = size;
@@ -120,15 +120,15 @@ export class PetSpecification {
     static fromConfiguration(): PetSpecification {
         var color = vscode.workspace
             .getConfiguration('vscode-pets')
-            .get<PetColor>('petColor', DEFAULT_COLOR);
+            .get<PokemonColor>('petColor', DEFAULT_COLOR);
         if (ALL_COLORS.lastIndexOf(color) === -1) {
             color = DEFAULT_COLOR;
         }
         var type = vscode.workspace
             .getConfiguration('vscode-pets')
-            .get<PetType>('petType', DEFAULT_PET_TYPE);
-        if (ALL_PETS.lastIndexOf(type) === -1) {
-            type = DEFAULT_PET_TYPE;
+            .get<PokemonType>('petType', DEFAULT_POKEMON_TYPE);
+        if (ALL_POKEMON.lastIndexOf(type) === -1) {
+            type = DEFAULT_POKEMON_TYPE;
         }
 
         return new PetSpecification(color, type, getConfiguredSize());
@@ -136,18 +136,18 @@ export class PetSpecification {
 
     static collectionFromMemento(
         context: vscode.ExtensionContext,
-        size: PetSize,
+        size: PokemonSize,
     ): PetSpecification[] {
-        var contextTypes = context.globalState.get<PetType[]>(
-            EXTRA_PETS_KEY_TYPES,
+        var contextTypes = context.globalState.get<PokemonType[]>(
+            EXTRA_POKEMON_KEY_TYPES,
             [],
         );
-        var contextColors = context.globalState.get<PetColor[]>(
-            EXTRA_PETS_KEY_COLORS,
+        var contextColors = context.globalState.get<PokemonColor[]>(
+            EXTRA_POKEMON_KEY_COLORS,
             [],
         );
         var contextNames = context.globalState.get<string[]>(
-            EXTRA_PETS_KEY_NAMES,
+            EXTRA_POKEMON_KEY_NAMES,
             [],
         );
         var result: PetSpecification[] = new Array();
@@ -177,22 +177,22 @@ export async function storeCollectionAsMemento(
         contextColors[index] = collection[index].color;
         contextNames[index] = collection[index].name;
     }
-    await context.globalState.update(EXTRA_PETS_KEY_TYPES, contextTypes);
-    await context.globalState.update(EXTRA_PETS_KEY_COLORS, contextColors);
-    await context.globalState.update(EXTRA_PETS_KEY_NAMES, contextNames);
+    await context.globalState.update(EXTRA_POKEMON_KEY_TYPES, contextTypes);
+    await context.globalState.update(EXTRA_POKEMON_KEY_COLORS, contextColors);
+    await context.globalState.update(EXTRA_POKEMON_KEY_NAMES, contextNames);
     context.globalState.setKeysForSync([
-        EXTRA_PETS_KEY_TYPES,
-        EXTRA_PETS_KEY_COLORS,
-        EXTRA_PETS_KEY_NAMES,
+        EXTRA_POKEMON_KEY_TYPES,
+        EXTRA_POKEMON_KEY_COLORS,
+        EXTRA_POKEMON_KEY_NAMES,
     ]);
 }
 
 let spawnPetStatusBar: vscode.StatusBarItem;
 
 interface IPetInfo {
-    type: PetType;
+    type: PokemonType;
     name: string;
-    color: PetColor;
+    color: PokemonColor;
 }
 
 async function handleRemovePetMessage(
@@ -208,9 +208,9 @@ async function handleRemovePetMessage(
                 }
                 var parts = pet.split(',');
                 petList.push({
-                    type: parts[0] as PetType,
+                    type: parts[0] as PokemonType,
                     name: parts[1],
-                    color: parts[2] as PetColor,
+                    color: parts[2] as PokemonColor,
                 });
             });
             break;
@@ -248,7 +248,7 @@ async function handleRemovePetMessage(
                             return new PetSpecification(
                                 item.color,
                                 item.type,
-                                PetSize.medium,
+                                PokemonSize.medium,
                                 item.name,
                             );
                         });
@@ -361,9 +361,9 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-pets.throw-ball', () => {
             const panel = getPetPanel();
-            if (panel !== undefined) {
-                panel.throwBall();
-            }
+            // if (panel !== undefined) {
+            //     panel.throwBall();
+            // }
         }),
     );
 
@@ -508,7 +508,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
             if (panel) {
                 const selectedPetType = await vscode.window.showQuickPick(
-                    localize.stringListAsQuickPickItemList<PetType>(ALL_PETS),
+                    localize.stringListAsQuickPickItemList<PokemonType>(ALL_POKEMON),
                     {
                         placeHolder: vscode.l10n.t('Select a pet'),
                     },
@@ -519,12 +519,12 @@ export function activate(context: vscode.ExtensionContext) {
                     );
                     return;
                 }
-                var petColor: PetColor = DEFAULT_COLOR;
+                var petColor: PokemonColor = DEFAULT_COLOR;
                 const possibleColors = availableColors(selectedPetType.value);
 
                 if (possibleColors.length > 1) {
                     var selectedColor = await vscode.window.showQuickPick(
-                        localize.stringListAsQuickPickItemList<PetColor>(
+                        localize.stringListAsQuickPickItemList<PokemonColor>(
                             possibleColors,
                         ),
                         {
@@ -686,7 +686,7 @@ function getWebviewOptions(
 }
 
 interface IPetPanel {
-    throwBall(): void;
+    // throwBall(): void;
     resetPets(): void;
     spawnPet(spec: PetSpecification): void;
     deletePet(petName: string): void;
@@ -694,9 +694,9 @@ interface IPetPanel {
     rollCall(): void;
     themeKind(): vscode.ColorThemeKind;
     throwBallWithMouse(): boolean;
-    updatePetColor(newColor: PetColor): void;
-    updatePetType(newType: PetType): void;
-    updatePetSize(newSize: PetSize): void;
+    updatePetColor(newColor: PokemonColor): void;
+    updatePetType(newType: PokemonType): void;
+    updatePetSize(newSize: PokemonSize): void;
     updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind): void;
     update(): void;
     setThrowWithMouse(newThrowWithMouse: boolean): void;
@@ -705,18 +705,18 @@ interface IPetPanel {
 class PetWebviewContainer implements IPetPanel {
     protected _extensionUri: vscode.Uri;
     protected _disposables: vscode.Disposable[] = [];
-    protected _petColor: PetColor;
-    protected _petType: PetType;
-    protected _petSize: PetSize;
+    protected _petColor: PokemonColor;
+    protected _petType: PokemonType;
+    protected _petSize: PokemonSize;
     protected _theme: Theme;
     protected _themeKind: vscode.ColorThemeKind;
     protected _throwBallWithMouse: boolean;
 
     constructor(
         extensionUri: vscode.Uri,
-        color: PetColor,
-        type: PetType,
-        size: PetSize,
+        color: PokemonColor,
+        type: PokemonType,
+        size: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -730,15 +730,15 @@ class PetWebviewContainer implements IPetPanel {
         this._throwBallWithMouse = throwBallWithMouse;
     }
 
-    public petColor(): PetColor {
+    public petColor(): PokemonColor {
         return normalizeColor(this._petColor, this._petType);
     }
 
-    public petType(): PetType {
+    public petType(): PokemonType {
         return this._petType;
     }
 
-    public petSize(): PetSize {
+    public petSize(): PokemonSize {
         return this._petSize;
     }
 
@@ -754,15 +754,15 @@ class PetWebviewContainer implements IPetPanel {
         return this._throwBallWithMouse;
     }
 
-    public updatePetColor(newColor: PetColor) {
+    public updatePetColor(newColor: PokemonColor) {
         this._petColor = newColor;
     }
 
-    public updatePetType(newType: PetType) {
+    public updatePetType(newType: PokemonType) {
         this._petType = newType;
     }
 
-    public updatePetSize(newSize: PetSize) {
+    public updatePetSize(newSize: PokemonSize) {
         this._petSize = newSize;
     }
 
@@ -828,7 +828,7 @@ class PetWebviewContainer implements IPetPanel {
         webview.html = this._getHtmlForWebview(webview);
     }
 
-    public update() {}
+    public update() { }
 
     protected _getHtmlForWebview(webview: vscode.Webview) {
         // Local path to main script run in the webview
@@ -880,11 +880,9 @@ class PetWebviewContainer implements IPetPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
-                    webview.cspSource
-                } 'nonce-${nonce}'; img-src ${
-            webview.cspSource
-        } https:; script-src 'nonce-${nonce}';
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource
+            } 'nonce-${nonce}'; img-src ${webview.cspSource
+            } https:; script-src 'nonce-${nonce}';
                 font-src ${webview.cspSource};">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${stylesResetUri}" rel="stylesheet" nonce="${nonce}">
@@ -934,9 +932,9 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
 
     public static createOrShow(
         extensionUri: vscode.Uri,
-        petColor: PetColor,
-        petType: PetType,
-        petSize: PetSize,
+        petColor: PokemonColor,
+        petType: PokemonType,
+        petSize: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1003,9 +1001,9 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
     public static revive(
         panel: vscode.WebviewPanel,
         extensionUri: vscode.Uri,
-        petColor: PetColor,
-        petType: PetType,
-        petSize: PetSize,
+        petColor: PokemonColor,
+        petType: PokemonType,
+        petSize: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1025,9 +1023,9 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
     private constructor(
         panel: vscode.WebviewPanel,
         extensionUri: vscode.Uri,
-        color: PetColor,
-        type: PetType,
-        size: PetSize,
+        color: PokemonColor,
+        type: PokemonType,
+        size: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,

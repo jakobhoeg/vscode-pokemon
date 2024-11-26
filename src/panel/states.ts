@@ -1,6 +1,6 @@
-import { PetColor, PetType } from '../common/types';
+import { PokemonColor, PokemonType } from '../common/types';
 
-export interface IPetType {
+export interface IPokemonType {
     nextFrame(): void;
 
     // Special methods for actions
@@ -15,7 +15,7 @@ export interface IPetType {
     // State API
     getState(): PetInstanceState;
     recoverState(state: PetInstanceState): void;
-    recoverFriend(friend: IPetType): void;
+    recoverFriend(friend: IPokemonType): void;
 
     // Positioning
     bottom: number;
@@ -29,8 +29,8 @@ export interface IPetType {
     name: string;
     emoji: string;
     hasFriend: boolean;
-    friend: IPetType | undefined;
-    makeFriendsWith(friend: IPetType): boolean;
+    friend: IPokemonType | undefined;
+    makeFriendsWith(friend: IPokemonType): boolean;
     isPlaying: boolean;
 
     showSpeechBubble(message: string, duration: number): void;
@@ -42,8 +42,8 @@ export class PetInstanceState {
 
 export class PetElementState {
     petState: PetInstanceState | undefined;
-    petType: PetType | undefined;
-    petColor: PetColor | undefined;
+    petType: PokemonType | undefined;
+    petColor: PokemonColor | undefined;
     elLeft: string | undefined;
     elBottom: string | undefined;
     petName: string | undefined;
@@ -112,7 +112,7 @@ export function isStateAboveGround(state: States): boolean {
     );
 }
 
-export function resolveState(state: string, pet: IPetType): IState {
+export function resolveState(state: string, pet: IPokemonType): IState {
     switch (state) {
         case States.sitIdle:
             return new SitIdleState(pet);
@@ -152,7 +152,7 @@ export interface IState {
     label: string;
     spriteLabel: string;
     horizontalDirection: HorizontalDirection;
-    pet: IPetType;
+    pet: IPokemonType;
     nextFrame(): FrameResult;
 }
 
@@ -161,11 +161,11 @@ class AbstractStaticState implements IState {
     idleCounter: number;
     spriteLabel = 'idle';
     holdTime = 50;
-    pet: IPetType;
+    pet: IPokemonType;
 
     horizontalDirection = HorizontalDirection.left;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.idleCounter = 0;
         this.pet = pet;
     }
@@ -223,7 +223,7 @@ export class IdleWithBallState extends AbstractStaticState {
 
 export class WalkRightState implements IState {
     label = States.walkRight;
-    pet: IPetType;
+    pet: IPokemonType;
     spriteLabel = 'walk';
     horizontalDirection = HorizontalDirection.right;
     leftBoundary: number;
@@ -231,7 +231,7 @@ export class WalkRightState implements IState {
     idleCounter: number;
     holdTime = 60;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.leftBoundary = Math.floor(window.innerWidth * 0.95);
         this.pet = pet;
         this.idleCounter = 0;
@@ -258,12 +258,12 @@ export class WalkLeftState implements IState {
     label = States.walkLeft;
     spriteLabel = 'walk';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPetType;
+    pet: IPokemonType;
     speedMultiplier = 1;
     idleCounter: number;
     holdTime = 60;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.pet = pet;
         this.idleCounter = 0;
     }
@@ -301,10 +301,10 @@ export class ChaseState implements IState {
     horizontalDirection = HorizontalDirection.left;
     ballState: BallState;
     canvas: HTMLCanvasElement;
-    pet: IPetType;
+    pet: IPokemonType;
 
     constructor(
-        pet: IPetType,
+        pet: IPokemonType,
         ballState: BallState,
         canvas: HTMLCanvasElement,
     ) {
@@ -327,7 +327,7 @@ export class ChaseState implements IState {
 
         if (
             this.canvas.height - this.ballState.cy <
-                this.pet.width + this.pet.floor &&
+            this.pet.width + this.pet.floor &&
             this.ballState.cx < this.pet.left &&
             this.pet.left < this.ballState.cx + 15
         ) {
@@ -344,9 +344,9 @@ export class ChaseFriendState implements IState {
     label = States.chaseFriend;
     spriteLabel = 'run';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPetType;
+    pet: IPokemonType;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.pet = pet;
     }
 
@@ -371,9 +371,9 @@ export class ClimbWallLeftState implements IState {
     label = States.climbWallLeft;
     spriteLabel = 'wallclimb';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPetType;
+    pet: IPokemonType;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.pet = pet;
     }
 
@@ -390,9 +390,9 @@ export class JumpDownLeftState implements IState {
     label = States.jumpDownLeft;
     spriteLabel = 'fall_from_grab';
     horizontalDirection = HorizontalDirection.right;
-    pet: IPetType;
+    pet: IPokemonType;
 
-    constructor(pet: IPetType) {
+    constructor(pet: IPokemonType) {
         this.pet = pet;
     }
 
