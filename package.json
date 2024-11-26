@@ -152,25 +152,7 @@
                     "vscode-pets.petColor": {
                         "type": "string",
                         "enum": [
-                            "black",
-                            "lightbrown",
-                            "brown",
-                            "green",
-                            "yellow",
-                            "gray",
-                            "purple",
-                            "red",
-                            "white",
-                            "orange",
-                            "akita",
-                            "socks black",
-                            "socks beige",
-                            "socks brown",
-                            "paint beige",
-                            "paint black",
-                            "paint brown",
-                            "magical",
-                            "warrior"
+                            "default"
                         ],
                         "default": "brown",
                         "description": "Pet color",
@@ -179,24 +161,9 @@
                     "vscode-pets.petType": {
                         "type": "string",
                         "enum": [
-                            "cat",
-                            "chicken",
-                            "crab",
-                            "clippy",
-                            "cockatiel",
-                            "dog",
-                            "fox",
-                            "horse",
-                            "mod",
-                            "rat",
-                            "rocky",
-                            "rubber-duck",
-                            "snake",
-                            "totoro",
-                            "turtle",
-                            "zappy"
+                            "dragonite"
                         ],
-                        "default": "cat",
+                        "default": "dragonite",
                         "description": "Pet type",
                         "scope": "window"
                     },
