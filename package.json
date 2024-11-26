@@ -154,16 +154,18 @@
                         "enum": [
                             "default"
                         ],
-                        "default": "brown",
+                        "default": "default",
                         "description": "Pet color",
                         "scope": "window"
                     },
                     "vscode-pets.petType": {
                         "type": "string",
                         "enum": [
+                            "bulbasaur",
+                            "ivysaur",
                             "dragonite"
                         ],
-                        "default": "dragonite",
+                        "default": "bulbasaur",
                         "description": "Pet type",
                         "scope": "window"
                     },

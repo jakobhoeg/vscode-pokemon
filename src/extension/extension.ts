@@ -22,7 +22,7 @@ const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
 const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
 const DEFAULT_POKEMON_SCALE = PokemonSize.nano;
 const DEFAULT_COLOR = PokemonColor.default;
-const DEFAULT_POKEMON_TYPE = PokemonType.dragonite;
+const DEFAULT_POKEMON_TYPE = PokemonType.bulbasaur;
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
 

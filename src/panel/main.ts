@@ -242,14 +242,14 @@ function recoverState(
 
         try {
             var newPet = addPetToPanel(
-                p.petType ?? PokemonType.dragonite,
+                p.petType ?? PokemonType.bulbasaur,
                 basePetUri,
                 p.petColor ?? PokemonColor.default,
                 petSize,
                 parseInt(p.elLeft ?? '0'),
                 parseInt(p.elBottom ?? '0'),
                 floor,
-                p.petName ?? randomName(p.petType ?? PokemonType.dragonite),
+                p.petName ?? randomName(p.petType ?? PokemonType.bulbasaur),
                 stateApi,
             );
             allPets.push(newPet);

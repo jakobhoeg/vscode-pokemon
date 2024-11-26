@@ -1,6 +1,20 @@
 import * as fs from 'fs';
 
 const pets: { [key: string]: { colors: string[]; states: string[] } } = {
+    bulbasaur: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
+    ivysaur: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
     dragonite: {
         colors: ['default'],
         states: [

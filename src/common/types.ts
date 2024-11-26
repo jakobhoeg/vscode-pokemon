@@ -4,6 +4,8 @@ export const enum PokemonColor {
 }
 
 export const enum PokemonType {
+    bulbasaur = 'bulbasaur',
+    ivysaur = 'ivysaur',
     dragonite = 'dragonite',
     null = 'null',
 }
@@ -53,6 +55,8 @@ export class WebviewMessage {
 }
 
 export const ALL_POKEMON = [
+    PokemonType.bulbasaur,
+    PokemonType.ivysaur,
     PokemonType.dragonite,
 ];
 

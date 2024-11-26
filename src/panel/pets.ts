@@ -1,5 +1,7 @@
 import { PokemonColor, PokemonSize, PokemonSpeed, PokemonType } from '../common/types';
+import { Bulbasaur } from './pets/bulbasaur';
 import { Dragonite } from './pets/dragonite';
+import { Ivysaur } from './pets/ivysaur';
 import { IPokemonType } from './states';
 
 export class PetElement {
@@ -160,6 +162,10 @@ export function createPet(
     ] = [el, collision, speech, size, left, bottom, petRoot, floor, name];
 
     switch (petType) {
+        case PokemonType.bulbasaur:
+            return new Bulbasaur(...standardPetArguments, PokemonSpeed.normal);
+        case PokemonType.ivysaur:
+            return new Ivysaur(...standardPetArguments, PokemonSpeed.normal);
         case PokemonType.dragonite:
             return new Dragonite(...standardPetArguments, PokemonSpeed.normal);
         default:
@@ -169,6 +175,10 @@ export function createPet(
 
 export function availableColors(petType: PokemonType): PokemonColor[] {
     switch (petType) {
+        case PokemonType.bulbasaur:
+            return Bulbasaur.possibleColors;
+        case PokemonType.ivysaur:
+            return Ivysaur.possibleColors;
         case PokemonType.dragonite:
             return Dragonite.possibleColors;
         default:
