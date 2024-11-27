@@ -32,8 +32,6 @@
     "icon": "icon.png",
     "activationEvents": [
         "onCommand:vscode-pets.start",
-        "onCommand:vscode-pets.throw-with-mouse",
-        "onCommand:vscode-pets.throw-ball",
         "onCommand:vscode-pets.spawn-pet",
         "onCommand:vscode-pets.delete-pet",
         "onCommand:vscode-pets.remove-all-pets",
@@ -67,11 +65,6 @@
                     "group": "navigation@1"
                 },
                 {
-                    "command": "vscode-pets.throw-ball",
-                    "when": "view == petsView",
-                    "group": "navigation@2"
-                },
-                {
                     "command": "vscode-pets.delete-pet",
                     "when": "view == petsView",
                     "group": "navigation@3"
@@ -84,24 +77,6 @@
                 "title": "Start pet coding session",
                 "category": "Pet Coding",
                 "icon": "media/dog.svg"
-            },
-            {
-                "command": "vscode-pets.throw-with-mouse",
-                "title": "Throw ball with mouse",
-                "category": "Pet Coding",
-                "icon": {
-                    "dark": "media/icon/dark-throw-outline.svg",
-                    "light": "media/icon/light-throw-outline.svg"
-                }
-            },
-            {
-                "command": "vscode-pets.throw-ball",
-                "title": "Throw ball",
-                "category": "Pet Coding",
-                "icon": {
-                    "dark": "media/icon/dark-circle-outline.svg",
-                    "light": "media/icon/light-circle-outline.svg"
-                }
             },
             {
                 "command": "vscode-pets.export-pet-list",
@@ -158,11 +133,22 @@
                         "description": "Pet color",
                         "scope": "window"
                     },
+                    "vscode-pokemon.pokemonGeneration": {
+                        "type": "number",
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "default": 1,
+                        "description": "Pokémon generation to choose from"
+                    },
                     "vscode-pets.petType": {
                         "type": "string",
                         "enum": [
                             "bulbasaur",
                             "ivysaur",
+                            "venusaur",
                             "dragonite"
                         ],
                         "default": "bulbasaur",
@@ -199,11 +185,6 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pets"
-                    },
-                    "vscode-pets.throwBallWithMouse": {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Throw ball with mouse"
                     }
                 }
             }
