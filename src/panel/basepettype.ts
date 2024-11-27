@@ -137,7 +137,7 @@ export abstract class BasePetType implements IPokemonType {
             case PokemonSize.medium:
                 return 64;
             case PokemonSize.large:
-                return 96;
+                return 80;
             default:
                 return 32;
         }
