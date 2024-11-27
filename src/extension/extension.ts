@@ -19,7 +19,7 @@ import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pets';
 
-const EXTRA_POKEMON_KEY = 'vscode-pets.extra-pets';
+const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
 const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
 const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
@@ -29,7 +29,7 @@ const DEFAULT_POKEMON_TYPE = getDefaultPokemon();
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
 
-class PetQuickPickItem implements vscode.QuickPickItem {
+class PokemonQuickPickItem implements vscode.QuickPickItem {
     constructor(
         public readonly name_: string,
         public readonly type: string,
@@ -50,12 +50,12 @@ class PetQuickPickItem implements vscode.QuickPickItem {
     buttons?: readonly vscode.QuickInputButton[] | undefined;
 }
 
-let webviewViewProvider: PetWebviewViewProvider;
+let webviewViewProvider: PokemonWebviewViewProvider;
 
 function getConfiguredSize(): PokemonSize {
     var size = vscode.workspace
-        .getConfiguration('vscode-pets')
-        .get<PokemonSize>('petSize', DEFAULT_POKEMON_SCALE);
+        .getConfiguration('vscode-pokemon')
+        .get<PokemonSize>('pokemonSize', DEFAULT_POKEMON_SCALE);
     if (ALL_SCALES.lastIndexOf(size) === -1) {
         size = DEFAULT_POKEMON_SCALE;
     }
@@ -64,7 +64,7 @@ function getConfiguredSize(): PokemonSize {
 
 function getConfiguredTheme(): Theme {
     var theme = vscode.workspace
-        .getConfiguration('vscode-pets')
+        .getConfiguration('vscode-pokemon')
         .get<Theme>('theme', DEFAULT_THEME);
     if (ALL_THEMES.lastIndexOf(theme) === -1) {
         theme = DEFAULT_THEME;
@@ -78,18 +78,18 @@ function getConfiguredThemeKind(): ColorThemeKind {
 
 function getConfigurationPosition() {
     return vscode.workspace
-        .getConfiguration('vscode-pets')
+        .getConfiguration('vscode-pokemon')
         .get<ExtPosition>('position', DEFAULT_POSITION);
 }
 
 function getThrowWithMouseConfiguration(): boolean {
     return vscode.workspace
-        .getConfiguration('vscode-pets')
+        .getConfiguration('vscode-pokemon')
         .get<boolean>('throwBallWithMouse', true);
 }
 
 function updatePanelThrowWithMouse(): void {
-    const panel = getPetPanel();
+    const panel = getPokemonPanel();
     if (panel !== undefined) {
         panel.setThrowWithMouse(getThrowWithMouseConfiguration());
     }
@@ -98,12 +98,12 @@ function updatePanelThrowWithMouse(): void {
 async function updateExtensionPositionContext() {
     await vscode.commands.executeCommand(
         'setContext',
-        'vscode-pets.position',
+        'vscode-pokemon.position',
         getConfigurationPosition(),
     );
 }
 
-export class PetSpecification {
+export class PokemonSpecification {
     color: PokemonColor;
     type: PokemonType;
     size: PokemonSize;
@@ -120,29 +120,29 @@ export class PetSpecification {
         }
     }
 
-    static fromConfiguration(): PetSpecification {
+    static fromConfiguration(): PokemonSpecification {
         var color = vscode.workspace
-            .getConfiguration('vscode-pets')
-            .get<PokemonColor>('petColor', DEFAULT_COLOR);
+            .getConfiguration('vscode-pokemon')
+            .get<PokemonColor>('pokemonColor', DEFAULT_COLOR);
         if (ALL_COLORS.lastIndexOf(color) === -1) {
             color = DEFAULT_COLOR;
         }
         var type = vscode.workspace
-            .getConfiguration('vscode-pets')
-            .get<PokemonType>('petType', DEFAULT_POKEMON_TYPE);
+            .getConfiguration('vscode-pokemon')
+            .get<PokemonType>('pokemonType', DEFAULT_POKEMON_TYPE);
 
         // Use POKEMON_DATA to validate the type
         if (!POKEMON_DATA[type]) {
             type = DEFAULT_POKEMON_TYPE;
         }
 
-        return new PetSpecification(color, type, getConfiguredSize());
+        return new PokemonSpecification(color, type, getConfiguredSize());
     }
 
     static collectionFromMemento(
         context: vscode.ExtensionContext,
         size: PokemonSize,
-    ): PetSpecification[] {
+    ): PokemonSpecification[] {
         var contextTypes = context.globalState.get<PokemonType[]>(
             EXTRA_POKEMON_KEY_TYPES,
             [],
@@ -155,10 +155,10 @@ export class PetSpecification {
             EXTRA_POKEMON_KEY_NAMES,
             [],
         );
-        var result: PetSpecification[] = new Array();
+        var result: PokemonSpecification[] = new Array();
         for (let index = 0; index < contextTypes.length; index++) {
             result.push(
-                new PetSpecification(
+                new PokemonSpecification(
                     contextColors?.[index] ?? DEFAULT_COLOR,
                     contextTypes[index],
                     size,
@@ -172,7 +172,7 @@ export class PetSpecification {
 
 export async function storeCollectionAsMemento(
     context: vscode.ExtensionContext,
-    collection: PetSpecification[],
+    collection: PokemonSpecification[],
 ) {
     var contextTypes = new Array(collection.length);
     var contextColors = new Array(collection.length);
@@ -192,27 +192,27 @@ export async function storeCollectionAsMemento(
     ]);
 }
 
-let spawnPetStatusBar: vscode.StatusBarItem;
+let spawnPokemonStatusBar: vscode.StatusBarItem;
 
-interface IPetInfo {
+interface IPokemonInfo {
     type: PokemonType;
     name: string;
     color: PokemonColor;
 }
 
-async function handleRemovePetMessage(
+async function handleRemovePokemonMessage(
     this: vscode.ExtensionContext,
     message: WebviewMessage,
 ) {
-    var petList: IPetInfo[] = Array();
+    var pokemonList: IPokemonInfo[] = Array();
     switch (message.command) {
-        case 'list-pets':
-            message.text.split('\n').forEach((pet) => {
-                if (!pet) {
+        case 'list-pokemon':
+            message.text.split('\n').forEach((pokemon) => {
+                if (!pokemon) {
                     return;
                 }
-                var parts = pet.split(',');
-                petList.push({
+                var parts = pokemon.split(',');
+                pokemonList.push({
                     type: parts[0] as PokemonType,
                     name: parts[1],
                     color: parts[2] as PokemonColor,
@@ -222,35 +222,35 @@ async function handleRemovePetMessage(
         default:
             return;
     }
-    if (!petList) {
+    if (!pokemonList) {
         return;
     }
-    if (!petList.length) {
+    if (!pokemonList.length) {
         await vscode.window.showErrorMessage(
-            vscode.l10n.t('There are no pets to remove.'),
+            vscode.l10n.t('There are no pokemon to remove.'),
         );
         return;
     }
     await vscode.window
-        .showQuickPick<PetQuickPickItem>(
-            petList.map((val) => {
-                return new PetQuickPickItem(val.name, val.type, val.color);
+        .showQuickPick<PokemonQuickPickItem>(
+            pokemonList.map((val) => {
+                return new PokemonQuickPickItem(val.name, val.type, val.color);
             }),
             {
-                placeHolder: vscode.l10n.t('Select the pet to remove.'),
+                placeHolder: vscode.l10n.t('Select the pokemon to remove.'),
             },
         )
-        .then(async (pet: PetQuickPickItem | undefined) => {
-            if (pet) {
-                const panel = getPetPanel();
+        .then(async (pokemon: PokemonQuickPickItem | undefined) => {
+            if (pokemon) {
+                const panel = getPokemonPanel();
                 if (panel !== undefined) {
-                    panel.deletePet(pet.name);
-                    const collection = petList
+                    panel.deletePokemon(pokemon.name);
+                    const collection = pokemonList
                         .filter((item) => {
-                            return item.name !== pet.name;
+                            return item.name !== pokemon.name;
                         })
-                        .map<PetSpecification>((item) => {
-                            return new PetSpecification(
+                        .map<PokemonSpecification>((item) => {
+                            return new PokemonSpecification(
                                 item.color,
                                 item.type,
                                 PokemonSize.medium,
@@ -263,14 +263,14 @@ async function handleRemovePetMessage(
         });
 }
 
-function getPetPanel(): IPetPanel | undefined {
+function getPokemonPanel(): IPokemonPanel | undefined {
     if (
         getConfigurationPosition() === ExtPosition.explorer &&
         webviewViewProvider
     ) {
         return webviewViewProvider;
-    } else if (PetPanel.currentPanel) {
-        return PetPanel.currentPanel;
+    } else if (PokemonPanel.currentPanel) {
+        return PokemonPanel.currentPanel;
     } else {
         return undefined;
     }
@@ -282,22 +282,22 @@ function getWebview(): vscode.Webview | undefined {
         webviewViewProvider
     ) {
         return webviewViewProvider.getWebview();
-    } else if (PetPanel.currentPanel) {
-        return PetPanel.currentPanel.getWebview();
+    } else if (PokemonPanel.currentPanel) {
+        return PokemonPanel.currentPanel.getWebview();
     }
 }
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pets.start', async () => {
+        vscode.commands.registerCommand('vscode-pokemon.start', async () => {
             if (
                 getConfigurationPosition() === ExtPosition.explorer &&
                 webviewViewProvider
             ) {
-                await vscode.commands.executeCommand('petsView.focus');
+                await vscode.commands.executeCommand('pokemonView.focus');
             } else {
-                const spec = PetSpecification.fromConfiguration();
-                PetPanel.createOrShow(
+                const spec = PokemonSpecification.fromConfiguration();
+                PokemonPanel.createOrShow(
                     context.extensionUri,
                     spec.color,
                     spec.type,
@@ -307,13 +307,13 @@ export function activate(context: vscode.ExtensionContext) {
                     getThrowWithMouseConfiguration(),
                 );
 
-                if (PetPanel.currentPanel) {
-                    var collection = PetSpecification.collectionFromMemento(
+                if (PokemonPanel.currentPanel) {
+                    var collection = PokemonSpecification.collectionFromMemento(
                         context,
                         getConfiguredSize(),
                     );
                     collection.forEach((item) => {
-                        PetPanel.currentPanel?.spawnPet(item);
+                        PokemonPanel.currentPanel?.spawnPokemon(item);
                     });
                     // Store the collection in the memento, incase any of the null values (e.g. name) have been set
                     await storeCollectionAsMemento(context, collection);
@@ -322,12 +322,12 @@ export function activate(context: vscode.ExtensionContext) {
         }),
     );
 
-    spawnPetStatusBar = vscode.window.createStatusBarItem(
+    spawnPokemonStatusBar = vscode.window.createStatusBarItem(
         vscode.StatusBarAlignment.Right,
         100,
     );
-    spawnPetStatusBar.command = 'vscode-pets.spawn-pet';
-    context.subscriptions.push(spawnPetStatusBar);
+    spawnPokemonStatusBar.command = 'vscode-pokemon.spawn-pokemon';
+    context.subscriptions.push(spawnPokemonStatusBar);
 
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(updateStatusBar),
@@ -342,8 +342,8 @@ export function activate(context: vscode.ExtensionContext) {
     );
     updateStatusBar();
 
-    const spec = PetSpecification.fromConfiguration();
-    webviewViewProvider = new PetWebviewViewProvider(
+    const spec = PokemonSpecification.fromConfiguration();
+    webviewViewProvider = new PokemonWebviewViewProvider(
         context.extensionUri,
         spec.color,
         spec.type,
@@ -358,51 +358,51 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
-            PetWebviewViewProvider.viewType,
+            PokemonWebviewViewProvider.viewType,
             webviewViewProvider,
         ),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pets.delete-pet', async () => {
-            const panel = getPetPanel();
+        vscode.commands.registerCommand('vscode-pokemon.delete-pokemon', async () => {
+            const panel = getPokemonPanel();
             if (panel !== undefined) {
-                panel.listPets();
+                panel.listPokemon();
                 getWebview()?.onDidReceiveMessage(
-                    handleRemovePetMessage,
+                    handleRemovePokemonMessage,
                     context,
                 );
             } else {
-                await createPetPlayground(context);
+                await createPokemonPlayground(context);
             }
         }),
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pets.roll-call', async () => {
-            const panel = getPetPanel();
+        vscode.commands.registerCommand('vscode-pokemon.roll-call', async () => {
+            const panel = getPokemonPanel();
             if (panel !== undefined) {
                 panel.rollCall();
             } else {
-                await createPetPlayground(context);
+                await createPokemonPlayground(context);
             }
         }),
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pets.export-pet-list',
+            'vscode-pokemon.export-pokemon-list',
             async () => {
-                const pets = PetSpecification.collectionFromMemento(
+                const pokemonCollection = PokemonSpecification.collectionFromMemento(
                     context,
                     getConfiguredSize(),
                 );
-                const petJson = JSON.stringify(pets, null, 2);
-                const fileName = `pets-${Date.now()}.json`;
+                const pokemonJson = JSON.stringify(pokemonCollection, null, 2);
+                const fileName = `pokemonCollection-${Date.now()}.json`;
                 if (!vscode.workspace.workspaceFolders) {
                     await vscode.window.showErrorMessage(
                         vscode.l10n.t(
-                            'You must have a folder or workspace open to export pets.',
+                            'You must have a folder or workspace open to export pokemonCollection.',
                         ),
                     );
                     return;
@@ -424,7 +424,7 @@ export function activate(context: vscode.ExtensionContext) {
                                 await editor.edit((edit) => {
                                     edit.insert(
                                         new vscode.Position(0, 0),
-                                        petJson,
+                                        pokemonJson,
                                     );
                                 });
                             });
@@ -435,11 +435,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pets.import-pet-list',
+            'vscode-pokemon.import-pokemon-list',
             async () => {
                 const options: vscode.OpenDialogOptions = {
                     canSelectMany: false,
-                    openLabel: 'Open pets.json',
+                    openLabel: 'Open pokemonCollection.json',
                     filters: {
                         json: ['json'],
                     },
@@ -452,38 +452,38 @@ export function activate(context: vscode.ExtensionContext) {
                         const fileContents = await vscode.workspace.fs.readFile(
                             fileUri[0],
                         );
-                        const petsToLoad = JSON.parse(
+                        const pokemonToLoad = JSON.parse(
                             String.fromCharCode.apply(
                                 null,
                                 Array.from(fileContents),
                             ),
                         );
 
-                        // load the pets into the collection
-                        var collection = PetSpecification.collectionFromMemento(
+                        // load the pokemon into the collection
+                        var collection = PokemonSpecification.collectionFromMemento(
                             context,
                             getConfiguredSize(),
                         );
-                        // fetch just the pet types
-                        const panel = getPetPanel();
-                        for (let i = 0; i < petsToLoad.length; i++) {
-                            const pet = petsToLoad[i];
-                            const petSpec = new PetSpecification(
-                                normalizeColor(pet.color, pet.type),
-                                pet.type,
-                                pet.size,
-                                pet.name,
+                        // fetch just the pokemon types
+                        const panel = getPokemonPanel();
+                        for (let i = 0; i < pokemonToLoad.length; i++) {
+                            const pokemon = pokemonToLoad[i];
+                            const pokemonSpec = new PokemonSpecification(
+                                normalizeColor(pokemon.color, pokemon.type),
+                                pokemon.type,
+                                pokemon.size,
+                                pokemon.name,
                             );
-                            collection.push(petSpec);
+                            collection.push(pokemonSpec);
                             if (panel !== undefined) {
-                                panel.spawnPet(petSpec);
+                                panel.spawnPokemon(pokemonSpec);
                             }
                         }
                         await storeCollectionAsMemento(context, collection);
                     } catch (e: any) {
                         await vscode.window.showErrorMessage(
                             vscode.l10n.t(
-                                'Failed to import pets: {0}',
+                                'Failed to import pokemon: {0}',
                                 e?.message,
                             ),
                         );
@@ -494,10 +494,10 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pets.spawn-pet', async () => {
-            const panel = getPetPanel();
+        vscode.commands.registerCommand('vscode-pokemon.spawn-pokemon', async () => {
+            const panel = getPokemonPanel();
             if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
-                await vscode.commands.executeCommand('petsView.focus');
+                await vscode.commands.executeCommand('pokemonView.focus');
             }
             if (panel) {
                 // First, select a generation
@@ -517,7 +517,7 @@ export function activate(context: vscode.ExtensionContext) {
                 );
 
                 if (!selectedGeneration) {
-                    console.log('Cancelled Spawning Pet - No Generation Selected');
+                    console.log('Cancelled Spawning Pokemon - No Generation Selected');
                     return;
                 }
 
@@ -529,21 +529,21 @@ export function activate(context: vscode.ExtensionContext) {
                     description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`
                 }));
 
-                const selectedPetType = await vscode.window.showQuickPick(
+                const selectedPokemonType = await vscode.window.showQuickPick(
                     pokemonOptions,
                     {
                         placeHolder: vscode.l10n.t('Select a Pokémon'),
                     }
                 );
 
-                if (!selectedPetType) {
-                    console.log('Cancelled Spawning Pet - No Pokémon Selected');
+                if (!selectedPokemonType) {
+                    console.log('Cancelled Spawning Pokemon - No Pokémon Selected');
                     return;
                 }
 
                 // Rest of the existing code
-                var petColor: PokemonColor = DEFAULT_COLOR;
-                const possibleColors = availableColors(selectedPetType.value);
+                var pokemonColor: PokemonColor = DEFAULT_COLOR;
+                const possibleColors = availableColors(selectedPokemonType.value);
 
                 if (possibleColors.length > 1) {
                     var selectedColor = await vscode.window.showQuickPick(
@@ -555,36 +555,36 @@ export function activate(context: vscode.ExtensionContext) {
                         },
                     );
                     if (!selectedColor) {
-                        console.log('Cancelled Spawning Pet - No Color Selected');
+                        console.log('Cancelled Spawning Pokemon - No Color Selected');
                         return;
                     }
-                    petColor = selectedColor.value;
+                    pokemonColor = selectedColor.value;
                 } else {
-                    petColor = possibleColors[0];
+                    pokemonColor = possibleColors[0];
                 }
 
                 const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
                     prompt: vscode.l10n.t('Name your Pokémon'),
-                    value: randomName(selectedPetType.value),
+                    value: randomName(selectedPokemonType.value),
                 });
 
-                const spec = new PetSpecification(
-                    petColor,
-                    selectedPetType.value,
+                const spec = new PokemonSpecification(
+                    pokemonColor,
+                    selectedPokemonType.value,
                     getConfiguredSize(),
                     name,
                 );
 
-                panel.spawnPet(spec);
-                var collection = PetSpecification.collectionFromMemento(
+                panel.spawnPokemon(spec);
+                var collection = PokemonSpecification.collectionFromMemento(
                     context,
                     getConfiguredSize(),
                 );
                 collection.push(spec);
                 await storeCollectionAsMemento(context, collection);
             } else {
-                await createPetPlayground(context);
+                await createPokemonPlayground(context);
                 await vscode.window.showInformationMessage(
                     vscode.l10n.t(
                         "A Pokemon Playground has been created. You can now use the 'Spawn Additional Pokemon' Command to add more Pokemon.",
@@ -596,14 +596,14 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pets.remove-all-pets',
+            'vscode-pokemon.remove-all-pokemon',
             async () => {
-                const panel = getPetPanel();
+                const panel = getPokemonPanel();
                 if (panel !== undefined) {
-                    panel.resetPets();
+                    panel.resetPokemon();
                     await storeCollectionAsMemento(context, []);
                 } else {
-                    await createPetPlayground(context);
+                    await createPokemonPlayground(context);
                     await vscode.window.showInformationMessage(
                         vscode.l10n.t(
                             "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
@@ -619,18 +619,18 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeConfiguration(
             (e: vscode.ConfigurationChangeEvent): void => {
                 if (
-                    e.affectsConfiguration('vscode-pets.petColor') ||
-                    e.affectsConfiguration('vscode-pets.petType') ||
-                    e.affectsConfiguration('vscode-pets.petSize') ||
-                    e.affectsConfiguration('vscode-pets.theme') ||
+                    e.affectsConfiguration('vscode-pokemon.pokemonColor') ||
+                    e.affectsConfiguration('vscode-pokemon.pokemonType') ||
+                    e.affectsConfiguration('vscode-pokemon.pokemonSize') ||
+                    e.affectsConfiguration('vscode-pokemon.theme') ||
                     e.affectsConfiguration('workbench.colorTheme')
                 ) {
-                    const spec = PetSpecification.fromConfiguration();
-                    const panel = getPetPanel();
+                    const spec = PokemonSpecification.fromConfiguration();
+                    const panel = getPokemonPanel();
                     if (panel) {
-                        panel.updatePetColor(spec.color);
-                        panel.updatePetSize(spec.size);
-                        panel.updatePetType(spec.type);
+                        panel.updatePokemonColor(spec.color);
+                        panel.updatePokemonSize(spec.size);
+                        panel.updatePokemonType(spec.type);
                         panel.updateTheme(
                             getConfiguredTheme(),
                             getConfiguredThemeKind(),
@@ -639,11 +639,11 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                 }
 
-                if (e.affectsConfiguration('vscode-pets.position')) {
+                if (e.affectsConfiguration('vscode-pokemon.position')) {
                     void updateExtensionPositionContext();
                 }
 
-                if (e.affectsConfiguration('vscode-pets.throwBallWithMouse')) {
+                if (e.affectsConfiguration('vscode-pokemon.throwBallWithMouse')) {
                     updatePanelThrowWithMouse();
                 }
             },
@@ -652,14 +652,14 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (vscode.window.registerWebviewPanelSerializer) {
         // Make sure we register a serializer in activation event
-        vscode.window.registerWebviewPanelSerializer(PetPanel.viewType, {
+        vscode.window.registerWebviewPanelSerializer(PokemonPanel.viewType, {
             async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel) {
                 // Reset the webview options so we use latest uri for `localResourceRoots`.
                 webviewPanel.webview.options = getWebviewOptions(
                     context.extensionUri,
                 );
-                const spec = PetSpecification.fromConfiguration();
-                PetPanel.revive(
+                const spec = PokemonSpecification.fromConfiguration();
+                PokemonPanel.revive(
                     webviewPanel,
                     context.extensionUri,
                     spec.color,
@@ -675,13 +675,13 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function updateStatusBar(): void {
-    spawnPetStatusBar.text = `$(squirrel)`;
-    spawnPetStatusBar.tooltip = vscode.l10n.t('Spawn Pet');
-    spawnPetStatusBar.show();
+    spawnPokemonStatusBar.text = `$(squirrel)`;
+    spawnPokemonStatusBar.tooltip = vscode.l10n.t('Spawn Pokemon');
+    spawnPokemonStatusBar.show();
 }
 
-export function spawnPetDeactivate() {
-    spawnPetStatusBar.dispose();
+export function spawnPokemonDeactivate() {
+    spawnPokemonStatusBar.dispose();
 }
 
 function getWebviewOptions(
@@ -695,29 +695,29 @@ function getWebviewOptions(
     };
 }
 
-interface IPetPanel {
+interface IPokemonPanel {
     // throwBall(): void;
-    resetPets(): void;
-    spawnPet(spec: PetSpecification): void;
-    deletePet(petName: string): void;
-    listPets(): void;
+    resetPokemon(): void;
+    spawnPokemon(spec: PokemonSpecification): void;
+    deletePokemon(pokemonName: string): void;
+    listPokemon(): void;
     rollCall(): void;
     themeKind(): vscode.ColorThemeKind;
     throwBallWithMouse(): boolean;
-    updatePetColor(newColor: PokemonColor): void;
-    updatePetType(newType: PokemonType): void;
-    updatePetSize(newSize: PokemonSize): void;
+    updatePokemonColor(newColor: PokemonColor): void;
+    updatePokemonType(newType: PokemonType): void;
+    updatePokemonSize(newSize: PokemonSize): void;
     updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind): void;
     update(): void;
     setThrowWithMouse(newThrowWithMouse: boolean): void;
 }
 
-class PetWebviewContainer implements IPetPanel {
+class PokemonWebviewContainer implements IPokemonPanel {
     protected _extensionUri: vscode.Uri;
     protected _disposables: vscode.Disposable[] = [];
-    protected _petColor: PokemonColor;
-    protected _petType: PokemonType;
-    protected _petSize: PokemonSize;
+    protected _pokemonColor: PokemonColor;
+    protected _pokemonType: PokemonType;
+    protected _pokemonSize: PokemonSize;
     protected _theme: Theme;
     protected _themeKind: vscode.ColorThemeKind;
     protected _throwBallWithMouse: boolean;
@@ -732,24 +732,24 @@ class PetWebviewContainer implements IPetPanel {
         throwBallWithMouse: boolean,
     ) {
         this._extensionUri = extensionUri;
-        this._petColor = color;
-        this._petType = type;
-        this._petSize = size;
+        this._pokemonColor = color;
+        this._pokemonType = type;
+        this._pokemonSize = size;
         this._theme = theme;
         this._themeKind = themeKind;
         this._throwBallWithMouse = throwBallWithMouse;
     }
 
-    public petColor(): PokemonColor {
-        return normalizeColor(this._petColor, this._petType);
+    public pokemonColor(): PokemonColor {
+        return normalizeColor(this._pokemonColor, this._pokemonType);
     }
 
-    public petType(): PokemonType {
-        return this._petType;
+    public pokemonType(): PokemonType {
+        return this._pokemonType;
     }
 
-    public petSize(): PokemonSize {
-        return this._petSize;
+    public pokemonSize(): PokemonSize {
+        return this._pokemonSize;
     }
 
     public theme(): Theme {
@@ -764,16 +764,16 @@ class PetWebviewContainer implements IPetPanel {
         return this._throwBallWithMouse;
     }
 
-    public updatePetColor(newColor: PokemonColor) {
-        this._petColor = newColor;
+    public updatePokemonColor(newColor: PokemonColor) {
+        this._pokemonColor = newColor;
     }
 
-    public updatePetType(newType: PokemonType) {
-        this._petType = newType;
+    public updatePokemonType(newType: PokemonType) {
+        this._pokemonType = newType;
     }
 
-    public updatePetSize(newSize: PokemonSize) {
-        this._petSize = newSize;
+    public updatePokemonSize(newSize: PokemonSize) {
+        this._pokemonSize = newSize;
     }
 
     public updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind) {
@@ -795,15 +795,15 @@ class PetWebviewContainer implements IPetPanel {
         });
     }
 
-    public resetPets(): void {
+    public resetPokemon(): void {
         void this.getWebview().postMessage({
-            command: 'reset-pet',
+            command: 'reset-pokemon',
         });
     }
 
-    public spawnPet(spec: PetSpecification) {
+    public spawnPokemon(spec: PokemonSpecification) {
         void this.getWebview().postMessage({
-            command: 'spawn-pet',
+            command: 'spawn-pokemon',
             type: spec.type,
             color: spec.color,
             name: spec.name,
@@ -814,18 +814,18 @@ class PetWebviewContainer implements IPetPanel {
         });
     }
 
-    public listPets() {
-        void this.getWebview().postMessage({ command: 'list-pets' });
+    public listPokemon() {
+        void this.getWebview().postMessage({ command: 'list-pokemon' });
     }
 
     public rollCall(): void {
         void this.getWebview().postMessage({ command: 'roll-call' });
     }
 
-    public deletePet(petName: string) {
+    public deletePokemon(pokemonName: string) {
         void this.getWebview().postMessage({
-            command: 'delete-pet',
-            name: petName,
+            command: 'delete-pokemon',
+            name: pokemonName,
         });
     }
 
@@ -860,7 +860,7 @@ class PetWebviewContainer implements IPetPanel {
         const stylesPathMainPath = vscode.Uri.joinPath(
             this._extensionUri,
             'media',
-            'pets.css',
+            'pokemon.css',
         );
         const silkScreenFontPath = webview.asWebviewUri(
             vscode.Uri.joinPath(
@@ -875,7 +875,7 @@ class PetWebviewContainer implements IPetPanel {
         const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
 
         // Get path to resource on disk
-        const basePetUri = webview.asWebviewUri(
+        const basePokemonUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, 'media'),
         );
 
@@ -906,11 +906,11 @@ class PetWebviewContainer implements IPetPanel {
 				<title>VS Code Pokemon</title>
 			</head>
 			<body>
-				<canvas id="petCanvas"></canvas>
-				<div id="petsContainer"></div>
+				<canvas id="pokemonCanvas"></canvas>
+				<div id="pokemonContainer"></div>
 				<div id="foreground"></div>	
 				<script nonce="${nonce}" src="${scriptUri}"></script>
-				<script nonce="${nonce}">petApp.petPanelApp("${basePetUri}", "${this.theme()}", ${this.themeKind()}, "${this.petColor()}", "${this.petSize()}", "${this.petType()}", ${this.throwBallWithMouse()});</script>
+				<script nonce="${nonce}">pokemonApp.pokemonPanelApp("${basePokemonUri}", "${this.theme()}", ${this.themeKind()}, "${this.pokemonColor()}", "${this.pokemonSize()}", "${this.pokemonType()}", ${this.throwBallWithMouse()});</script>
 			</body>
 			</html>`;
     }
@@ -928,23 +928,23 @@ function handleWebviewMessage(message: WebviewMessage) {
 }
 
 /**
- * Manages pet coding webview panels
+ * Manages pokemon coding webview panels
  */
-class PetPanel extends PetWebviewContainer implements IPetPanel {
+class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
     /**
      * Track the currently panel. Only allow a single panel to exist at a time.
      */
-    public static currentPanel: PetPanel | undefined;
+    public static currentPanel: PokemonPanel | undefined;
 
-    public static readonly viewType = 'petCoding';
+    public static readonly viewType = 'pokemonCoding';
 
     private readonly _panel: vscode.WebviewPanel;
 
     public static createOrShow(
         extensionUri: vscode.Uri,
-        petColor: PokemonColor,
-        petType: PokemonType,
-        petSize: PokemonSize,
+        pokemonColor: PokemonColor,
+        pokemonType: PokemonType,
+        pokemonSize: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -953,77 +953,77 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
         // If we already have a panel, show it.
-        if (PetPanel.currentPanel) {
+        if (PokemonPanel.currentPanel) {
             if (
-                petColor === PetPanel.currentPanel.petColor() &&
-                petType === PetPanel.currentPanel.petType() &&
-                petSize === PetPanel.currentPanel.petSize()
+                pokemonColor === PokemonPanel.currentPanel.pokemonColor() &&
+                pokemonType === PokemonPanel.currentPanel.pokemonType() &&
+                pokemonSize === PokemonPanel.currentPanel.pokemonSize()
             ) {
-                PetPanel.currentPanel._panel.reveal(column);
+                PokemonPanel.currentPanel._panel.reveal(column);
                 return;
             } else {
-                PetPanel.currentPanel.updatePetColor(petColor);
-                PetPanel.currentPanel.updatePetType(petType);
-                PetPanel.currentPanel.updatePetSize(petSize);
-                PetPanel.currentPanel.update();
+                PokemonPanel.currentPanel.updatePokemonColor(pokemonColor);
+                PokemonPanel.currentPanel.updatePokemonType(pokemonType);
+                PokemonPanel.currentPanel.updatePokemonSize(pokemonSize);
+                PokemonPanel.currentPanel.update();
             }
         }
 
         // Otherwise, create a new panel.
         const panel = vscode.window.createWebviewPanel(
-            PetPanel.viewType,
-            vscode.l10n.t('Pet Panel'),
+            PokemonPanel.viewType,
+            vscode.l10n.t('Pokemon Panel'),
             vscode.ViewColumn.Two,
             getWebviewOptions(extensionUri),
         );
 
-        PetPanel.currentPanel = new PetPanel(
+        PokemonPanel.currentPanel = new PokemonPanel(
             panel,
             extensionUri,
-            petColor,
-            petType,
-            petSize,
+            pokemonColor,
+            pokemonType,
+            pokemonSize,
             theme,
             themeKind,
             throwBallWithMouse,
         );
     }
 
-    public resetPets() {
-        void this.getWebview().postMessage({ command: 'reset-pet' });
+    public resetPokemon() {
+        void this.getWebview().postMessage({ command: 'reset-pokemon' });
     }
 
-    public listPets() {
-        void this.getWebview().postMessage({ command: 'list-pets' });
+    public listPokemon() {
+        void this.getWebview().postMessage({ command: 'list-pokemon' });
     }
 
     public rollCall(): void {
         void this.getWebview().postMessage({ command: 'roll-call' });
     }
 
-    public deletePet(petName: string): void {
+    public deletePokemon(pokemonName: string): void {
         void this.getWebview().postMessage({
-            command: 'delete-pet',
-            name: petName,
+            command: 'delete-pokemon',
+            name: pokemonName,
         });
     }
 
     public static revive(
         panel: vscode.WebviewPanel,
         extensionUri: vscode.Uri,
-        petColor: PokemonColor,
-        petType: PokemonType,
-        petSize: PokemonSize,
+        pokemonColor: PokemonColor,
+        pokemonType: PokemonType,
+        pokemonSize: PokemonSize,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
     ) {
-        PetPanel.currentPanel = new PetPanel(
+        PokemonPanel.currentPanel = new PokemonPanel(
             panel,
             extensionUri,
-            petColor,
-            petType,
-            petSize,
+            pokemonColor,
+            pokemonType,
+            pokemonSize,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1077,7 +1077,7 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
     }
 
     public dispose() {
-        PetPanel.currentPanel = undefined;
+        PokemonPanel.currentPanel = undefined;
 
         // Clean up our resources
         this._panel.dispose();
@@ -1101,8 +1101,8 @@ class PetPanel extends PetWebviewContainer implements IPetPanel {
     }
 }
 
-class PetWebviewViewProvider extends PetWebviewContainer {
-    public static readonly viewType = 'petsView';
+class PokemonWebviewViewProvider extends PokemonWebviewContainer {
+    public static readonly viewType = 'pokemonView';
 
     private _webviewView?: vscode.WebviewView;
 
@@ -1127,7 +1127,7 @@ class PetWebviewViewProvider extends PetWebviewContainer {
         if (this._webviewView === undefined) {
             throw new Error(
                 vscode.l10n.t(
-                    'Panel not active, make sure the pets view is visible before running this command.',
+                    'Panel not active, make sure the pokemon view is visible before running this command.',
                 ),
             );
         } else {
@@ -1146,9 +1146,9 @@ function getNonce() {
     return text;
 }
 
-async function createPetPlayground(context: vscode.ExtensionContext) {
-    const spec = PetSpecification.fromConfiguration();
-    PetPanel.createOrShow(
+async function createPokemonPlayground(context: vscode.ExtensionContext) {
+    const spec = PokemonSpecification.fromConfiguration();
+    PokemonPanel.createOrShow(
         context.extensionUri,
         spec.color,
         spec.type,
@@ -1157,17 +1157,17 @@ async function createPetPlayground(context: vscode.ExtensionContext) {
         getConfiguredThemeKind(),
         getThrowWithMouseConfiguration(),
     );
-    if (PetPanel.currentPanel) {
-        var collection = PetSpecification.collectionFromMemento(
+    if (PokemonPanel.currentPanel) {
+        var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),
         );
         collection.forEach((item) => {
-            PetPanel.currentPanel?.spawnPet(item);
+            PokemonPanel.currentPanel?.spawnPokemon(item);
         });
         await storeCollectionAsMemento(context, collection);
     } else {
-        var collection = PetSpecification.collectionFromMemento(
+        var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),
         );

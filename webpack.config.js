@@ -5,41 +5,41 @@ var removeSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-
 
 
 const desktopConfig = {
-  mode: "development",
-  devtool: "inline-source-map",
-  entry: {
-    main: "./src/panel/main.ts",
-  },
-  output: {
-    path: path.resolve(__dirname, './media'),
-    filename: "[name]-bundle.js", // <--- Will be compiled to this single file
-    library: {
-      name: 'petApp',
-      type: 'global'
-    }
-  },
-  plugins: [
-    new removeSourceMapUrlWebpackPlugin({
-      test: /main-bundle\.js$/
-    })
-  ],
-  resolve: {
-    extensions: [".ts", ".tsx", ".js"],
-  },
-  module: {
-    rules: [{
-      test: /\.ts$/,
-      exclude: /node_modules/,
-      use: [
-          {
-              loader: 'ts-loader',
-              options: {
-                configFile : 'tsconfig.panel.json'
-              }
-          },
-      ],
-    }]
-  },
+	mode: "development",
+	devtool: "inline-source-map",
+	entry: {
+		main: "./src/panel/main.ts",
+	},
+	output: {
+		path: path.resolve(__dirname, './media'),
+		filename: "[name]-bundle.js", // <--- Will be compiled to this single file
+		library: {
+			name: 'pokemonApp',
+			type: 'global'
+		}
+	},
+	plugins: [
+		new removeSourceMapUrlWebpackPlugin({
+			test: /main-bundle\.js$/
+		})
+	],
+	resolve: {
+		extensions: [".ts", ".tsx", ".js"],
+	},
+	module: {
+		rules: [{
+			test: /\.ts$/,
+			exclude: /node_modules/,
+			use: [
+				{
+					loader: 'ts-loader',
+					options: {
+						configFile: 'tsconfig.panel.json'
+					}
+				},
+			],
+		}]
+	},
 };
 
 const webExtensionConfig = {
@@ -65,8 +65,8 @@ const webExtensionConfig = {
 			// see https://webpack.js.org/configuration/resolve/#resolvefallback
 			// for the list of Node.js core module polyfills.
 			"assert": require.resolve('assert'),
-      "path": require.resolve("path-browserify"),
-      "fs": false,
+			"path": require.resolve("path-browserify"),
+			"fs": false,
 		},
 	},
 	module: {
@@ -77,9 +77,9 @@ const webExtensionConfig = {
 				use: [
 					{
 						loader: 'ts-loader',
-            options: {
-              configFile : 'tsconfig.web.json'
-            }
+						options: {
+							configFile: 'tsconfig.web.json'
+						}
 					},
 				],
 			},

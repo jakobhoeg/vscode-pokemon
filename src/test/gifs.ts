@@ -2,28 +2,28 @@ import * as fs from 'fs';
 
 import { getAllPokemon, PokemonColor } from '../common/types';
 
-const defaultPetConfig = {
+const defaultPokemonConfig = {
     colors: [PokemonColor.default],
     states: ['idle', 'walk']
 };
 
-const pets = getAllPokemon().reduce((acc, pokemon) => ({
+const allPokemon = getAllPokemon().reduce((acc, pokemon) => ({
     ...acc,
-    [pokemon]: defaultPetConfig
+    [pokemon]: defaultPokemonConfig
 }), {} as { [key: string]: { colors: string[]; states: string[] } });
 
 function checkGifFilenames(folder: string) {
-    for (const pet in pets) {
-        const allowedColors = pets[pet].colors;
-        const allowedStates = pets[pet].states;
+    for (const pokemon in allPokemon) {
+        const allowedColors = allPokemon[pokemon].colors;
+        const allowedStates = allPokemon[pokemon].states;
         if (!allowedColors) {
-            console.error(`No colors found for pet "${pet}"`);
+            console.error(`No colors found for pokemon "${pokemon}"`);
             return;
         }
         allowedColors.forEach((color) => {
             allowedStates.forEach((state) => {
                 const filename = `${color}_${state}_8fps.gif`;
-                const filePath = `${folder}/${pet}/${filename}`;
+                const filePath = `${folder}/${pokemon}/${filename}`;
                 if (!fs.existsSync(filePath)) {
                     // \x1b[31m is the ANSI escape code for red, and \x1b[0m resets the color back to the terminal's default.
                     console.error(

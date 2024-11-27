@@ -6,7 +6,7 @@
 	--input-margin-horizontal: 0;
 }
 
-*{
+* {
 	user-select: none;
 }
 
@@ -20,7 +20,8 @@ body {
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-position: bottom left;
-	overflow: hidden; /* Hide scrollbars */
+	overflow: hidden;
+	/* Hide scrollbars */
 }
 
 #foreground {
@@ -40,8 +41,8 @@ ul {
 	padding-left: var(--container-paddding);
 }
 
-body > *,
-form > * {
+body>*,
+form>* {
 	margin-block-start: var(--input-margin-vertical);
 	margin-block-end: var(--input-margin-vertical);
 }
@@ -110,20 +111,20 @@ textarea::placeholder {
 	color: var(--vscode-input-placeholderForeground);
 }
 
-#petCanvas{
-	position:fixed; 
-	bottom:0;
-	left:0; 
+#pokemonCanvas {
+	position: fixed;
+	bottom: 0;
+	left: 0;
 	z-index: 3;
 }
 
-img.pet {
+img.pokemon {
 	-webkit-transform: scaleX(-1);
 	transform: scaleX(-1);
 	position: absolute;
 	left: 0px;
 	right: 0px;
-	bottom:0px;
+	bottom: 0px;
 	z-index: 2;
 }
 
@@ -131,7 +132,7 @@ img.pet {
 	position: absolute;
 	left: 0px;
 	right: 0px;
-	bottom:0px;
+	bottom: 0px;
 	z-index: 999;
 }
 

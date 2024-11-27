@@ -2,11 +2,11 @@ import { PokemonColor, PokemonSize, PokemonSpeed, PokemonType } from '../common/
 import { Pokemon } from './pokemon';
 import { IPokemonType } from './states';
 
-export class PetElement {
+export class PokemonElement {
     el: HTMLImageElement;
     collision: HTMLDivElement;
     speech: HTMLDivElement;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
     color: PokemonColor;
     type: PokemonType;
     remove() {
@@ -20,100 +20,100 @@ export class PetElement {
         el: HTMLImageElement,
         collision: HTMLDivElement,
         speech: HTMLDivElement,
-        pet: IPokemonType,
+        pokemon: IPokemonType,
         color: PokemonColor,
         type: PokemonType,
     ) {
         this.el = el;
         this.collision = collision;
         this.speech = speech;
-        this.pet = pet;
+        this.pokemon = pokemon;
         this.color = color;
         this.type = type;
     }
 }
 
-export interface IPetCollection {
-    pets: Array<PetElement>;
-    push(pet: PetElement): void;
+export interface IPokemonCollection {
+    pokemonCollection: Array<PokemonElement>;
+    push(pokemon: PokemonElement): void;
     reset(): void;
     seekNewFriends(): string[];
-    locate(name: string): PetElement | undefined;
+    locate(name: string): PokemonElement | undefined;
     remove(name: string): void;
 }
 
-export class PetCollection implements IPetCollection {
-    private _pets: Array<PetElement>;
+export class PokemonCollection implements IPokemonCollection {
+    private _pokemonCollection: Array<PokemonElement>;
 
     constructor() {
-        this._pets = new Array(0);
+        this._pokemonCollection = new Array(0);
     }
 
-    public get pets() {
-        return this._pets;
+    public get pokemonCollection() {
+        return this._pokemonCollection;
     }
 
-    push(pet: PetElement) {
-        this._pets.push(pet);
+    push(pokemon: PokemonElement) {
+        this._pokemonCollection.push(pokemon);
     }
 
     reset() {
-        this._pets.forEach((pet) => {
-            pet.remove();
+        this._pokemonCollection.forEach((pokemon) => {
+            pokemon.remove();
         });
-        this._pets = [];
+        this._pokemonCollection = [];
     }
 
-    locate(name: string): PetElement | undefined {
-        return this._pets.find((collection) => {
-            return collection.pet.name === name;
+    locate(name: string): PokemonElement | undefined {
+        return this._pokemonCollection.find((collection) => {
+            return collection.pokemon.name === name;
         });
     }
 
     remove(name: string): any {
-        this._pets.forEach((pet) => {
-            if (pet.pet.name === name) {
-                pet.remove();
+        this._pokemonCollection.forEach((pokemon) => {
+            if (pokemon.pokemon.name === name) {
+                pokemon.remove();
             }
         });
-        this._pets = this._pets.filter((pet) => {
-            return pet.pet.name !== name;
+        this._pokemonCollection = this._pokemonCollection.filter((pokemon) => {
+            return pokemon.pokemon.name !== name;
         });
     }
 
     seekNewFriends(): string[] {
-        if (this._pets.length <= 1) {
+        if (this._pokemonCollection.length <= 1) {
             return [];
         } // You can't be friends with yourself.
         var messages = new Array<string>(0);
-        this._pets.forEach((petInCollection) => {
-            if (petInCollection.pet.hasFriend) {
+        this._pokemonCollection.forEach((pokemonInCollection) => {
+            if (pokemonInCollection.pokemon.hasFriend) {
                 return;
             } // I already have a friend!
-            this._pets.forEach((potentialFriend) => {
-                if (potentialFriend.pet.hasFriend) {
+            this._pokemonCollection.forEach((potentialFriend) => {
+                if (potentialFriend.pokemon.hasFriend) {
                     return;
                 } // Already has a friend. sorry.
-                if (!potentialFriend.pet.canChase) {
+                if (!potentialFriend.pokemon.canChase) {
                     return;
-                } // Pet is busy doing something else.
+                } // Pokemon is busy doing something else.
                 if (
-                    potentialFriend.pet.left > petInCollection.pet.left &&
-                    potentialFriend.pet.left <
-                    petInCollection.pet.left + petInCollection.pet.width
+                    potentialFriend.pokemon.left > pokemonInCollection.pokemon.left &&
+                    potentialFriend.pokemon.left <
+                    pokemonInCollection.pokemon.left + pokemonInCollection.pokemon.width
                 ) {
                     // We found a possible new friend..
                     console.log(
-                        petInCollection.pet.name,
+                        pokemonInCollection.pokemon.name,
                         ' wants to be friends with ',
-                        potentialFriend.pet.name,
+                        potentialFriend.pokemon.name,
                         '.',
                     );
                     if (
-                        petInCollection.pet.makeFriendsWith(potentialFriend.pet)
+                        pokemonInCollection.pokemon.makeFriendsWith(potentialFriend.pokemon)
                     ) {
-                        potentialFriend.pet.showSpeechBubble('❤️', 2000);
-                        petInCollection.pet.showSpeechBubble('❤️', 2000);
+                        potentialFriend.pokemon.showSpeechBubble('❤️', 2000);
+                        pokemonInCollection.pokemon.showSpeechBubble('❤️', 2000);
                     }
                 }
             });
@@ -122,7 +122,7 @@ export class PetCollection implements IPetCollection {
     }
 }
 
-export class InvalidPetException {
+export class InvalidPokemonException {
     message?: string;
 
     constructor(message?: string) {
@@ -130,47 +130,47 @@ export class InvalidPetException {
     }
 }
 
-export function createPet(
-    petType: string,
+export function createPokemon(
+    pokemonType: string,
     el: HTMLImageElement,
     collision: HTMLDivElement,
     speech: HTMLDivElement,
     size: PokemonSize,
     left: number,
     bottom: number,
-    petRoot: string,
+    pokemonRoot: string,
     floor: number,
     name: string,
 ): IPokemonType {
     if (!name) {
-        throw new InvalidPetException('name is undefined');
+        throw new InvalidPokemonException('name is undefined');
     }
 
     try {
         return new Pokemon(
-            petType,
+            pokemonType,
             el,
             collision,
             speech,
             size,
             left,
             bottom,
-            petRoot,
+            pokemonRoot,
             floor,
             name,
             PokemonSpeed.normal
         );
     } catch (error) {
-        throw new InvalidPetException(`Invalid Pokemon type: ${petType}`);
+        throw new InvalidPokemonException(`Invalid Pokemon type: ${pokemonType}`);
     }
 }
 
-export function availableColors(petType: PokemonType): PokemonColor[] {
-    const pokemon = Pokemon.getPokemonData(petType);
+export function availableColors(pokemonType: PokemonType): PokemonColor[] {
+    const pokemon = Pokemon.getPokemonData(pokemonType);
     return pokemon ? pokemon.possibleColors : [PokemonColor.default];
 }
 
-export function normalizeColor(petColor: PokemonColor, petType: PokemonType): PokemonColor {
-    const colors = availableColors(petType);
-    return colors.includes(petColor) ? petColor : colors[0];
+export function normalizeColor(pokemonColor: PokemonColor, pokemonType: PokemonType): PokemonColor {
+    const colors = availableColors(pokemonType);
+    return colors.includes(pokemonColor) ? pokemonColor : colors[0];
 }
