@@ -587,7 +587,7 @@ export function activate(context: vscode.ExtensionContext) {
                 await createPetPlayground(context);
                 await vscode.window.showInformationMessage(
                     vscode.l10n.t(
-                        "A Pet Playground has been created. You can now use the 'Spawn Additional Pet' Command to add more pets.",
+                        "A Pokemon Playground has been created. You can now use the 'Spawn Additional Pokemon' Command to add more Pokemon.",
                     ),
                 );
             }
@@ -606,7 +606,7 @@ export function activate(context: vscode.ExtensionContext) {
                     await createPetPlayground(context);
                     await vscode.window.showInformationMessage(
                         vscode.l10n.t(
-                            "A Pet Playground has been created. You can now use the 'Remove All Pets' Command to remove all pets.",
+                            "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
                         ),
                     );
                 }
