@@ -1,9 +1,9 @@
 import { POKEMON_DATA, PokemonColor, PokemonConfig, PokemonGeneration, PokemonSize } from '../common/types';
-import { BasePetType } from './basepettype';
+import { BasePokemonType } from './base-pokemon-type';
 import { States } from './states';
 
 
-export class Pokemon extends BasePetType {
+export class Pokemon extends BasePokemonType {
   private config: PokemonConfig;
 
   constructor(
@@ -14,12 +14,12 @@ export class Pokemon extends BasePetType {
     size: PokemonSize,
     left: number,
     bottom: number,
-    petRoot: string,
+    pokemonRoot: string,
     floor: number,
     name: string,
     speed: number,
   ) {
-    super(spriteElement, collisionElement, speechElement, size, left, bottom, petRoot, floor, name, speed);
+    super(spriteElement, collisionElement, speechElement, size, left, bottom, pokemonRoot, floor, name, speed);
 
     this.config = POKEMON_DATA[pokemonType] || POKEMON_DATA.bulbasaur;
     this.label = pokemonType;

@@ -15,16 +15,16 @@ import {
 
 export class InvalidStateError extends Error {
     fromState: States;
-    petType: string;
+    pokemonType: string;
 
-    constructor(fromState: States, petType: string) {
-        super(`Invalid state ${fromState} for pet type ${petType}`);
+    constructor(fromState: States, pokemonType: string) {
+        super(`Invalid state ${fromState} for pokemon type ${pokemonType}`);
         this.fromState = fromState;
-        this.petType = petType;
+        this.pokemonType = pokemonType;
     }
 }
 
-export abstract class BasePetType implements IPokemonType {
+export abstract class BasePokemonType implements IPokemonType {
     label: string = 'base';
     static count: number = 0;
     sequence: ISequenceTree = {
@@ -41,7 +41,7 @@ export abstract class BasePetType implements IPokemonType {
     private speech: HTMLDivElement;
     private _left: number;
     private _bottom: number;
-    petRoot: string;
+    pokemonRoot: string;
     _floor: number;
     _friend: IPokemonType | undefined;
     private _name: string;
@@ -55,7 +55,7 @@ export abstract class BasePetType implements IPokemonType {
         size: PokemonSize,
         left: number,
         bottom: number,
-        petRoot: string,
+        pokemonRoot: string,
         floor: number,
         name: string,
         speed: number,
@@ -63,7 +63,7 @@ export abstract class BasePetType implements IPokemonType {
         this.el = spriteElement;
         this.collision = collisionElement;
         this.speech = speechElement;
-        this.petRoot = petRoot;
+        this.pokemonRoot = pokemonRoot;
         this._floor = floor;
         this._left = left;
         this._bottom = bottom;
@@ -75,7 +75,7 @@ export abstract class BasePetType implements IPokemonType {
         this._size = size;
         this._speed = this.randomizeSpeed(speed);
 
-        // Increment the static count of the Pet class that the constructor belongs to
+        // Increment the static count of the Pokemon class that the constructor belongs to
         (this.constructor as any).count += 1;
     }
 
@@ -237,7 +237,7 @@ export abstract class BasePetType implements IPokemonType {
         if (this.el.src.endsWith(`_${face}_8fps.gif`)) {
             return;
         }
-        this.el.src = `${this.petRoot}_${face}_8fps.gif`;
+        this.el.src = `${this.pokemonRoot}_${face}_8fps.gif`;
     }
 
     chooseNextState(fromState: States): States {
