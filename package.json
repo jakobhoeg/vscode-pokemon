@@ -149,6 +149,9 @@
                             "bulbasaur",
                             "ivysaur",
                             "venusaur",
+                            "charmander",
+                            "charmeleon",
+                            "charizard",
                             "dragonite"
                         ],
                         "default": "bulbasaur",

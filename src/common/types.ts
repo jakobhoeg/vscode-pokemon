@@ -44,6 +44,27 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
         cry: 'Venu!',
         possibleColors: [PokemonColor.default]
     },
+    charmander: {
+        id: 4,
+        name: 'Charmander',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Char!',
+        possibleColors: [PokemonColor.default]
+    },
+    charmeleon: {
+        id: 5,
+        name: 'Charmeleon',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Char!',
+        possibleColors: [PokemonColor.default]
+    },
+    charizard: {
+        id: 6,
+        name: 'Charizard',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Char!',
+        possibleColors: [PokemonColor.default]
+    },
     dragonite: {
         id: 149,
         name: 'Dragonite',

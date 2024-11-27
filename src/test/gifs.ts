@@ -22,6 +22,27 @@ const pets: { [key: string]: { colors: string[]; states: string[] } } = {
             'walk',
         ]
     },
+    charmander: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
+    charmeleon: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
+    charizard: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
     dragonite: {
         colors: ['default'],
         states: [
