@@ -79,37 +79,21 @@ export abstract class BasePetType implements IPokemonType {
         (this.constructor as any).count += 1;
     }
 
-    initSprite(petSize: PokemonSize, left: number, bottom: number) {
-        // Store size for later use
-        this._size = petSize;
-
-        // Position elements
+    initSprite(pokemonSize: PokemonSize, left: number, bottom: number) {
         this.el.style.left = `${left}px`;
         this.el.style.bottom = `${bottom}px`;
-
-        // Calculate size based on petSize
-        const spriteSize = this.calculateSpriteWidth(petSize);
-
-        // Apply size to sprite
-        this.el.style.width = `${spriteSize}px`;
-        this.el.style.height = `${spriteSize}px`;
-
-        // Apply size to collision box
+        this.el.style.width = 'auto';
+        this.el.style.height = 'auto';
+        this.el.style.maxWidth = `${this.calculateSpriteWidth(pokemonSize)}px`;
+        this.el.style.maxHeight = `${this.calculateSpriteWidth(pokemonSize)}px`;
         this.collision.style.left = `${left}px`;
         this.collision.style.bottom = `${bottom}px`;
-        this.collision.style.width = `${spriteSize}px`;
-        this.collision.style.height = `${spriteSize}px`;
-
-        // Position speech bubble above sprite
+        this.collision.style.width = `${this.calculateSpriteWidth(pokemonSize)}px`;
+        this.collision.style.height = `${this.calculateSpriteWidth(pokemonSize)}px`;
         this.speech.style.left = `${left}px`;
-        this.speech.style.bottom = `${bottom + spriteSize}px`;
-
-        // Hide speech bubble initially
+        this.speech.style.bottom = `${bottom + this.calculateSpriteWidth(pokemonSize)
+            }px`;
         this.hideSpeechBubble();
-
-        // Add size class for any CSS-based styling
-        this.el.className = `pet pet-${petSize}`;
-        this.collision.className = `collision pet-${petSize}`;
     }
 
     get left(): number {
