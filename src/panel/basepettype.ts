@@ -1,16 +1,16 @@
 import { PokemonColor, PokemonGeneration, PokemonSize, PokemonSpeed } from '../common/types';
-import { IPokemonType } from './states';
 import { ISequenceTree } from './sequences';
 import {
     States,
     IState,
     resolveState,
-    PetInstanceState,
+    PokemonInstanceState,
     isStateAboveGround,
     BallState,
     ChaseState,
     HorizontalDirection,
     FrameResult,
+    IPokemonType,
 } from './states';
 
 export class InvalidStateError extends Error {
@@ -152,7 +152,7 @@ export abstract class BasePetType implements IPokemonType {
         return ` says hello 👋!`;
     }
 
-    getState(): PetInstanceState {
+    getState(): PokemonInstanceState {
         return { currentStateEnum: this.currentStateEnum };
     }
 
@@ -176,7 +176,7 @@ export abstract class BasePetType implements IPokemonType {
         this._friend = friend;
     }
 
-    recoverState(state: PetInstanceState) {
+    recoverState(state: PokemonInstanceState) {
         // TODO : Resolve a bug where if it was swiping before, it would fail
         // because holdState is no longer valid.
         this.currentStateEnum = state.currentStateEnum ?? States.sitIdle;

@@ -13,8 +13,8 @@ export interface IPokemonType {
     hello: string;
 
     // State API
-    getState(): PetInstanceState;
-    recoverState(state: PetInstanceState): void;
+    getState(): PokemonInstanceState;
+    recoverState(state: PokemonInstanceState): void;
     recoverFriend(friend: IPokemonType): void;
 
     // Positioning
@@ -36,23 +36,23 @@ export interface IPokemonType {
     showSpeechBubble(message: string, duration: number): void;
 }
 
-export class PetInstanceState {
+export class PokemonInstanceState {
     currentStateEnum: States | undefined;
 }
 
-export class PetElementState {
-    petState: PetInstanceState | undefined;
-    petType: PokemonType | undefined;
-    petColor: PokemonColor | undefined;
+export class PokemonElementState {
+    pokemonState: PokemonInstanceState | undefined;
+    pokemonType: PokemonType | undefined;
+    pokemonColor: PokemonColor | undefined;
     elLeft: string | undefined;
     elBottom: string | undefined;
-    petName: string | undefined;
-    petFriend: string | undefined;
+    pokemonName: string | undefined;
+    pokemonFriend: string | undefined;
 }
 
-export class PetPanelState {
-    petStates: Array<PetElementState> | undefined;
-    petCounter: number | undefined;
+export class PokemonPanelState {
+    pokemonStates: Array<PokemonElementState> | undefined;
+    pokemonCounter: number | undefined;
 }
 
 export enum HorizontalDirection {
@@ -112,47 +112,47 @@ export function isStateAboveGround(state: States): boolean {
     );
 }
 
-export function resolveState(state: string, pet: IPokemonType): IState {
+export function resolveState(state: string, pokemon: IPokemonType): IState {
     switch (state) {
         case States.sitIdle:
-            return new SitIdleState(pet);
+            return new SitIdleState(pokemon);
         case States.walkRight:
-            return new WalkRightState(pet);
+            return new WalkRightState(pokemon);
         case States.walkLeft:
-            return new WalkLeftState(pet);
+            return new WalkLeftState(pokemon);
         case States.runRight:
-            return new RunRightState(pet);
+            return new RunRightState(pokemon);
         case States.runLeft:
-            return new RunLeftState(pet);
+            return new RunLeftState(pokemon);
         case States.lie:
-            return new LieState(pet);
+            return new LieState(pokemon);
         case States.wallHangLeft:
-            return new WallHangLeftState(pet);
+            return new WallHangLeftState(pokemon);
         case States.climbWallLeft:
-            return new ClimbWallLeftState(pet);
+            return new ClimbWallLeftState(pokemon);
         case States.jumpDownLeft:
-            return new JumpDownLeftState(pet);
+            return new JumpDownLeftState(pokemon);
         case States.land:
-            return new LandState(pet);
+            return new LandState(pokemon);
         case States.swipe:
-            return new SwipeState(pet);
+            return new SwipeState(pokemon);
         case States.idleWithBall:
-            return new IdleWithBallState(pet);
+            return new IdleWithBallState(pokemon);
         case States.chaseFriend:
-            return new ChaseFriendState(pet);
+            return new ChaseFriendState(pokemon);
         case States.standRight:
-            return new StandRightState(pet);
+            return new StandRightState(pokemon);
         case States.standLeft:
-            return new StandLeftState(pet);
+            return new StandLeftState(pokemon);
     }
-    return new SitIdleState(pet);
+    return new SitIdleState(pokemon);
 }
 
 export interface IState {
     label: string;
     spriteLabel: string;
     horizontalDirection: HorizontalDirection;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
     nextFrame(): FrameResult;
 }
 
@@ -161,13 +161,13 @@ class AbstractStaticState implements IState {
     idleCounter: number;
     spriteLabel = 'idle';
     holdTime = 50;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
 
     horizontalDirection = HorizontalDirection.left;
 
-    constructor(pet: IPokemonType) {
+    constructor(pokemon: IPokemonType) {
         this.idleCounter = 0;
-        this.pet = pet;
+        this.pokemon = pokemon;
     }
 
     nextFrame(): FrameResult {
@@ -223,7 +223,7 @@ export class IdleWithBallState extends AbstractStaticState {
 
 export class WalkRightState implements IState {
     label = States.walkRight;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
     spriteLabel = 'walk';
     horizontalDirection = HorizontalDirection.right;
     leftBoundary: number;
@@ -231,23 +231,23 @@ export class WalkRightState implements IState {
     idleCounter: number;
     holdTime = 60;
 
-    constructor(pet: IPokemonType) {
+    constructor(pokemon: IPokemonType) {
         this.leftBoundary = Math.floor(window.innerWidth * 0.95);
-        this.pet = pet;
+        this.pokemon = pokemon;
         this.idleCounter = 0;
     }
 
     nextFrame(): FrameResult {
         this.idleCounter++;
-        this.pet.positionLeft(
-            this.pet.left + this.pet.speed * this.speedMultiplier,
+        this.pokemon.positionLeft(
+            this.pokemon.left + this.pokemon.speed * this.speedMultiplier,
         );
         if (
-            this.pet.isMoving &&
-            this.pet.left >= this.leftBoundary - this.pet.width
+            this.pokemon.isMoving &&
+            this.pokemon.left >= this.leftBoundary - this.pokemon.width
         ) {
             return FrameResult.stateComplete;
-        } else if (!this.pet.isMoving && this.idleCounter > this.holdTime) {
+        } else if (!this.pokemon.isMoving && this.idleCounter > this.holdTime) {
             return FrameResult.stateComplete;
         }
         return FrameResult.stateContinue;
@@ -258,23 +258,23 @@ export class WalkLeftState implements IState {
     label = States.walkLeft;
     spriteLabel = 'walk';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
     speedMultiplier = 1;
     idleCounter: number;
     holdTime = 60;
 
-    constructor(pet: IPokemonType) {
-        this.pet = pet;
+    constructor(pokemon: IPokemonType) {
+        this.pokemon = pokemon;
         this.idleCounter = 0;
     }
 
     nextFrame(): FrameResult {
-        this.pet.positionLeft(
-            this.pet.left - this.pet.speed * this.speedMultiplier,
+        this.pokemon.positionLeft(
+            this.pokemon.left - this.pokemon.speed * this.speedMultiplier,
         );
-        if (this.pet.isMoving && this.pet.left <= 0) {
+        if (this.pokemon.isMoving && this.pokemon.left <= 0) {
             return FrameResult.stateComplete;
-        } else if (!this.pet.isMoving && this.idleCounter > this.holdTime) {
+        } else if (!this.pokemon.isMoving && this.idleCounter > this.holdTime) {
             return FrameResult.stateComplete;
         }
         return FrameResult.stateContinue;
@@ -301,14 +301,14 @@ export class ChaseState implements IState {
     horizontalDirection = HorizontalDirection.left;
     ballState: BallState;
     canvas: HTMLCanvasElement;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
 
     constructor(
-        pet: IPokemonType,
+        pokemon: IPokemonType,
         ballState: BallState,
         canvas: HTMLCanvasElement,
     ) {
-        this.pet = pet;
+        this.pokemon = pokemon;
         this.ballState = ballState;
         this.canvas = canvas;
     }
@@ -317,19 +317,19 @@ export class ChaseState implements IState {
         if (this.ballState.paused) {
             return FrameResult.stateCancel; // Ball is already caught
         }
-        if (this.pet.left > this.ballState.cx) {
+        if (this.pokemon.left > this.ballState.cx) {
             this.horizontalDirection = HorizontalDirection.left;
-            this.pet.positionLeft(this.pet.left - this.pet.speed);
+            this.pokemon.positionLeft(this.pokemon.left - this.pokemon.speed);
         } else {
             this.horizontalDirection = HorizontalDirection.right;
-            this.pet.positionLeft(this.pet.left + this.pet.speed);
+            this.pokemon.positionLeft(this.pokemon.left + this.pokemon.speed);
         }
 
         if (
             this.canvas.height - this.ballState.cy <
-            this.pet.width + this.pet.floor &&
-            this.ballState.cx < this.pet.left &&
-            this.pet.left < this.ballState.cx + 15
+            this.pokemon.width + this.pokemon.floor &&
+            this.ballState.cx < this.pokemon.left &&
+            this.pokemon.left < this.ballState.cx + 15
         ) {
             // hide ball
             this.canvas.style.display = 'none';
@@ -344,23 +344,23 @@ export class ChaseFriendState implements IState {
     label = States.chaseFriend;
     spriteLabel = 'run';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
 
-    constructor(pet: IPokemonType) {
-        this.pet = pet;
+    constructor(pokemon: IPokemonType) {
+        this.pokemon = pokemon;
     }
 
     nextFrame(): FrameResult {
-        if (!this.pet.hasFriend || !this.pet.friend?.isPlaying) {
+        if (!this.pokemon.hasFriend || !this.pokemon.friend?.isPlaying) {
             return FrameResult.stateCancel; // Friend is no longer playing.
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        if (this.pet.left > this.pet.friend!.left) {
+        if (this.pokemon.left > this.pokemon.friend!.left) {
             this.horizontalDirection = HorizontalDirection.left;
-            this.pet.positionLeft(this.pet.left - this.pet.speed);
+            this.pokemon.positionLeft(this.pokemon.left - this.pokemon.speed);
         } else {
             this.horizontalDirection = HorizontalDirection.right;
-            this.pet.positionLeft(this.pet.left + this.pet.speed);
+            this.pokemon.positionLeft(this.pokemon.left + this.pokemon.speed);
         }
 
         return FrameResult.stateContinue;
@@ -371,15 +371,15 @@ export class ClimbWallLeftState implements IState {
     label = States.climbWallLeft;
     spriteLabel = 'wallclimb';
     horizontalDirection = HorizontalDirection.left;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
 
-    constructor(pet: IPokemonType) {
-        this.pet = pet;
+    constructor(pokemon: IPokemonType) {
+        this.pokemon = pokemon;
     }
 
     nextFrame(): FrameResult {
-        this.pet.positionBottom(this.pet.bottom + 1);
-        if (this.pet.bottom >= 100) {
+        this.pokemon.positionBottom(this.pokemon.bottom + 1);
+        if (this.pokemon.bottom >= 100) {
             return FrameResult.stateComplete;
         }
         return FrameResult.stateContinue;
@@ -390,16 +390,16 @@ export class JumpDownLeftState implements IState {
     label = States.jumpDownLeft;
     spriteLabel = 'fall_from_grab';
     horizontalDirection = HorizontalDirection.right;
-    pet: IPokemonType;
+    pokemon: IPokemonType;
 
-    constructor(pet: IPokemonType) {
-        this.pet = pet;
+    constructor(pokemon: IPokemonType) {
+        this.pokemon = pokemon;
     }
 
     nextFrame(): FrameResult {
-        this.pet.positionBottom(this.pet.bottom - 5);
-        if (this.pet.bottom <= this.pet.floor) {
-            this.pet.positionBottom(this.pet.floor);
+        this.pokemon.positionBottom(this.pokemon.bottom - 5);
+        if (this.pokemon.bottom <= this.pokemon.floor) {
+            this.pokemon.positionBottom(this.pokemon.floor);
             return FrameResult.stateComplete;
         }
         return FrameResult.stateContinue;
