@@ -1,56 +1,16 @@
 import * as fs from 'fs';
 
-const pets: { [key: string]: { colors: string[]; states: string[] } } = {
-    bulbasaur: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    ivysaur: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    venusaur: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    charmander: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    charmeleon: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    charizard: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
-    dragonite: {
-        colors: ['default'],
-        states: [
-            'idle',
-            'walk',
-        ]
-    },
+import { getAllPokemon, PokemonColor } from '../common/types';
+
+const defaultPetConfig = {
+    colors: [PokemonColor.default],
+    states: ['idle', 'walk']
 };
+
+const pets = getAllPokemon().reduce((acc, pokemon) => ({
+    ...acc,
+    [pokemon]: defaultPetConfig
+}), {} as { [key: string]: { colors: string[]; states: string[] } });
 
 function checkGifFilenames(folder: string) {
     for (const pet in pets) {

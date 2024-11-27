@@ -152,6 +152,9 @@
                             "charmander",
                             "charmeleon",
                             "charizard",
+                            "squirtle",
+                            "wartortle",
+                            "blastoise",
                             "dragonite"
                         ],
                         "default": "bulbasaur",
