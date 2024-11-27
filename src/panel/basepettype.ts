@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonSize, PokemonSpeed } from '../common/types';
+import { PokemonColor, PokemonGeneration, PokemonSize, PokemonSpeed } from '../common/types';
 import { IPokemonType } from './states';
 import { ISequenceTree } from './sequences';
 import {

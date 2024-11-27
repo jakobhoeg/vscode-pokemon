@@ -8,9 +8,12 @@ import {
     Theme,
     WebviewMessage,
     ALL_COLORS,
-    ALL_POKEMON,
     ALL_SCALES,
     ALL_THEMES,
+    getDefaultPokemon,
+    POKEMON_DATA,
+    getPokemonByGeneration,
+    PokemonGeneration,
 } from '../common/types';
 import { randomName } from '../common/names';
 import * as localize from '../common/localize';
@@ -22,7 +25,7 @@ const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
 const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
 const DEFAULT_POKEMON_SCALE = PokemonSize.nano;
 const DEFAULT_COLOR = PokemonColor.default;
-const DEFAULT_POKEMON_TYPE = PokemonType.bulbasaur;
+const DEFAULT_POKEMON_TYPE = getDefaultPokemon();
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
 
@@ -127,7 +130,9 @@ export class PetSpecification {
         var type = vscode.workspace
             .getConfiguration('vscode-pets')
             .get<PokemonType>('petType', DEFAULT_POKEMON_TYPE);
-        if (ALL_POKEMON.lastIndexOf(type) === -1) {
+
+        // Use POKEMON_DATA to validate the type
+        if (!POKEMON_DATA[type]) {
             type = DEFAULT_POKEMON_TYPE;
         }
 
@@ -359,15 +364,6 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pets.throw-ball', () => {
-            const panel = getPetPanel();
-            // if (panel !== undefined) {
-            //     panel.throwBall();
-            // }
-        }),
-    );
-
-    context.subscriptions.push(
         vscode.commands.registerCommand('vscode-pets.delete-pet', async () => {
             const panel = getPetPanel();
             if (panel !== undefined) {
@@ -500,25 +496,52 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-pets.spawn-pet', async () => {
             const panel = getPetPanel();
-            if (
-                getConfigurationPosition() === ExtPosition.explorer &&
-                webviewViewProvider
-            ) {
+            if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
                 await vscode.commands.executeCommand('petsView.focus');
             }
             if (panel) {
-                const selectedPetType = await vscode.window.showQuickPick(
-                    localize.stringListAsQuickPickItemList<PokemonType>(ALL_POKEMON),
+                // First, select a generation
+                const generations = Object.values(PokemonGeneration)
+                    .filter(gen => typeof gen === 'number')
+                    .map(gen => ({
+                        label: `Generation ${gen}`,
+                        value: gen as PokemonGeneration,
+                        description: `Gen ${gen} Pokémon`
+                    }));
+
+                const selectedGeneration = await vscode.window.showQuickPick(
+                    generations,
                     {
-                        placeHolder: vscode.l10n.t('Select a pet'),
-                    },
+                        placeHolder: vscode.l10n.t('Select a generation'),
+                    }
                 );
-                if (selectedPetType === undefined) {
-                    console.log(
-                        'Cancelled Spawning Pet - No Pet Type Selected',
-                    );
+
+                if (!selectedGeneration) {
+                    console.log('Cancelled Spawning Pet - No Generation Selected');
                     return;
                 }
+
+                // Get Pokémon from selected generation
+                const pokemonInGeneration = getPokemonByGeneration(selectedGeneration.value);
+                const pokemonOptions = pokemonInGeneration.map(type => ({
+                    label: POKEMON_DATA[type].name,
+                    value: type,
+                    description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`
+                }));
+
+                const selectedPetType = await vscode.window.showQuickPick(
+                    pokemonOptions,
+                    {
+                        placeHolder: vscode.l10n.t('Select a Pokémon'),
+                    }
+                );
+
+                if (!selectedPetType) {
+                    console.log('Cancelled Spawning Pet - No Pokémon Selected');
+                    return;
+                }
+
+                // Rest of the existing code
                 var petColor: PokemonColor = DEFAULT_COLOR;
                 const possibleColors = availableColors(selectedPetType.value);
 
@@ -531,10 +554,8 @@ export function activate(context: vscode.ExtensionContext) {
                             placeHolder: vscode.l10n.t('Select a color'),
                         },
                     );
-                    if (selectedColor === undefined) {
-                        console.log(
-                            'Cancelled Spawning Pet - No Pet Color Selected',
-                        );
+                    if (!selectedColor) {
+                        console.log('Cancelled Spawning Pet - No Color Selected');
                         return;
                     }
                     petColor = selectedColor.value;
@@ -542,31 +563,20 @@ export function activate(context: vscode.ExtensionContext) {
                     petColor = possibleColors[0];
                 }
 
-                if (petColor === undefined) {
-                    console.log(
-                        'Cancelled Spawning Pet - No Pet Color Selected',
-                    );
-                    return;
-                }
-
                 const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
-                    prompt: vscode.l10n.t('Name your pet'),
+                    prompt: vscode.l10n.t('Name your Pokémon'),
                     value: randomName(selectedPetType.value),
                 });
+
                 const spec = new PetSpecification(
                     petColor,
                     selectedPetType.value,
                     getConfiguredSize(),
                     name,
                 );
-                if (!spec.type || !spec.color || !spec.size) {
-                    return vscode.window.showWarningMessage(
-                        vscode.l10n.t('Cancelled Spawning Pet'),
-                    );
-                } else if (spec) {
-                    panel.spawnPet(spec);
-                }
+
+                panel.spawnPet(spec);
                 var collection = PetSpecification.collectionFromMemento(
                     context,
                     getConfiguredSize(),

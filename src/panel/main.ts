@@ -235,21 +235,16 @@ function recoverState(
 
     var recoveryMap: Map<IPokemonType, PetElementState> = new Map();
     state?.petStates?.forEach((p) => {
-        // Fixes a bug related to duck animations
-        if ((p.petType as string) === 'rubber duck') {
-            (p.petType as string) = 'rubber-duck';
-        }
-
         try {
             var newPet = addPetToPanel(
-                p.petType ?? PokemonType.bulbasaur,
+                p.petType ?? 'bulbasaur',
                 basePetUri,
                 p.petColor ?? PokemonColor.default,
                 petSize,
                 parseInt(p.elLeft ?? '0'),
                 parseInt(p.elBottom ?? '0'),
                 floor,
-                p.petName ?? randomName(p.petType ?? PokemonType.bulbasaur),
+                p.petName ?? randomName(p.petType ?? 'bulbasaur'),
                 stateApi,
             );
             allPets.push(newPet);
@@ -342,140 +337,6 @@ export function petPanelApp(
         foregroundEl!.style.backgroundImage = '';
     }
 
-    /// Bouncing ball components, credit https://stackoverflow.com/a/29982343
-    const gravity: number = 0.6,
-        damping: number = 0.9,
-        traction: number = 0.8,
-        interval: number = 1000 / 24; // msec for single frame
-    let then: number = 0; // last draw
-    var ballState: BallState;
-
-    function resetBall() {
-        if (ballState) {
-            ballState.paused = true;
-        }
-        if (canvas) {
-            canvas.style.display = 'block';
-        }
-        ballState = new BallState(100, 100, 4, 5);
-    }
-
-    // function dynamicThrowOn() {
-    //     let startMouseX: number;
-    //     let startMouseY: number;
-    //     let endMouseX: number;
-    //     let endMouseY: number;
-    //     console.log('Enabling dynamic throw');
-    //     window.onmousedown = (e) => {
-    //         if (ballState) {
-    //             ballState.paused = true;
-    //         }
-    //         if (canvas) {
-    //             canvas.style.display = 'block';
-    //         }
-    //         endMouseX = e.clientX;
-    //         endMouseY = e.clientY;
-    //         startMouseX = e.clientX;
-    //         startMouseY = e.clientY;
-    //         ballState = new BallState(e.clientX, e.clientY, 0, 0);
-
-    //         allPets.pets.forEach((petEl) => {
-    //             if (petEl.pet.canChase) {
-    //                 petEl.pet.chase(ballState, canvas);
-    //             }
-    //         });
-    //         ballState.paused = true;
-
-    //         drawBall();
-
-    //         window.onmousemove = (ev) => {
-    //             ev.preventDefault();
-    //             if (ballState) {
-    //                 ballState.paused = true;
-    //             }
-    //             startMouseX = endMouseX;
-    //             startMouseY = endMouseY;
-    //             endMouseX = ev.clientX;
-    //             endMouseY = ev.clientY;
-    //             ballState = new BallState(ev.clientX, ev.clientY, 0, 0);
-    //             drawBall();
-    //         };
-    //         window.onmouseup = (ev) => {
-    //             ev.preventDefault();
-    //             window.onmouseup = null;
-    //             window.onmousemove = null;
-
-    //             ballState = new BallState(
-    //                 endMouseX,
-    //                 endMouseY,
-    //                 endMouseX - startMouseX,
-    //                 endMouseY - startMouseY,
-    //             );
-    //             allPets.pets.forEach((petEl) => {
-    //                 if (petEl.pet.canChase) {
-    //                     petEl.pet.chase(ballState, canvas);
-    //                 }
-    //             });
-    //             throwBall();
-    //         };
-    //     };
-    // }
-    function dynamicThrowOff() {
-        console.log('Disabling dynamic throw');
-        window.onmousedown = null;
-        if (ballState) {
-            ballState.paused = true;
-        }
-        if (canvas) {
-            canvas.style.display = 'none';
-        }
-    }
-    function throwBall() {
-        if (!ballState.paused) {
-            requestAnimationFrame(throwBall);
-        }
-
-        // throttling the frame rate
-        const now = Date.now();
-        const elapsed = now - then;
-        if (elapsed <= interval) {
-            return;
-        }
-        then = now - (elapsed % interval);
-
-        if (ballState.cx + ballRadius >= canvas.width) {
-            ballState.vx = -ballState.vx * damping;
-            ballState.cx = canvas.width - ballRadius;
-        } else if (ballState.cx - ballRadius <= 0) {
-            ballState.vx = -ballState.vx * damping;
-            ballState.cx = ballRadius;
-        }
-        if (ballState.cy + ballRadius + floor >= canvas.height) {
-            ballState.vy = -ballState.vy * damping;
-            ballState.cy = canvas.height - ballRadius - floor;
-            // traction here
-            ballState.vx *= traction;
-        } else if (ballState.cy - ballRadius <= 0) {
-            ballState.vy = -ballState.vy * damping;
-            ballState.cy = ballRadius;
-        }
-
-        ballState.vy += gravity;
-
-        ballState.cx += ballState.vx;
-        ballState.cy += ballState.vy;
-        drawBall();
-    }
-
-    function drawBall() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.beginPath();
-        ctx.arc(ballState.cx, ballState.cy, ballRadius, 0, 2 * Math.PI, false);
-        ctx.fillStyle = '#2ed851';
-        ctx.fill();
-    }
-
     console.log(
         'Starting pet session',
         petColor,
@@ -510,32 +371,10 @@ export function petPanelApp(
 
     initCanvas();
 
-    // if (throwBallWithMouse) {
-    //     dynamicThrowOn();
-    // } else {
-    //     dynamicThrowOff();
-    // }
-
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
-            // case 'throw-with-mouse':
-            //     if (message.enabled) {
-            //         dynamicThrowOn();
-            //     } else {
-            //         dynamicThrowOff();
-            //     }
-            //     break;
-            // case 'throw-ball':
-            //     resetBall();
-            //     throwBall();
-            //     allPets.pets.forEach((petEl) => {
-            //         if (petEl.pet.canChase) {
-            //             petEl.pet.chase(ballState, canvas);
-            //         }
-            //     });
-            //     break;
             case 'spawn-pet':
                 allPets.push(
                     addPetToPanel(

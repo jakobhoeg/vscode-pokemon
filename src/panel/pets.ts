@@ -1,7 +1,5 @@
 import { PokemonColor, PokemonSize, PokemonSpeed, PokemonType } from '../common/types';
-import { Bulbasaur } from './pets/bulbasaur';
-import { Dragonite } from './pets/dragonite';
-import { Ivysaur } from './pets/ivysaur';
+import { Pokemon } from './pokemon';
 import { IPokemonType } from './states';
 
 export class PetElement {
@@ -16,7 +14,6 @@ export class PetElement {
         this.collision.remove();
         this.speech.remove();
         this.color = PokemonColor.null;
-        this.type = PokemonType.null;
     }
 
     constructor(
@@ -145,58 +142,35 @@ export function createPet(
     floor: number,
     name: string,
 ): IPokemonType {
-    if (name === undefined || name === null || name === '') {
+    if (!name) {
         throw new InvalidPetException('name is undefined');
     }
 
-    const standardPetArguments: [
-        HTMLImageElement,
-        HTMLDivElement,
-        HTMLDivElement,
-        PokemonSize,
-        number,
-        number,
-        string,
-        number,
-        string,
-    ] = [el, collision, speech, size, left, bottom, petRoot, floor, name];
-
-    switch (petType) {
-        case PokemonType.bulbasaur:
-            return new Bulbasaur(...standardPetArguments, PokemonSpeed.normal);
-        case PokemonType.ivysaur:
-            return new Ivysaur(...standardPetArguments, PokemonSpeed.normal);
-        case PokemonType.dragonite:
-            return new Dragonite(...standardPetArguments, PokemonSpeed.normal);
-        default:
-            throw new InvalidPetException("Pet type doesn't exist");
+    try {
+        return new Pokemon(
+            petType,
+            el,
+            collision,
+            speech,
+            size,
+            left,
+            bottom,
+            petRoot,
+            floor,
+            name,
+            PokemonSpeed.normal
+        );
+    } catch (error) {
+        throw new InvalidPetException(`Invalid Pokemon type: ${petType}`);
     }
 }
 
 export function availableColors(petType: PokemonType): PokemonColor[] {
-    switch (petType) {
-        case PokemonType.bulbasaur:
-            return Bulbasaur.possibleColors;
-        case PokemonType.ivysaur:
-            return Ivysaur.possibleColors;
-        case PokemonType.dragonite:
-            return Dragonite.possibleColors;
-        default:
-            throw new InvalidPetException("Pet type doesn't exist");
-    }
+    const pokemon = Pokemon.getPokemonData(petType);
+    return pokemon ? pokemon.possibleColors : [PokemonColor.default];
 }
 
-/**
- * Some pets can only have certain colors, this makes sure they haven't been misconfigured.
- * @param petColor
- * @param petType
- * @returns normalized color
- */
 export function normalizeColor(petColor: PokemonColor, petType: PokemonType): PokemonColor {
     const colors = availableColors(petType);
-    if (colors.includes(petColor)) {
-        return petColor;
-    } else {
-        return colors[0];
-    }
+    return colors.includes(petColor) ? petColor : colors[0];
 }

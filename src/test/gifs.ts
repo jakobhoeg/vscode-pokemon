@@ -15,6 +15,13 @@ const pets: { [key: string]: { colors: string[]; states: string[] } } = {
             'walk',
         ]
     },
+    venusaur: {
+        colors: ['default'],
+        states: [
+            'idle',
+            'walk',
+        ]
+    },
     dragonite: {
         colors: ['default'],
         states: [
