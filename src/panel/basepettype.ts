@@ -80,19 +80,36 @@ export abstract class BasePetType implements IPokemonType {
     }
 
     initSprite(petSize: PokemonSize, left: number, bottom: number) {
+        // Store size for later use
+        this._size = petSize;
+
+        // Position elements
         this.el.style.left = `${left}px`;
         this.el.style.bottom = `${bottom}px`;
-        this.el.style.width = 'auto';
-        this.el.style.height = 'auto';
-        this.el.style.maxWidth = `${this.calculateSpriteWidth(petSize)}px`;
-        this.el.style.maxHeight = `${this.calculateSpriteWidth(petSize)}px`;
+
+        // Calculate size based on petSize
+        const spriteSize = this.calculateSpriteWidth(petSize);
+
+        // Apply size to sprite
+        this.el.style.width = `${spriteSize}px`;
+        this.el.style.height = `${spriteSize}px`;
+
+        // Apply size to collision box
         this.collision.style.left = `${left}px`;
         this.collision.style.bottom = `${bottom}px`;
-        this.collision.style.width = `${this.calculateSpriteWidth(petSize)}px`;
-        this.collision.style.height = `${this.calculateSpriteWidth(petSize)}px`;
+        this.collision.style.width = `${spriteSize}px`;
+        this.collision.style.height = `${spriteSize}px`;
+
+        // Position speech bubble above sprite
         this.speech.style.left = `${left}px`;
-        this.speech.style.bottom = `${bottom + this.calculateSpriteWidth(petSize)}px`;
+        this.speech.style.bottom = `${bottom + spriteSize}px`;
+
+        // Hide speech bubble initially
         this.hideSpeechBubble();
+
+        // Add size class for any CSS-based styling
+        this.el.className = `pet pet-${petSize}`;
+        this.collision.className = `collision pet-${petSize}`;
     }
 
     get left(): number {
@@ -112,16 +129,17 @@ export abstract class BasePetType implements IPokemonType {
     }
 
     calculateSpriteWidth(size: PokemonSize): number {
-        if (size === PokemonSize.nano) {
-            return 30;
-        } else if (size === PokemonSize.small) {
-            return 40;
-        } else if (size === PokemonSize.medium) {
-            return 55;
-        } else if (size === PokemonSize.large) {
-            return 110;
-        } else {
-            return 30; // Shrug
+        switch (size) {
+            case PokemonSize.nano:
+                return 32;
+            case PokemonSize.small:
+                return 48;
+            case PokemonSize.medium:
+                return 64;
+            case PokemonSize.large:
+                return 96;
+            default:
+                return 32;
         }
     }
 
