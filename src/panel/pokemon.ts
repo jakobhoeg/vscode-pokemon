@@ -1,4 +1,5 @@
-import { POKEMON_DATA, PokemonColor, PokemonConfig, PokemonGeneration, PokemonSize } from '../common/types';
+import { POKEMON_DATA } from '../common/pokemon-data';
+import { PokemonColor, PokemonConfig, PokemonGeneration, PokemonSize } from '../common/types';
 import { BasePokemonType } from './base-pokemon-type';
 import { States } from './states';
 

@@ -10,14 +10,12 @@ import {
     ALL_COLORS,
     ALL_SCALES,
     ALL_THEMES,
-    getDefaultPokemon,
-    POKEMON_DATA,
-    getPokemonByGeneration,
     PokemonGeneration,
 } from '../common/types';
 import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
+import { getDefaultPokemon, getPokemonByGeneration, POKEMON_DATA } from '../common/pokemon-data';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
