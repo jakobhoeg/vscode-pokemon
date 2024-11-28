@@ -1,17 +1,17 @@
 <div align='center'>
 
-# VS Code Pets
+# VS Code Pokémon
 
-![icon](https://github.com/tonybaloney/vscode-pets/raw/main/icon.png)
+![icon](https://github.com/jakobhoeg/vscode-pokemon/raw/main/icon.png)
 </div>    
 
 <p align="center">
-    Puts a small, bored cat, an enthusiastic dog, a feisty snake, a rubber duck, or Clippy 📎 in your code editor to boost productivity.
+    Puts cute Pokémon as you remember them in your code editor to boost productivity.
     <br>
     <br>
-    <a href="https://github.com/tonybaloney/vscode-pets/issues/new?assignees=&labels=feature&template=bug_report.md&title=">Report a Bug</a>
+    <a href="https://github.com/jakobhoeg/vscode-pokemon/issues/new?assignees=&labels=feature&template=bug_report.md&title=">Report a Bug</a>
     ·
-    <a href="https://github.com/tonybaloney/vscode-pets/issues/new?assignees=&labels=feature&template=feature_request.md&title=">Request feature</a>
+    <a href="https://github.com/jakobhoeg/vscode-pokemon/issues/new?assignees=&labels=feature&template=feature_request.md&title=">Request feature</a>
 </p>
 
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/tonybaloney.vscode-pets?color=blue&logo=visual-studio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw)

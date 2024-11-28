@@ -2,31 +2,29 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "1.27.0",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.73.0"
     },
     "l10n": "./l10n",
     "repository": {
         "type": "github",
-        "url": "https://github.com/tonybaloney/vscode-pokemon"
+        "url": "https://github.com/jakobhoeg/vscode-pokemon"
     },
-    "homepage": "https://tonybaloney.github.io/vscode-pokemon",
-    "bugs": "https://github.com/tonybaloney/vscode-pokemon/issues",
-    "publisher": "tonybaloney",
+    "homepage": "https://github.com/jakobhoeg/vscode-pokemon",
+    "bugs": "https://github.com/jakobhoeg/vscode-pokemon/issues",
+    "publisher": "jakobhoeg",
     "categories": [
         "Other"
     ],
     "keywords": [
         "pokemon",
-        "cat",
-        "chicken",
-        "dog",
         "pets",
-        "clippy",
-        "rubber duck",
-        "horse",
-        "deno"
+        "pokémon",
+        "pixelart",
+        "pixel",
+        "pixel",
+        "vscode"
     ],
     "license": "MIT",
     "icon": "icon.png",

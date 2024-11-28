@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for ScratchTools
+about: Suggest an idea for vscode-pokemon
 title: ''
 labels: 'feature'
 assignees: ''
