@@ -16,7 +16,7 @@ import {
     IPokemonCollection,
     availableColors,
     InvalidPokemonException,
-} from './pets';
+} from './pokemon-collection';
 import { BallState, PokemonElementState, PokemonPanelState } from './states';
 
 /* This is how the VS Code API can be invoked from the panel */
