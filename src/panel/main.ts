@@ -1,86 +1,86 @@
 // This script will be run within the webview itself
 import { randomName } from '../common/names';
 import {
-    PetSize,
-    PetColor,
-    PetType,
+    PokemonSize,
+    PokemonColor,
+    PokemonType,
     Theme,
     ColorThemeKind,
     WebviewMessage,
 } from '../common/types';
-import { IPetType } from './states';
+import { IPokemonType } from './states';
 import {
-    createPet,
-    PetCollection,
-    PetElement,
-    IPetCollection,
+    createPokemon,
+    PokemonCollection,
+    PokemonElement,
+    IPokemonCollection,
     availableColors,
-    InvalidPetException,
-} from './pets';
-import { BallState, PetElementState, PetPanelState } from './states';
+    InvalidPokemonException,
+} from './pokemon-collection';
+import { BallState, PokemonElementState, PokemonPanelState } from './states';
 
 /* This is how the VS Code API can be invoked from the panel */
 declare global {
     interface VscodeStateApi {
-        getState(): PetPanelState | undefined; // API is actually Any, but we want it to be typed.
-        setState(state: PetPanelState): void;
+        getState(): PokemonPanelState | undefined; // API is actually Any, but we want it to be typed.
+        setState(state: PokemonPanelState): void;
         postMessage(message: WebviewMessage): void;
     }
     function acquireVsCodeApi(): VscodeStateApi;
 }
 
-export var allPets: IPetCollection = new PetCollection();
-var petCounter: number;
+export var allPokemon: IPokemonCollection = new PokemonCollection();
+var pokemonCounter: number;
 
-function calculateBallRadius(size: PetSize): number {
-    if (size === PetSize.nano) {
+function calculateBallRadius(size: PokemonSize): number {
+    if (size === PokemonSize.nano) {
         return 2;
-    } else if (size === PetSize.small) {
+    } else if (size === PokemonSize.small) {
         return 3;
-    } else if (size === PetSize.medium) {
+    } else if (size === PokemonSize.medium) {
         return 4;
-    } else if (size === PetSize.large) {
+    } else if (size === PokemonSize.large) {
         return 8;
     } else {
         return 1; // Shrug
     }
 }
 
-function calculateFloor(size: PetSize, theme: Theme): number {
+function calculateFloor(size: PokemonSize, theme: Theme): number {
     switch (theme) {
         case Theme.forest:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 30;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 40;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 65;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 23;
             }
         case Theme.castle:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 60;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 80;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 120;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 45;
             }
         case Theme.beach:
             switch (size) {
-                case PetSize.small:
+                case PokemonSize.small:
                     return 60;
-                case PetSize.medium:
+                case PokemonSize.medium:
                     return 80;
-                case PetSize.large:
+                case PokemonSize.large:
                     return 120;
-                case PetSize.nano:
+                case PokemonSize.nano:
                 default:
                     return 45;
             }
@@ -90,19 +90,19 @@ function calculateFloor(size: PetSize, theme: Theme): number {
 
 function handleMouseOver(e: MouseEvent) {
     var el = e.currentTarget as HTMLDivElement;
-    allPets.pets.forEach((element) => {
+    allPokemon.pokemonCollection.forEach((element) => {
         if (element.collision === el) {
-            if (!element.pet.canSwipe) {
+            if (!element.pokemon.canSwipe) {
                 return;
             }
-            element.pet.swipe();
+            element.pokemon.swipe();
         }
     });
 }
 
 function startAnimations(
     collision: HTMLDivElement,
-    pet: IPetType,
+    pokemon: IPokemonType,
     stateApi?: VscodeStateApi,
 ) {
     if (!stateApi) {
@@ -111,83 +111,83 @@ function startAnimations(
 
     collision.addEventListener('mouseover', handleMouseOver);
     setInterval(() => {
-        var updates = allPets.seekNewFriends();
+        var updates = allPokemon.seekNewFriends();
         updates.forEach((message) => {
             stateApi?.postMessage({
                 text: message,
                 command: 'info',
             });
         });
-        pet.nextFrame();
+        pokemon.nextFrame();
         saveState(stateApi);
     }, 100);
 }
 
 function addPetToPanel(
-    petType: PetType,
+    pokemonType: PokemonType,
     basePetUri: string,
-    petColor: PetColor,
-    petSize: PetSize,
+    pokemonColor: PokemonColor,
+    pokemonSize: PokemonSize,
     left: number,
     bottom: number,
     floor: number,
     name: string,
     stateApi?: VscodeStateApi,
-): PetElement {
-    var petSpriteElement: HTMLImageElement = document.createElement('img');
-    petSpriteElement.className = 'pet';
-    (document.getElementById('petsContainer') as HTMLDivElement).appendChild(
-        petSpriteElement,
+): PokemonElement {
+    var pokemonSpriteElement: HTMLImageElement = document.createElement('img');
+    pokemonSpriteElement.className = 'pokemon';
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
+        pokemonSpriteElement,
     );
 
     var collisionElement: HTMLDivElement = document.createElement('div');
     collisionElement.className = 'collision';
-    (document.getElementById('petsContainer') as HTMLDivElement).appendChild(
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
         collisionElement,
     );
 
     var speechBubbleElement: HTMLDivElement = document.createElement('div');
-    speechBubbleElement.className = `bubble bubble-${petSize}`;
+    speechBubbleElement.className = `bubble bubble-${pokemonSize}`;
     speechBubbleElement.innerText = 'Hello!';
-    (document.getElementById('petsContainer') as HTMLDivElement).appendChild(
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
         speechBubbleElement,
     );
 
-    const root = basePetUri + '/' + petType + '/' + petColor;
-    console.log('Creating new pet : ', petType, root, petColor, petSize, name);
+    const root = basePetUri + '/' + pokemonType + '/' + pokemonColor;
+    console.log('Creating new pokemon : ', pokemonType, root, pokemonColor, pokemonSize, name);
     try {
-        if (!availableColors(petType).includes(petColor)) {
-            throw new InvalidPetException('Invalid color for pet type');
+        if (!availableColors(pokemonType).includes(pokemonColor)) {
+            throw new InvalidPokemonException('Invalid color for pokemon type');
         }
-        var newPet = createPet(
-            petType,
-            petSpriteElement,
+        var newPet = createPokemon(
+            pokemonType,
+            pokemonSpriteElement,
             collisionElement,
             speechBubbleElement,
-            petSize,
+            pokemonSize,
             left,
             bottom,
             root,
             floor,
             name,
         );
-        petCounter++;
+        pokemonCounter++;
         startAnimations(collisionElement, newPet, stateApi);
     } catch (e: any) {
         // Remove elements
-        petSpriteElement.remove();
+        pokemonSpriteElement.remove();
         collisionElement.remove();
         speechBubbleElement.remove();
         throw e;
     }
 
-    return new PetElement(
-        petSpriteElement,
+    return new PokemonElement(
+        pokemonSpriteElement,
         collisionElement,
         speechBubbleElement,
         newPet,
-        petColor,
-        petType,
+        pokemonColor,
+        pokemonType,
     );
 }
 
@@ -195,27 +195,27 @@ export function saveState(stateApi?: VscodeStateApi) {
     if (!stateApi) {
         stateApi = acquireVsCodeApi();
     }
-    var state = new PetPanelState();
-    state.petStates = new Array();
+    var state = new PokemonPanelState();
+    state.pokemonStates = new Array();
 
-    allPets.pets.forEach((petItem) => {
-        state.petStates?.push({
-            petName: petItem.pet.name,
-            petColor: petItem.color,
-            petType: petItem.type,
-            petState: petItem.pet.getState(),
-            petFriend: petItem.pet.friend?.name ?? undefined,
-            elLeft: petItem.el.style.left,
-            elBottom: petItem.el.style.bottom,
+    allPokemon.pokemonCollection.forEach((pokemonItem) => {
+        state.pokemonStates?.push({
+            pokemonName: pokemonItem.pokemon.name,
+            pokemonColor: pokemonItem.color,
+            pokemonType: pokemonItem.type,
+            pokemonState: pokemonItem.pokemon.getState(),
+            pokemonFriend: pokemonItem.pokemon.friend?.name ?? undefined,
+            elLeft: pokemonItem.el.style.left,
+            elBottom: pokemonItem.el.style.bottom,
         });
     });
-    state.petCounter = petCounter;
+    state.pokemonCounter = pokemonCounter;
     stateApi?.setState(state);
 }
 
 function recoverState(
     basePetUri: string,
-    petSize: PetSize,
+    pokemonSize: PokemonSize,
     floor: number,
     stateApi?: VscodeStateApi,
 ) {
@@ -224,54 +224,49 @@ function recoverState(
     }
     var state = stateApi?.getState();
     if (!state) {
-        petCounter = 1;
+        pokemonCounter = 1;
     } else {
-        if (state.petCounter === undefined || isNaN(state.petCounter)) {
-            petCounter = 1;
+        if (state.pokemonCounter === undefined || isNaN(state.pokemonCounter)) {
+            pokemonCounter = 1;
         } else {
-            petCounter = state.petCounter ?? 1;
+            pokemonCounter = state.pokemonCounter ?? 1;
         }
     }
 
-    var recoveryMap: Map<IPetType, PetElementState> = new Map();
-    state?.petStates?.forEach((p) => {
-        // Fixes a bug related to duck animations
-        if ((p.petType as string) === 'rubber duck') {
-            (p.petType as string) = 'rubber-duck';
-        }
-
+    var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
+    state?.pokemonStates?.forEach((p) => {
         try {
             var newPet = addPetToPanel(
-                p.petType ?? PetType.cat,
+                p.pokemonType ?? 'bulbasaur',
                 basePetUri,
-                p.petColor ?? PetColor.brown,
-                petSize,
+                p.pokemonColor ?? PokemonColor.default,
+                pokemonSize,
                 parseInt(p.elLeft ?? '0'),
                 parseInt(p.elBottom ?? '0'),
                 floor,
-                p.petName ?? randomName(p.petType ?? PetType.cat),
+                p.pokemonName ?? randomName(p.pokemonType ?? 'bulbasaur'),
                 stateApi,
             );
-            allPets.push(newPet);
-            recoveryMap.set(newPet.pet, p);
+            allPokemon.push(newPet);
+            recoveryMap.set(newPet.pokemon, p);
         } catch (InvalidPetException) {
             console.log(
-                'State had invalid pet (' + p.petType + '), discarding.',
+                'State had invalid pokemon (' + p.pokemonType + '), discarding.',
             );
         }
     });
-    recoveryMap.forEach((state, pet) => {
+    recoveryMap.forEach((state, pokemon) => {
         // Recover previous state.
-        if (state.petState !== undefined) {
-            pet.recoverState(state.petState);
+        if (state.pokemonState !== undefined) {
+            pokemon.recoverState(state.pokemonState);
         }
 
         // Resolve friend relationships
         var friend = undefined;
-        if (state.petFriend) {
-            friend = allPets.locate(state.petFriend);
+        if (state.pokemonFriend) {
+            friend = allPokemon.locate(state.pokemonFriend);
             if (friend) {
-                pet.recoverFriend(friend.pet);
+                pokemon.recoverFriend(friend.pokemon);
             }
         }
     });
@@ -284,7 +279,7 @@ function randomStartPosition(): number {
 let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D;
 
 function initCanvas() {
-    canvas = document.getElementById('petCanvas') as HTMLCanvasElement;
+    canvas = document.getElementById('pokemonCanvas') as HTMLCanvasElement;
     if (!canvas) {
         console.log('Canvas not ready');
         return;
@@ -299,17 +294,17 @@ function initCanvas() {
 }
 
 // It cannot access the main VS Code APIs directly.
-export function petPanelApp(
+export function pokemonPanelApp(
     basePetUri: string,
     theme: Theme,
     themeKind: ColorThemeKind,
-    petColor: PetColor,
-    petSize: PetSize,
-    petType: PetType,
+    pokemonColor: PokemonColor,
+    pokemonSize: PokemonSize,
+    pokemonType: PokemonType,
     throwBallWithMouse: boolean,
     stateApi?: VscodeStateApi,
 ) {
-    const ballRadius: number = calculateBallRadius(petSize);
+    const ballRadius: number = calculateBallRadius(pokemonSize);
     var floor = 0;
     if (!stateApi) {
         stateApi = acquireVsCodeApi();
@@ -331,156 +326,22 @@ export function petPanelApp(
                 break;
         }
 
-        document.body.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/background-${_themeKind}-${petSize}.png')`;
+        document.body.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/background-${_themeKind}-${pokemonSize}.png')`;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        foregroundEl!.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/foreground-${_themeKind}-${petSize}.png')`;
+        foregroundEl!.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/foreground-${_themeKind}-${pokemonSize}.png')`;
 
-        floor = calculateFloor(petSize, theme); // Themes have pets at a specified height from the ground
+        floor = calculateFloor(pokemonSize, theme); // Themes have pokemonCollection at a specified height from the ground
     } else {
         document.body.style.backgroundImage = '';
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         foregroundEl!.style.backgroundImage = '';
     }
 
-    /// Bouncing ball components, credit https://stackoverflow.com/a/29982343
-    const gravity: number = 0.6,
-        damping: number = 0.9,
-        traction: number = 0.8,
-        interval: number = 1000 / 24; // msec for single frame
-    let then: number = 0; // last draw
-    var ballState: BallState;
-
-    function resetBall() {
-        if (ballState) {
-            ballState.paused = true;
-        }
-        if (canvas) {
-            canvas.style.display = 'block';
-        }
-        ballState = new BallState(100, 100, 4, 5);
-    }
-
-    function dynamicThrowOn() {
-        let startMouseX: number;
-        let startMouseY: number;
-        let endMouseX: number;
-        let endMouseY: number;
-        console.log('Enabling dynamic throw');
-        window.onmousedown = (e) => {
-            if (ballState) {
-                ballState.paused = true;
-            }
-            if (canvas) {
-                canvas.style.display = 'block';
-            }
-            endMouseX = e.clientX;
-            endMouseY = e.clientY;
-            startMouseX = e.clientX;
-            startMouseY = e.clientY;
-            ballState = new BallState(e.clientX, e.clientY, 0, 0);
-
-            allPets.pets.forEach((petEl) => {
-                if (petEl.pet.canChase) {
-                    petEl.pet.chase(ballState, canvas);
-                }
-            });
-            ballState.paused = true;
-
-            drawBall();
-
-            window.onmousemove = (ev) => {
-                ev.preventDefault();
-                if (ballState) {
-                    ballState.paused = true;
-                }
-                startMouseX = endMouseX;
-                startMouseY = endMouseY;
-                endMouseX = ev.clientX;
-                endMouseY = ev.clientY;
-                ballState = new BallState(ev.clientX, ev.clientY, 0, 0);
-                drawBall();
-            };
-            window.onmouseup = (ev) => {
-                ev.preventDefault();
-                window.onmouseup = null;
-                window.onmousemove = null;
-
-                ballState = new BallState(
-                    endMouseX,
-                    endMouseY,
-                    endMouseX - startMouseX,
-                    endMouseY - startMouseY,
-                );
-                allPets.pets.forEach((petEl) => {
-                    if (petEl.pet.canChase) {
-                        petEl.pet.chase(ballState, canvas);
-                    }
-                });
-                throwBall();
-            };
-        };
-    }
-    function dynamicThrowOff() {
-        console.log('Disabling dynamic throw');
-        window.onmousedown = null;
-        if (ballState) {
-            ballState.paused = true;
-        }
-        if (canvas) {
-            canvas.style.display = 'none';
-        }
-    }
-    function throwBall() {
-        if (!ballState.paused) {
-            requestAnimationFrame(throwBall);
-        }
-
-        // throttling the frame rate
-        const now = Date.now();
-        const elapsed = now - then;
-        if (elapsed <= interval) {
-            return;
-        }
-        then = now - (elapsed % interval);
-
-        if (ballState.cx + ballRadius >= canvas.width) {
-            ballState.vx = -ballState.vx * damping;
-            ballState.cx = canvas.width - ballRadius;
-        } else if (ballState.cx - ballRadius <= 0) {
-            ballState.vx = -ballState.vx * damping;
-            ballState.cx = ballRadius;
-        }
-        if (ballState.cy + ballRadius + floor >= canvas.height) {
-            ballState.vy = -ballState.vy * damping;
-            ballState.cy = canvas.height - ballRadius - floor;
-            // traction here
-            ballState.vx *= traction;
-        } else if (ballState.cy - ballRadius <= 0) {
-            ballState.vy = -ballState.vy * damping;
-            ballState.cy = ballRadius;
-        }
-
-        ballState.vy += gravity;
-
-        ballState.cx += ballState.vx;
-        ballState.cy += ballState.vy;
-        drawBall();
-    }
-
-    function drawBall() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.beginPath();
-        ctx.arc(ballState.cx, ballState.cy, ballRadius, 0, 2 * Math.PI, false);
-        ctx.fillStyle = '#2ed851';
-        ctx.fill();
-    }
-
     console.log(
-        'Starting pet session',
-        petColor,
+        'Starting pokemon session',
+        pokemonColor,
         basePetUri,
-        petType,
+        pokemonType,
         throwBallWithMouse,
     );
 
@@ -488,61 +349,39 @@ export function petPanelApp(
     var state = stateApi?.getState();
     if (!state) {
         console.log('No state, starting a new session.');
-        petCounter = 1;
-        allPets.push(
+        pokemonCounter = 1;
+        allPokemon.push(
             addPetToPanel(
-                petType,
+                pokemonType,
                 basePetUri,
-                petColor,
-                petSize,
+                pokemonColor,
+                pokemonSize,
                 randomStartPosition(),
                 floor,
                 floor,
-                randomName(petType),
+                randomName(pokemonType),
                 stateApi,
             ),
         );
         saveState(stateApi);
     } else {
         console.log('Recovering state - ', state);
-        recoverState(basePetUri, petSize, floor, stateApi);
+        recoverState(basePetUri, pokemonSize, floor, stateApi);
     }
 
     initCanvas();
-
-    if (throwBallWithMouse) {
-        dynamicThrowOn();
-    } else {
-        dynamicThrowOff();
-    }
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
-            case 'throw-with-mouse':
-                if (message.enabled) {
-                    dynamicThrowOn();
-                } else {
-                    dynamicThrowOff();
-                }
-                break;
-            case 'throw-ball':
-                resetBall();
-                throwBall();
-                allPets.pets.forEach((petEl) => {
-                    if (petEl.pet.canChase) {
-                        petEl.pet.chase(ballState, canvas);
-                    }
-                });
-                break;
-            case 'spawn-pet':
-                allPets.push(
+            case 'spawn-pokemon':
+                allPokemon.push(
                     addPetToPanel(
                         message.type,
                         basePetUri,
                         message.color,
-                        petSize,
+                        pokemonSize,
                         randomStartPosition(),
                         floor,
                         floor,
@@ -553,51 +392,51 @@ export function petPanelApp(
                 saveState(stateApi);
                 break;
 
-            case 'list-pets':
-                var pets = allPets.pets;
+            case 'list-pokemon':
+                var pokemonCollection = allPokemon.pokemonCollection;
                 stateApi?.postMessage({
-                    command: 'list-pets',
-                    text: pets
+                    command: 'list-pokemon',
+                    text: pokemonCollection
                         .map(
-                            (pet) => `${pet.type},${pet.pet.name},${pet.color}`,
+                            (pokemon) => `${pokemon.type},${pokemon.pokemon.name},${pokemon.color}`,
                         )
                         .join('\n'),
                 });
                 break;
 
             case 'roll-call':
-                var pets = allPets.pets;
+                var pokemonCollection = allPokemon.pokemonCollection;
                 // go through every single
-                // pet and then print out their name
-                pets.forEach((pet) => {
+                // pokemon and then print out their name
+                pokemonCollection.forEach((pokemon) => {
                     stateApi?.postMessage({
                         command: 'info',
-                        text: `${pet.pet.emoji} ${pet.pet.name} (${pet.color} ${pet.type}): ${pet.pet.hello}`,
+                        text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}): ${pokemon.pokemon.hello}`,
                     });
                 });
-            case 'delete-pet':
-                var pet = allPets.locate(message.name);
-                if (pet) {
-                    allPets.remove(message.name);
+            case 'delete-pokemon':
+                var pokemon = allPokemon.locate(message.name);
+                if (pokemon) {
+                    allPokemon.remove(message.name);
                     saveState(stateApi);
                     stateApi?.postMessage({
                         command: 'info',
-                        text: '👋 Removed pet ' + message.name,
+                        text: '👋 Removed pokemon ' + message.name,
                     });
                 } else {
                     stateApi?.postMessage({
                         command: 'error',
-                        text: `Could not find pet ${message.name}`,
+                        text: `Could not find pokemon ${message.name}`,
                     });
                 }
                 break;
-            case 'reset-pet':
-                allPets.reset();
-                petCounter = 0;
+            case 'reset-pokemon':
+                allPokemon.reset();
+                pokemonCounter = 0;
                 saveState(stateApi);
                 break;
-            case 'pause-pet':
-                petCounter = 1;
+            case 'pause-pokemon':
+                pokemonCounter = 1;
                 saveState(stateApi);
                 break;
         }

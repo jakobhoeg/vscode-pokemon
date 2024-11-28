@@ -1,48 +1,44 @@
 {
-    "name": "vscode-pets",
-    "displayName": "vscode-pets",
-    "description": "Pets for your VS Code",
-    "version": "1.27.0",
+    "name": "vscode-pokemon",
+    "displayName": "vscode-pokemon",
+    "description": "Pokémon for your VS Code",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.73.0"
     },
     "l10n": "./l10n",
     "repository": {
         "type": "github",
-        "url": "https://github.com/tonybaloney/vscode-pets"
+        "url": "https://github.com/jakobhoeg/vscode-pokemon"
     },
-    "homepage": "https://tonybaloney.github.io/vscode-pets",
-    "bugs": "https://github.com/tonybaloney/vscode-pets/issues",
-    "publisher": "tonybaloney",
+    "homepage": "https://github.com/jakobhoeg/vscode-pokemon",
+    "bugs": "https://github.com/jakobhoeg/vscode-pokemon/issues",
+    "publisher": "jakobhoeg",
     "categories": [
         "Other"
     ],
     "keywords": [
-        "pet",
-        "cat",
-        "chicken",
-        "dog",
+        "pokemon",
         "pets",
-        "clippy",
-        "rubber duck",
-        "horse",
-        "deno"
+        "pokémon",
+        "pixelart",
+        "pixel",
+        "pixel",
+        "vscode"
     ],
     "license": "MIT",
     "icon": "icon.png",
     "activationEvents": [
-        "onCommand:vscode-pets.start",
-        "onCommand:vscode-pets.throw-with-mouse",
-        "onCommand:vscode-pets.throw-ball",
-        "onCommand:vscode-pets.spawn-pet",
-        "onCommand:vscode-pets.delete-pet",
-        "onCommand:vscode-pets.remove-all-pets",
-        "onCommand:vscode-pets.roll-call",
-        "onCommand:vscode-pets.export-pet-list",
-        "onCommand:vscode-pets.import-pet-list",
-        "onWebviewPanel:petCoding",
+        "onCommand:vscode-pokemon.start",
+        "onCommand:vscode-pokemon.spawn-pokemon",
+        "onCommand:vscode-pokemon.delete-pokemon",
+        "onCommand:vscode-pokemon.remove-all-pokemon",
+        "onCommand:vscode-pokemon.roll-call",
+        "onCommand:vscode-pokemon.export-pokemon-list",
+        "onCommand:vscode-pokemon.import-pokemon-list",
+        "onWebviewPanel:pokemonCoding",
         "onView:explorer",
-        "onView:petsView",
+        "onView:pokemonView",
         "onStartupFinished"
     ],
     "main": "./out/extension/extension.js",
@@ -52,155 +48,79 @@
             "explorer": [
                 {
                     "type": "webview",
-                    "id": "petsView",
-                    "name": "VS Code Pets",
-                    "when": "vscode-pets.position == 'explorer'",
-                    "icon": "media/dog.svg"
+                    "id": "pokemonView",
+                    "name": "VS Code Pokémon",
+                    "when": "vscode-pokemon.position == 'explorer'"
                 }
             ]
         },
         "menus": {
             "view/title": [
                 {
-                    "command": "vscode-pets.spawn-pet",
-                    "when": "view == petsView",
+                    "command": "vscode-pokemon.spawn-pokemon",
+                    "when": "view == pokemonView",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "vscode-pets.throw-ball",
-                    "when": "view == petsView",
-                    "group": "navigation@2"
-                },
-                {
-                    "command": "vscode-pets.delete-pet",
-                    "when": "view == petsView",
+                    "command": "vscode-pokemon.delete-pokemon",
+                    "when": "view == pokemonView",
                     "group": "navigation@3"
                 }
             ]
         },
         "commands": [
             {
-                "command": "vscode-pets.start",
-                "title": "Start pet coding session",
-                "category": "Pet Coding",
-                "icon": "media/dog.svg"
+                "command": "vscode-pokemon.start",
+                "title": "Start pokemon coding session",
+                "category": "Pokemon Coding"
             },
             {
-                "command": "vscode-pets.throw-with-mouse",
-                "title": "Throw ball with mouse",
-                "category": "Pet Coding",
-                "icon": {
-                    "dark": "media/icon/dark-throw-outline.svg",
-                    "light": "media/icon/light-throw-outline.svg"
-                }
+                "command": "vscode-pokemon.export-pokemon-list",
+                "title": "Export pokemon list",
+                "category": "Pokemon Coding"
             },
             {
-                "command": "vscode-pets.throw-ball",
-                "title": "Throw ball",
-                "category": "Pet Coding",
-                "icon": {
-                    "dark": "media/icon/dark-circle-outline.svg",
-                    "light": "media/icon/light-circle-outline.svg"
-                }
+                "command": "vscode-pokemon.import-pokemon-list",
+                "title": "Import pokemon list",
+                "category": "Pokemon Coding"
             },
             {
-                "command": "vscode-pets.export-pet-list",
-                "title": "Export pet list",
-                "category": "Pet Coding"
-            },
-            {
-                "command": "vscode-pets.import-pet-list",
-                "title": "Import pet list",
-                "category": "Pet Coding"
-            },
-            {
-                "command": "vscode-pets.spawn-pet",
-                "title": "Spawn additional pet",
-                "category": "Pet Coding",
+                "command": "vscode-pokemon.spawn-pokemon",
+                "title": "Spawn additional pokemon",
+                "category": "Pokemon Coding",
                 "icon": {
                     "dark": "media/icon/dark-add.svg",
                     "light": "media/icon/light-add.svg"
                 }
             },
             {
-                "command": "vscode-pets.delete-pet",
-                "title": "Remove pet",
-                "category": "Pet Coding",
+                "command": "vscode-pokemon.delete-pokemon",
+                "title": "Remove pokemon",
+                "category": "Pokemon Coding",
                 "icon": {
                     "dark": "media/icon/dark-trash.svg",
                     "light": "media/icon/light-trash.svg"
                 }
             },
             {
-                "command": "vscode-pets.remove-all-pets",
-                "title": "Remove all pets",
-                "category": "Pet Coding",
+                "command": "vscode-pokemon.remove-all-pokemon",
+                "title": "Remove all pokemon",
+                "category": "Pokemon Coding",
                 "icon": {
                     "dark": "media/icon/dark-trash.svg",
                     "light": "media/icon/light-trash.svg"
                 }
             },
             {
-                "command": "vscode-pets.roll-call",
+                "command": "vscode-pokemon.roll-call",
                 "title": "Roll-call",
-                "category": "Pet Coding"
+                "category": "Pokemon Coding"
             }
         ],
         "configuration": [
             {
                 "properties": {
-                    "vscode-pets.petColor": {
-                        "type": "string",
-                        "enum": [
-                            "black",
-                            "lightbrown",
-                            "brown",
-                            "green",
-                            "yellow",
-                            "gray",
-                            "purple",
-                            "red",
-                            "white",
-                            "orange",
-                            "akita",
-                            "socks black",
-                            "socks beige",
-                            "socks brown",
-                            "paint beige",
-                            "paint black",
-                            "paint brown",
-                            "magical",
-                            "warrior"
-                        ],
-                        "default": "brown",
-                        "description": "Pet color",
-                        "scope": "window"
-                    },
-                    "vscode-pets.petType": {
-                        "type": "string",
-                        "enum": [
-                            "cat",
-                            "chicken",
-                            "crab",
-                            "clippy",
-                            "cockatiel",
-                            "dog",
-                            "fox",
-                            "horse",
-                            "mod",
-                            "rat",
-                            "rocky",
-                            "rubber-duck",
-                            "snake",
-                            "totoro",
-                            "turtle",
-                            "zappy"
-                        ],
-                        "default": "cat",
-                        "description": "Pet type",
-                        "scope": "window"
-                    },
-                    "vscode-pets.petSize": {
+                    "vscode-pokemon.pokemonSize": {
                         "type": "string",
                         "enum": [
                             "nano",
@@ -209,18 +129,18 @@
                             "large"
                         ],
                         "default": "nano",
-                        "description": "Pet size"
+                        "description": "Pokemon size"
                     },
-                    "vscode-pets.position": {
+                    "vscode-pokemon.position": {
                         "type": "string",
                         "enum": [
                             "panel",
                             "explorer"
                         ],
                         "default": "explorer",
-                        "description": "VSCode pets webview position"
+                        "description": "VSCode pokemon webview position"
                     },
-                    "vscode-pets.theme": {
+                    "vscode-pokemon.theme": {
                         "type": "string",
                         "enum": [
                             "none",
@@ -229,12 +149,7 @@
                             "beach"
                         ],
                         "default": "none",
-                        "description": "Background theme assets for your pets"
-                    },
-                    "vscode-pets.throwBallWithMouse": {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Throw ball with mouse"
+                        "description": "Background theme assets for your pokemon"
                     }
                 }
             }

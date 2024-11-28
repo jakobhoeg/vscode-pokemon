@@ -1,49 +1,101 @@
-export const enum PetColor {
-    brown = 'brown',
-    lightbrown = 'lightbrown',
-    black = 'black',
-    green = 'green',
-    yellow = 'yellow',
-    gray = 'gray',
-    purple = 'purple',
-    red = 'red',
-    white = 'white',
-    orange = 'orange',
-    akita = 'akita',
-    socksblack = 'socks black',
-    socksbeige = 'socks beige',
-    socksbrown = 'socks brown',
-    paintbeige = 'paint beige',
-    paintblack = 'paint black',
-    paintbrown = 'paint brown',
-    magical = 'magical',
-    warrior = 'warrior',
+export const enum PokemonColor {
+    default = 'default',
+    shiny = 'shiny',
     null = 'null',
 }
 
-export const enum PetType {
-    cat = 'cat',
-    chicken = 'chicken',
-    clippy = 'clippy',
-    cockatiel = 'cockatiel',
-    crab = 'crab',
-    dog = 'dog',
-    deno = 'deno',
-    fox = 'fox',
-    horse = 'horse',
-    mod = 'mod',
-    rat = 'rat',
-    rocky = 'rocky',
-    rubberduck = 'rubber-duck',
-    snail = 'snail',
-    snake = 'snake',
-    totoro = 'totoro',
-    turtle = 'turtle',
-    zappy = 'zappy',
-    null = 'null',
+export enum PokemonGeneration {
+    Gen1 = 1,
+    Gen2 = 2,
+    Gen3 = 3,
 }
 
-export const enum PetSpeed {
+export type PokemonTypeString = string & keyof typeof POKEMON_DATA;
+
+export type PokemonType = PokemonTypeString | 'null';
+
+export interface PokemonConfig {
+    id: number;
+    name: string;
+    generation: PokemonGeneration;
+    cry: string;
+    possibleColors: PokemonColor[];
+}
+
+export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
+    bulbasaur: {
+        id: 1,
+        name: 'Bulbasaur',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Bulbasaur!',
+        possibleColors: [PokemonColor.default]
+    },
+    ivysaur: {
+        id: 2,
+        name: 'Ivysaur',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Ivysaur!',
+        possibleColors: [PokemonColor.default]
+    },
+    venusaur: {
+        id: 3,
+        name: 'Venusaur',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Venusaur!',
+        possibleColors: [PokemonColor.default]
+    },
+    charmander: {
+        id: 4,
+        name: 'Charmander',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Charmander!',
+        possibleColors: [PokemonColor.default]
+    },
+    charmeleon: {
+        id: 5,
+        name: 'Charmeleon',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Charmeleon!',
+        possibleColors: [PokemonColor.default]
+    },
+    charizard: {
+        id: 6,
+        name: 'Charizard',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Charizard!',
+        possibleColors: [PokemonColor.default]
+    },
+    squirtle: {
+        id: 7,
+        name: 'Squirtle',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Squritle!',
+        possibleColors: [PokemonColor.default]
+    },
+    wartortle: {
+        id: 8,
+        name: 'Wartortle',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Wartortle!',
+        possibleColors: [PokemonColor.default]
+    },
+    blastoise: {
+        id: 9,
+        name: 'Blastoise',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Blastoise!',
+        possibleColors: [PokemonColor.default]
+    },
+    dragonite: {
+        id: 149,
+        name: 'Dragonite',
+        generation: PokemonGeneration.Gen1,
+        cry: 'Draa!',
+        possibleColors: [PokemonColor.default]
+    },
+};
+
+export const enum PokemonSpeed {
     still = 0,
     verySlow = 1,
     slow = 2,
@@ -52,7 +104,7 @@ export const enum PetSpeed {
     veryFast = 5,
 }
 
-export const enum PetSize {
+export const enum PokemonSize {
     nano = 'nano',
     small = 'small',
     medium = 'medium',
@@ -87,52 +139,27 @@ export class WebviewMessage {
     }
 }
 
-export const ALL_PETS = [
-    PetType.cat,
-    PetType.chicken,
-    PetType.clippy,
-    PetType.cockatiel,
-    PetType.crab,
-    PetType.dog,
-    PetType.deno,
-    PetType.fox,
-    PetType.horse,
-    PetType.mod,
-    PetType.rat,
-    PetType.rocky,
-    PetType.rubberduck,
-    PetType.snail,
-    PetType.snake,
-    PetType.totoro,
-    PetType.turtle,
-    PetType.zappy,
-];
 export const ALL_COLORS = [
-    PetColor.black,
-    PetColor.brown,
-    PetColor.lightbrown,
-    PetColor.green,
-    PetColor.yellow,
-    PetColor.gray,
-    PetColor.purple,
-    PetColor.red,
-    PetColor.white,
-    PetColor.orange,
-    PetColor.akita,
-    PetColor.socksblack,
-    PetColor.socksbeige,
-    PetColor.socksbrown,
-    PetColor.paintbeige,
-    PetColor.paintblack,
-    PetColor.paintbrown,
-    PetColor.magical,
-    PetColor.warrior,
-    PetColor.null,
+    PokemonColor.default,
 ];
 export const ALL_SCALES = [
-    PetSize.nano,
-    PetSize.small,
-    PetSize.medium,
-    PetSize.large,
+    PokemonSize.nano,
+    PokemonSize.small,
+    PokemonSize.medium,
+    PokemonSize.large,
 ];
 export const ALL_THEMES = [Theme.none, Theme.forest, Theme.castle, Theme.beach];
+
+export function getAllPokemon(): PokemonType[] {
+    return Object.keys(POKEMON_DATA) as PokemonType[];
+}
+
+export function getPokemonByGeneration(generation: PokemonGeneration): PokemonType[] {
+    return Object.entries(POKEMON_DATA)
+        .filter(([_, config]) => config.generation === generation)
+        .map(([key, _]) => key as PokemonType);
+}
+
+export function getDefaultPokemon(): PokemonType {
+    return 'bulbasaur';
+}
