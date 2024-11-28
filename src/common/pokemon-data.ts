@@ -64,6 +64,27 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Blastoise!',
     possibleColors: [PokemonColor.default]
   },
+  caterpie: {
+    id: 10,
+    name: 'Caterpie',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Caterpie!',
+    possibleColors: [PokemonColor.default]
+  },
+  metapod: {
+    id: 11,
+    name: 'Metapod',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Metapod!',
+    possibleColors: [PokemonColor.default]
+  },
+  butterfree: {
+    id: 12,
+    name: 'Butterfree',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Butterfree!',
+    possibleColors: [PokemonColor.default]
+  },
   dragonite: {
     id: 149,
     name: 'Dragonite',
