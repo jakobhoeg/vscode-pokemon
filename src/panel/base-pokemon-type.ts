@@ -80,19 +80,24 @@ export abstract class BasePokemonType implements IPokemonType {
     }
 
     initSprite(pokemonSize: PokemonSize, left: number, bottom: number) {
+        const spriteSize = this.calculateSpriteWidth(pokemonSize);
+
         this.el.style.left = `${left}px`;
         this.el.style.bottom = `${bottom}px`;
-        this.el.style.width = 'auto';
-        this.el.style.height = 'auto';
-        this.el.style.maxWidth = `${this.calculateSpriteWidth(pokemonSize)}px`;
-        this.el.style.maxHeight = `${this.calculateSpriteWidth(pokemonSize)}px`;
+        this.el.style.width = `${spriteSize}px`;
+        this.el.style.height = `${spriteSize}px`;
+
+        // Remove 'auto' since it gave issues with sizing
+        this.el.style.maxWidth = 'none';
+        this.el.style.maxHeight = 'none';
+
         this.collision.style.left = `${left}px`;
         this.collision.style.bottom = `${bottom}px`;
-        this.collision.style.width = `${this.calculateSpriteWidth(pokemonSize)}px`;
-        this.collision.style.height = `${this.calculateSpriteWidth(pokemonSize)}px`;
+        this.collision.style.width = `${spriteSize}px`;
+        this.collision.style.height = `${spriteSize}px`;
+
         this.speech.style.left = `${left}px`;
-        this.speech.style.bottom = `${bottom + this.calculateSpriteWidth(pokemonSize)
-            }px`;
+        this.speech.style.bottom = `${bottom + spriteSize}px`;
         this.hideSpeechBubble();
     }
 

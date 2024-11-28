@@ -50,8 +50,7 @@
                     "type": "webview",
                     "id": "pokemonView",
                     "name": "VS Code Pokémon",
-                    "when": "vscode-pokemon.position == 'explorer'",
-                    "icon": "media/dog.svg"
+                    "when": "vscode-pokemon.position == 'explorer'"
                 }
             ]
         },
@@ -73,8 +72,7 @@
             {
                 "command": "vscode-pokemon.start",
                 "title": "Start pokemon coding session",
-                "category": "Pokemon Coding",
-                "icon": "media/dog.svg"
+                "category": "Pokemon Coding"
             },
             {
                 "command": "vscode-pokemon.export-pokemon-list",
@@ -122,43 +120,6 @@
         "configuration": [
             {
                 "properties": {
-                    "vscode-pokemon.pokemonColor": {
-                        "type": "string",
-                        "enum": [
-                            "default"
-                        ],
-                        "default": "default",
-                        "description": "Pokemon color",
-                        "scope": "window"
-                    },
-                    "vscode-pokemon.pokemonGeneration": {
-                        "type": "number",
-                        "enum": [
-                            1,
-                            2,
-                            3
-                        ],
-                        "default": 1,
-                        "description": "Pokémon generation to choose from"
-                    },
-                    "vscode-pokemon.pokemonType": {
-                        "type": "string",
-                        "enum": [
-                            "bulbasaur",
-                            "ivysaur",
-                            "venusaur",
-                            "charmander",
-                            "charmeleon",
-                            "charizard",
-                            "squirtle",
-                            "wartortle",
-                            "blastoise",
-                            "dragonite"
-                        ],
-                        "default": "bulbasaur",
-                        "description": "Pokemon type",
-                        "scope": "window"
-                    },
                     "vscode-pokemon.pokemonSize": {
                         "type": "string",
                         "enum": [
