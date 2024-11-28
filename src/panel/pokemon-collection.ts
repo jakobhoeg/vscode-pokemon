@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonSize, PokemonSpeed, PokemonType } from '../common/types';
+import { PokemonColor, PokemonGeneration, PokemonSize, PokemonSpeed, PokemonType } from '../common/types';
 import { Pokemon } from './pokemon';
 import { IPokemonType } from './states';
 
@@ -9,6 +9,7 @@ export class PokemonElement {
     pokemon: IPokemonType;
     color: PokemonColor;
     type: PokemonType;
+    generation: string;
     remove() {
         this.el.remove();
         this.collision.remove();
@@ -23,6 +24,7 @@ export class PokemonElement {
         pokemon: IPokemonType,
         color: PokemonColor,
         type: PokemonType,
+        generation: string,
     ) {
         this.el = el;
         this.collision = collision;
@@ -30,6 +32,7 @@ export class PokemonElement {
         this.pokemon = pokemon;
         this.color = color;
         this.type = type;
+        this.generation = generation;
     }
 }
 
@@ -141,6 +144,7 @@ export function createPokemon(
     pokemonRoot: string,
     floor: number,
     name: string,
+    generation: string,
 ): IPokemonType {
     if (!name) {
         throw new InvalidPokemonException('name is undefined');
@@ -158,7 +162,8 @@ export function createPokemon(
             pokemonRoot,
             floor,
             name,
-            PokemonSpeed.normal
+            PokemonSpeed.normal,
+            generation
         );
     } catch (error) {
         throw new InvalidPokemonException(`Invalid Pokemon type: ${pokemonType}`);

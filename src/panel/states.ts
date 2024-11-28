@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonType } from '../common/types';
+import { PokemonColor, PokemonGeneration, PokemonType } from '../common/types';
 
 export interface IPokemonType {
     nextFrame(): void;
@@ -42,6 +42,7 @@ export class PokemonInstanceState {
 
 export class PokemonElementState {
     pokemonState: PokemonInstanceState | undefined;
+    pokemonGeneration: string | undefined;
     pokemonType: PokemonType | undefined;
     pokemonColor: PokemonColor | undefined;
     elLeft: string | undefined;
