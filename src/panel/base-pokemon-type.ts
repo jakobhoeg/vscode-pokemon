@@ -47,6 +47,7 @@ export abstract class BasePokemonType implements IPokemonType {
     private _name: string;
     private _speed: number;
     private _size: PokemonSize;
+    private _generation: string;
 
     constructor(
         spriteElement: HTMLImageElement,
@@ -59,6 +60,7 @@ export abstract class BasePokemonType implements IPokemonType {
         floor: number,
         name: string,
         speed: number,
+        generation: string,
     ) {
         this.el = spriteElement;
         this.collision = collisionElement;
@@ -74,6 +76,7 @@ export abstract class BasePokemonType implements IPokemonType {
         this._name = name;
         this._size = size;
         this._speed = this.randomizeSpeed(speed);
+        this._generation = generation;
 
         // Increment the static count of the Pokemon class that the constructor belongs to
         (this.constructor as any).count += 1;

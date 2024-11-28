@@ -126,6 +126,7 @@ function startAnimations(
 function addPetToPanel(
     pokemonType: PokemonType,
     basePetUri: string,
+    gen: string,
     pokemonColor: PokemonColor,
     pokemonSize: PokemonSize,
     left: number,
@@ -153,7 +154,7 @@ function addPetToPanel(
         speechBubbleElement,
     );
 
-    const root = basePetUri + '/' + pokemonType + '/' + pokemonColor;
+    const root = `${basePetUri}/${gen}/${pokemonType}/${pokemonColor}`;
     console.log('Creating new pokemon : ', pokemonType, root, pokemonColor, pokemonSize, name);
     try {
         if (!availableColors(pokemonType).includes(pokemonColor)) {
@@ -170,6 +171,7 @@ function addPetToPanel(
             root,
             floor,
             name,
+            gen
         );
         pokemonCounter++;
         startAnimations(collisionElement, newPet, stateApi);
@@ -188,6 +190,7 @@ function addPetToPanel(
         newPet,
         pokemonColor,
         pokemonType,
+        gen,
     );
 }
 
@@ -204,6 +207,7 @@ export function saveState(stateApi?: VscodeStateApi) {
             pokemonColor: pokemonItem.color,
             pokemonType: pokemonItem.type,
             pokemonState: pokemonItem.pokemon.getState(),
+            pokemonGeneration: pokemonItem.generation,
             pokemonFriend: pokemonItem.pokemon.friend?.name ?? undefined,
             elLeft: pokemonItem.el.style.left,
             elBottom: pokemonItem.el.style.bottom,
@@ -215,6 +219,7 @@ export function saveState(stateApi?: VscodeStateApi) {
 
 function recoverState(
     basePetUri: string,
+    gen: string,
     pokemonSize: PokemonSize,
     floor: number,
     stateApi?: VscodeStateApi,
@@ -239,6 +244,7 @@ function recoverState(
             var newPet = addPetToPanel(
                 p.pokemonType ?? 'bulbasaur',
                 basePetUri,
+                p.pokemonGeneration ?? 'gen1',
                 p.pokemonColor ?? PokemonColor.default,
                 pokemonSize,
                 parseInt(p.elLeft ?? '0'),
@@ -302,6 +308,7 @@ export function pokemonPanelApp(
     pokemonSize: PokemonSize,
     pokemonType: PokemonType,
     throwBallWithMouse: boolean,
+    gen: string,
     stateApi?: VscodeStateApi,
 ) {
     const ballRadius: number = calculateBallRadius(pokemonSize);
@@ -354,6 +361,7 @@ export function pokemonPanelApp(
             addPetToPanel(
                 pokemonType,
                 basePetUri,
+                gen,
                 pokemonColor,
                 pokemonSize,
                 randomStartPosition(),
@@ -366,7 +374,7 @@ export function pokemonPanelApp(
         saveState(stateApi);
     } else {
         console.log('Recovering state - ', state);
-        recoverState(basePetUri, pokemonSize, floor, stateApi);
+        recoverState(basePetUri, gen, pokemonSize, floor, stateApi);
     }
 
     initCanvas();
@@ -380,6 +388,7 @@ export function pokemonPanelApp(
                     addPetToPanel(
                         message.type,
                         basePetUri,
+                        message.generation,
                         message.color,
                         pokemonSize,
                         randomStartPosition(),

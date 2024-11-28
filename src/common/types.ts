@@ -12,7 +12,7 @@ export enum PokemonGeneration {
 
 export type PokemonTypeString = string & keyof typeof POKEMON_DATA;
 
-export type PokemonType = PokemonTypeString | 'null';
+export type PokemonType = PokemonTypeString;
 
 export interface PokemonConfig {
     id: number;

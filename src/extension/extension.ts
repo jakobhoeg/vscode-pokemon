@@ -108,8 +108,9 @@ export class PokemonSpecification {
     type: PokemonType;
     size: PokemonSize;
     name: string;
+    generation: string;
 
-    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string) {
+    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string) {
         this.color = color;
         this.type = type;
         this.size = size;
@@ -118,6 +119,7 @@ export class PokemonSpecification {
         } else {
             this.name = name;
         }
+        this.generation = generation || `gen${POKEMON_DATA[type].generation}`;
     }
 
     static fromConfiguration(): PokemonSpecification {
@@ -302,6 +304,7 @@ export function activate(context: vscode.ExtensionContext) {
                     spec.color,
                     spec.type,
                     spec.size,
+                    spec.generation,
                     getConfiguredTheme(),
                     getConfiguredThemeKind(),
                     getThrowWithMouseConfiguration(),
@@ -348,6 +351,7 @@ export function activate(context: vscode.ExtensionContext) {
         spec.color,
         spec.type,
         spec.size,
+        spec.generation,
         getConfiguredTheme(),
         getConfiguredThemeKind(),
         getThrowWithMouseConfiguration(),
@@ -665,6 +669,7 @@ export function activate(context: vscode.ExtensionContext) {
                     spec.color,
                     spec.type,
                     spec.size,
+                    spec.generation,
                     getConfiguredTheme(),
                     getConfiguredThemeKind(),
                     getThrowWithMouseConfiguration(),
@@ -718,6 +723,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
     protected _pokemonColor: PokemonColor;
     protected _pokemonType: PokemonType;
     protected _pokemonSize: PokemonSize;
+    protected _pokemonGeneration: string;
     protected _theme: Theme;
     protected _themeKind: vscode.ColorThemeKind;
     protected _throwBallWithMouse: boolean;
@@ -727,6 +733,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         color: PokemonColor,
         type: PokemonType,
         size: PokemonSize,
+        generation: string,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -735,6 +742,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         this._pokemonColor = color;
         this._pokemonType = type;
         this._pokemonSize = size;
+        this._pokemonGeneration = generation;
         this._theme = theme;
         this._themeKind = themeKind;
         this._throwBallWithMouse = throwBallWithMouse;
@@ -750,6 +758,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
 
     public pokemonSize(): PokemonSize {
         return this._pokemonSize;
+    }
+
+    public pokemonGeneration(): string {
+        return this._pokemonGeneration;
     }
 
     public theme(): Theme {
@@ -774,6 +786,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
 
     public updatePokemonSize(newSize: PokemonSize) {
         this._pokemonSize = newSize;
+    }
+
+    public updatePokemonGeneration(newGeneration: string) {
+        this._pokemonGeneration = newGeneration;
     }
 
     public updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind) {
@@ -807,6 +823,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
             type: spec.type,
             color: spec.color,
             name: spec.name,
+            generation: spec.generation,
         });
         void this.getWebview().postMessage({
             command: 'set-size',
@@ -906,12 +923,23 @@ class PokemonWebviewContainer implements IPokemonPanel {
 				<title>VS Code Pokemon</title>
 			</head>
 			<body>
-				<canvas id="pokemonCanvas"></canvas>
-				<div id="pokemonContainer"></div>
-				<div id="foreground"></div>	
-				<script nonce="${nonce}" src="${scriptUri}"></script>
-				<script nonce="${nonce}">pokemonApp.pokemonPanelApp("${basePokemonUri}", "${this.theme()}", ${this.themeKind()}, "${this.pokemonColor()}", "${this.pokemonSize()}", "${this.pokemonType()}", ${this.throwBallWithMouse()});</script>
-			</body>
+                <canvas id="pokemonCanvas"></canvas>
+                <div id="pokemonContainer"></div>
+                <div id="foreground"></div>    
+                <script nonce="${nonce}" src="${scriptUri}"></script>
+                <script nonce="${nonce}">
+                    pokemonApp.pokemonPanelApp(
+                        "${basePokemonUri}",
+                        "${this.theme()}", 
+                        ${this.themeKind()}, 
+                        "${this.pokemonColor()}", 
+                        "${this.pokemonSize()}", 
+                        "${this.pokemonType()}", 
+                        "${this.throwBallWithMouse()}",
+                        "${this.pokemonGeneration()}"
+                    );
+                </script>
+            </body>
 			</html>`;
     }
 }
@@ -945,6 +973,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         pokemonColor: PokemonColor,
         pokemonType: PokemonType,
         pokemonSize: PokemonSize,
+        pokemonGeneration: string,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -957,7 +986,8 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             if (
                 pokemonColor === PokemonPanel.currentPanel.pokemonColor() &&
                 pokemonType === PokemonPanel.currentPanel.pokemonType() &&
-                pokemonSize === PokemonPanel.currentPanel.pokemonSize()
+                pokemonSize === PokemonPanel.currentPanel.pokemonSize() &&
+                pokemonGeneration === PokemonPanel.currentPanel.pokemonGeneration()
             ) {
                 PokemonPanel.currentPanel._panel.reveal(column);
                 return;
@@ -983,6 +1013,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             pokemonColor,
             pokemonType,
             pokemonSize,
+            pokemonGeneration,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1014,6 +1045,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         pokemonColor: PokemonColor,
         pokemonType: PokemonType,
         pokemonSize: PokemonSize,
+        pokemonGeneration: string,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1024,6 +1056,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             pokemonColor,
             pokemonType,
             pokemonSize,
+            pokemonGeneration,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1036,6 +1069,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         color: PokemonColor,
         type: PokemonType,
         size: PokemonSize,
+        generation: string,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1045,6 +1079,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             color,
             type,
             size,
+            generation,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1153,6 +1188,7 @@ async function createPokemonPlayground(context: vscode.ExtensionContext) {
         spec.color,
         spec.type,
         spec.size,
+        spec.generation,
         getConfiguredTheme(),
         getConfiguredThemeKind(),
         getThrowWithMouseConfiguration(),

@@ -14,6 +14,7 @@
     "homepage": "https://github.com/jakobhoeg/vscode-pokemon",
     "bugs": "https://github.com/jakobhoeg/vscode-pokemon/issues",
     "publisher": "jakobhoeg",
+    "pricing": "Free",
     "categories": [
         "Other"
     ],
