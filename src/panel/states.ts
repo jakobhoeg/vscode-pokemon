@@ -210,7 +210,7 @@ export class LandState extends AbstractStaticState {
 
 export class SwipeState extends AbstractStaticState {
     label = States.swipe;
-    spriteLabel = 'swipe';
+    spriteLabel = 'idle'; // use base idle sprite
     horizontalDirection = HorizontalDirection.natural;
     holdTime = 15;
 }
