@@ -85,6 +85,27 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Butterfree!',
     possibleColors: [PokemonColor.default]
   },
+  weedle: {
+    id: 12,
+    name: 'Weedle',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Weedle!',
+    possibleColors: [PokemonColor.default]
+  },
+  kakuna: {
+    id: 12,
+    name: 'Kakuna',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kakuna!',
+    possibleColors: [PokemonColor.default]
+  },
+  beedrill: {
+    id: 12,
+    name: 'Beedrill',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Beedrill!',
+    possibleColors: [PokemonColor.default]
+  },
   dragonite: {
     id: 149,
     name: 'Dragonite',
