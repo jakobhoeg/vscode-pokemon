@@ -4,8 +4,6 @@
 name: CI
 
 on:
-    push:
-        branches: [main]
     pull_request:
         branches: [main]
 
@@ -24,9 +22,9 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - run: npm ci
             - run: npm run compile
-            
+
             - name: Package VSIX
               run: npm install -g vsce && vsce package
             - uses: actions/upload-artifact@v4
               with:
-                path: "*.vsix"
+                  path: '*.vsix'
