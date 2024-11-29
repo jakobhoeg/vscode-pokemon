@@ -253,6 +253,209 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Clefable!',
     possibleColors: [PokemonColor.default]
   },
+  vulpix: {
+    id: 37,
+    name: 'Vulpix',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Vulpix!',
+    possibleColors: [PokemonColor.default]
+  },
+  ninetales: {
+    id: 38,
+    name: 'Ninetales',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Ninetales!',
+    possibleColors: [PokemonColor.default]
+  },
+  jigglypuff: {
+    id: 39,
+    name: 'Jigglypuff',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Jigglypuff!',
+    possibleColors: [PokemonColor.default]
+  },
+  wigglytuff: {
+    id: 40,
+    name: 'Wigglytuff',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Wigglytuff!',
+    possibleColors: [PokemonColor.default]
+  },
+  zubat: {
+    id: 41,
+    name: 'Zubat',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Zubat!',
+    possibleColors: [PokemonColor.default]
+  },
+  golbat: {
+    id: 42,
+    name: 'Golbat',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Golbat!',
+    possibleColors: [PokemonColor.default]
+  },
+  oddish: {
+    id: 43,
+    name: 'Oddish',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Oddish!',
+    possibleColors: [PokemonColor.default]
+  },
+  gloom: {
+    id: 44,
+    name: 'Gloom',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Gloom!',
+    possibleColors: [PokemonColor.default]
+  },
+  vileplume: {
+    id: 45,
+    name: 'Vileplume',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Vileplume!',
+    possibleColors: [PokemonColor.default]
+  },
+  paras: {
+    id: 46,
+    name: 'Paras',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Paras!',
+    possibleColors: [PokemonColor.default]
+  },
+  parasect: {
+    id: 47,
+    name: 'Parasect',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Parasect!',
+    possibleColors: [PokemonColor.default]
+  },
+  venonat: {
+    id: 48,
+    name: 'Venonat',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Venonat!',
+    possibleColors: [PokemonColor.default]
+  },
+  venomoth: {
+    id: 49,
+    name: 'Venomoth',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Venomoth!',
+    possibleColors: [PokemonColor.default]
+  },
+  diglett: {
+    id: 50,
+    name: 'Diglett',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Diglett!',
+    possibleColors: [PokemonColor.default]
+  },
+  dugtrio: {
+    id: 51,
+    name: 'Dugtrio',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Dugtrio!',
+    possibleColors: [PokemonColor.default]
+  },
+  meowth: {
+    id: 52,
+    name: 'Meowth',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Meowth!',
+    possibleColors: [PokemonColor.default]
+  },
+  persian: {
+    id: 53,
+    name: 'Persian',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Persian!',
+    possibleColors: [PokemonColor.default]
+  },
+  psyduck: {
+    id: 54,
+    name: 'Psyduck',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Psyduck!',
+    possibleColors: [PokemonColor.default]
+  },
+  golduck: {
+    id: 55,
+    name: 'Golduck',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Golduck!',
+    possibleColors: [PokemonColor.default]
+  },
+  mankey: {
+    id: 56,
+    name: 'Mankey',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Mankey!',
+    possibleColors: [PokemonColor.default]
+  },
+  primeape: {
+    id: 57,
+    name: 'Primeape',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Primeape!',
+    possibleColors: [PokemonColor.default]
+  },
+  growlithe: {
+    id: 58,
+    name: 'Growlithe',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Growlithe!',
+    possibleColors: [PokemonColor.default]
+  },
+  arcanine: {
+    id: 59,
+    name: 'Arcanine',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Arcanine!',
+    possibleColors: [PokemonColor.default]
+  },
+  poliwag: {
+    id: 60,
+    name: 'Poliwag',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Poliwag!',
+    possibleColors: [PokemonColor.default]
+  },
+  poliwhirl: {
+    id: 61,
+    name: 'Poliwhirl',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Poliwhirl!',
+    possibleColors: [PokemonColor.default]
+  },
+  poliwrath: {
+    id: 62,
+    name: 'Poliwrath',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Poliwrath!',
+    possibleColors: [PokemonColor.default]
+  },
+  abra: {
+    id: 63,
+    name: 'Abra',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Abra!',
+    possibleColors: [PokemonColor.default]
+  },
+  kadabra: {
+    id: 64,
+    name: 'Kadabra',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kadabra!',
+    possibleColors: [PokemonColor.default]
+  },
+  alakazam: {
+    id: 65,
+    name: 'Alakazam',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Alakazam!',
+    possibleColors: [PokemonColor.default]
+  },
   dragonite: {
     id: 149,
     name: 'Dragonite',
