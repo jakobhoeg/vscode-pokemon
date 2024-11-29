@@ -456,6 +456,209 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Alakazam!',
     possibleColors: [PokemonColor.default]
   },
+  machop: {
+    id: 66,
+    name: 'Machop',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Machop!',
+    possibleColors: [PokemonColor.default]
+  },
+  machoke: {
+    id: 67,
+    name: 'Machoke',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Machoke!',
+    possibleColors: [PokemonColor.default]
+  },
+  machamp: {
+    id: 68,
+    name: 'Machamp',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Alakazam!',
+    possibleColors: [PokemonColor.default]
+  },
+  bellsprout: {
+    id: 69,
+    name: 'Bellsprout',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Bellsprout!',
+    possibleColors: [PokemonColor.default]
+  },
+  weepinbell: {
+    id: 70,
+    name: 'Weepinbell',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Weepinbell!',
+    possibleColors: [PokemonColor.default]
+  },
+  victreebel: {
+    id: 71,
+    name: 'Victreebel',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Victreebel!',
+    possibleColors: [PokemonColor.default]
+  },
+  tentacool: {
+    id: 72,
+    name: 'Tentacool',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Tentacool!',
+    possibleColors: [PokemonColor.default]
+  },
+  tentacruel: {
+    id: 73,
+    name: 'Tentacruel',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Tentacruel!',
+    possibleColors: [PokemonColor.default]
+  },
+  geodude: {
+    id: 74,
+    name: 'Geodude',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Geodude!',
+    possibleColors: [PokemonColor.default]
+  },
+  graveler: {
+    id: 75,
+    name: 'Graveler',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Graveler!',
+    possibleColors: [PokemonColor.default]
+  },
+  golem: {
+    id: 76,
+    name: 'Golem',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Golem!',
+    possibleColors: [PokemonColor.default]
+  },
+  ponyta: {
+    id: 77,
+    name: 'Ponyta',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Ponyta!',
+    possibleColors: [PokemonColor.default]
+  },
+  rapidash: {
+    id: 78,
+    name: 'Rapidash',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Rapidash!',
+    possibleColors: [PokemonColor.default]
+  },
+  slowpoke: {
+    id: 79,
+    name: 'Slowpoke',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Slowpoke!',
+    possibleColors: [PokemonColor.default]
+  },
+  slowbro: {
+    id: 80,
+    name: 'Slowbro',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Slowbro!',
+    possibleColors: [PokemonColor.default]
+  },
+  magnemite: {
+    id: 81,
+    name: 'Magnemite',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Magnemite!',
+    possibleColors: [PokemonColor.default]
+  },
+  magneton: {
+    id: 82,
+    name: 'Magneton',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Magneton!',
+    possibleColors: [PokemonColor.default]
+  },
+  farfetchd: {
+    id: 83,
+    name: 'Farfetch\'d',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Farfetch\'d!',
+    possibleColors: [PokemonColor.default]
+  },
+  doduo: {
+    id: 84,
+    name: 'Doduo',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Doduo!',
+    possibleColors: [PokemonColor.default]
+  },
+  dodrio: {
+    id: 85,
+    name: 'Dodrio',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Dodrio!',
+    possibleColors: [PokemonColor.default]
+  },
+  seel: {
+    id: 86,
+    name: 'Seel',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Seel!',
+    possibleColors: [PokemonColor.default]
+  },
+  dewgong: {
+    id: 87,
+    name: 'Dewgong',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Dewgong!',
+    possibleColors: [PokemonColor.default]
+  },
+  grimer: {
+    id: 88,
+    name: 'Grimer',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Grimer!',
+    possibleColors: [PokemonColor.default]
+  },
+  muk: {
+    id: 89,
+    name: 'Muk',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Muk!',
+    possibleColors: [PokemonColor.default]
+  },
+  shellder: {
+    id: 90,
+    name: 'Shellder',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Shellder!',
+    possibleColors: [PokemonColor.default]
+  },
+  cloyster: {
+    id: 91,
+    name: 'Cloyster',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Cloyster!',
+    possibleColors: [PokemonColor.default]
+  },
+  gastly: {
+    id: 92,
+    name: 'Gastly',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Gastly!',
+    possibleColors: [PokemonColor.default]
+  },
+  haunter: {
+    id: 93,
+    name: 'Haunter',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Haunter!',
+    possibleColors: [PokemonColor.default]
+  },
+  gengar: {
+    id: 94,
+    name: 'Gengar',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Gengar!',
+    possibleColors: [PokemonColor.default]
+  },
   dragonite: {
     id: 149,
     name: 'Dragonite',
