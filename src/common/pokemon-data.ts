@@ -190,57 +190,64 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Sandshrew!',
     possibleColors: [PokemonColor.default]
   },
-  nidoran_female: {
+  sandslash: {
     id: 28,
+    name: 'Sandslash',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Sandslash!',
+    possibleColors: [PokemonColor.default]
+  },
+  nidoran_female: {
+    id: 29,
     name: 'Nidoran♀',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidoran!',
     possibleColors: [PokemonColor.default]
   },
   nidorina: {
-    id: 29,
+    id: 30,
     name: 'Nidorina',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidorina!',
     possibleColors: [PokemonColor.default]
   },
   nidoqueen: {
-    id: 30,
+    id: 31,
     name: 'Nidoqueen',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidoqueen!',
     possibleColors: [PokemonColor.default]
   },
   nidoran_male: {
-    id: 31,
+    id: 32,
     name: 'Nidoran♂',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidoran!',
     possibleColors: [PokemonColor.default]
   },
   nidorino: {
-    id: 32,
+    id: 33,
     name: 'Nidorino',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidorino!',
     possibleColors: [PokemonColor.default]
   },
   nidoking: {
-    id: 33,
+    id: 34,
     name: 'Nidoking',
     generation: PokemonGeneration.Gen1,
     cry: 'Nidoking!',
     possibleColors: [PokemonColor.default]
   },
   clefairy: {
-    id: 34,
+    id: 35,
     name: 'Clefairy',
     generation: PokemonGeneration.Gen1,
     cry: 'Clefairy!',
     possibleColors: [PokemonColor.default]
   },
   clefable: {
-    id: 35,
+    id: 36,
     name: 'Clefable',
     generation: PokemonGeneration.Gen1,
     cry: 'Clefable!',
