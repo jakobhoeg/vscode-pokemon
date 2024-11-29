@@ -123,9 +123,9 @@ function startAnimations(
     }, 100);
 }
 
-function addPetToPanel(
+function addPokemonToPanel(
     pokemonType: PokemonType,
-    basePetUri: string,
+    basePokemonUri: string,
     gen: string,
     pokemonColor: PokemonColor,
     pokemonSize: PokemonSize,
@@ -154,13 +154,13 @@ function addPetToPanel(
         speechBubbleElement,
     );
 
-    const root = `${basePetUri}/${gen}/${pokemonType}/${pokemonColor}`;
+    const root = `${basePokemonUri}/${gen}/${pokemonType}/${pokemonColor}`;
     console.log('Creating new pokemon : ', pokemonType, root, pokemonColor, pokemonSize, name);
     try {
         if (!availableColors(pokemonType).includes(pokemonColor)) {
             throw new InvalidPokemonException('Invalid color for pokemon type');
         }
-        var newPet = createPokemon(
+        var newPokemon = createPokemon(
             pokemonType,
             pokemonSpriteElement,
             collisionElement,
@@ -174,7 +174,7 @@ function addPetToPanel(
             gen
         );
         pokemonCounter++;
-        startAnimations(collisionElement, newPet, stateApi);
+        startAnimations(collisionElement, newPokemon, stateApi);
     } catch (e: any) {
         // Remove elements
         pokemonSpriteElement.remove();
@@ -187,7 +187,7 @@ function addPetToPanel(
         pokemonSpriteElement,
         collisionElement,
         speechBubbleElement,
-        newPet,
+        newPokemon,
         pokemonColor,
         pokemonType,
         gen,
@@ -218,7 +218,7 @@ export function saveState(stateApi?: VscodeStateApi) {
 }
 
 function recoverState(
-    basePetUri: string,
+    basePokemonUri: string,
     gen: string,
     pokemonSize: PokemonSize,
     floor: number,
@@ -241,9 +241,9 @@ function recoverState(
     var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
     state?.pokemonStates?.forEach((p) => {
         try {
-            var newPet = addPetToPanel(
+            var newPokemon = addPokemonToPanel(
                 p.pokemonType ?? 'bulbasaur',
-                basePetUri,
+                basePokemonUri,
                 p.pokemonGeneration ?? 'gen1',
                 p.pokemonColor ?? PokemonColor.default,
                 pokemonSize,
@@ -253,9 +253,9 @@ function recoverState(
                 p.pokemonName ?? randomName(p.pokemonType ?? 'bulbasaur'),
                 stateApi,
             );
-            allPokemon.push(newPet);
-            recoveryMap.set(newPet.pokemon, p);
-        } catch (InvalidPetException) {
+            allPokemon.push(newPokemon);
+            recoveryMap.set(newPokemon.pokemon, p);
+        } catch (InvalidPokemonException) {
             console.log(
                 'State had invalid pokemon (' + p.pokemonType + '), discarding.',
             );
@@ -301,7 +301,7 @@ function initCanvas() {
 
 // It cannot access the main VS Code APIs directly.
 export function pokemonPanelApp(
-    basePetUri: string,
+    basePokemonUri: string,
     theme: Theme,
     themeKind: ColorThemeKind,
     pokemonColor: PokemonColor,
@@ -333,9 +333,9 @@ export function pokemonPanelApp(
                 break;
         }
 
-        document.body.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/background-${_themeKind}-${pokemonSize}.png')`;
+        document.body.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${theme}/background-${_themeKind}-${pokemonSize}.png')`;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        foregroundEl!.style.backgroundImage = `url('${basePetUri}/backgrounds/${theme}/foreground-${_themeKind}-${pokemonSize}.png')`;
+        foregroundEl!.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${theme}/foreground-${_themeKind}-${pokemonSize}.png')`;
 
         floor = calculateFloor(pokemonSize, theme); // Themes have pokemonCollection at a specified height from the ground
     } else {
@@ -347,7 +347,7 @@ export function pokemonPanelApp(
     console.log(
         'Starting pokemon session',
         pokemonColor,
-        basePetUri,
+        basePokemonUri,
         pokemonType,
         throwBallWithMouse,
     );
@@ -358,9 +358,9 @@ export function pokemonPanelApp(
         console.log('No state, starting a new session.');
         pokemonCounter = 1;
         allPokemon.push(
-            addPetToPanel(
+            addPokemonToPanel(
                 pokemonType,
-                basePetUri,
+                basePokemonUri,
                 gen,
                 pokemonColor,
                 pokemonSize,
@@ -374,7 +374,7 @@ export function pokemonPanelApp(
         saveState(stateApi);
     } else {
         console.log('Recovering state - ', state);
-        recoverState(basePetUri, gen, pokemonSize, floor, stateApi);
+        recoverState(basePokemonUri, gen, pokemonSize, floor, stateApi);
     }
 
     initCanvas();
@@ -385,9 +385,9 @@ export function pokemonPanelApp(
         switch (message.command) {
             case 'spawn-pokemon':
                 allPokemon.push(
-                    addPetToPanel(
+                    addPokemonToPanel(
                         message.type,
-                        basePetUri,
+                        basePokemonUri,
                         message.generation,
                         message.color,
                         pokemonSize,

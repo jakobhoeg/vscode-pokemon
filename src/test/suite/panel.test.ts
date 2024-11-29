@@ -1,5 +1,3 @@
-import * as assert from 'assert';
-
 function mockPanelWindow() {
     const html =
         '<!doctype html><html><body><div id="pokemonContainer"></div><div id="foreground"></div></body></html>';
