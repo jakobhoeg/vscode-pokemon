@@ -18,7 +18,7 @@
 [![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/tonybaloney.vscode-pets?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw)
 [![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/tonybaloney.vscode-pets?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw) -->
 
-![screenshot](https://github.com/jakobheg/vscode-pokemon/raw/main/vscode-pokemon.gif)
+![screenshot](https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon.gif)
 
 ## Installation
 
