@@ -659,11 +659,403 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Gengar!',
     possibleColors: [PokemonColor.default]
   },
+  onix: {
+    id: 95,
+    name: 'Onix',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Onix!',
+    possibleColors: [PokemonColor.default]
+  },
+  drowzee: {
+    id: 96,
+    name: 'Drowzee',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Drowzee!',
+    possibleColors: [PokemonColor.default]
+  },
+  hypno: {
+    id: 97,
+    name: 'Hypno',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Hypno!',
+    possibleColors: [PokemonColor.default]
+  },
+  krabby: {
+    id: 98,
+    name: 'Krabby',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Krabby!',
+    possibleColors: [PokemonColor.default]
+  },
+  kingler: {
+    id: 99,
+    name: 'Kingler',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kingler!',
+    possibleColors: [PokemonColor.default]
+  },
+  voltorb: {
+    id: 100,
+    name: 'Voltorb',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Voltorb!',
+    possibleColors: [PokemonColor.default]
+  },
+  electrode: {
+    id: 101,
+    name: 'Electrode',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Electrode!',
+    possibleColors: [PokemonColor.default]
+  },
+  exeggcute: {
+    id: 102,
+    name: 'Exeggcute',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Exeggcute!',
+    possibleColors: [PokemonColor.default]
+  },
+  exeggutor: {
+    id: 103,
+    name: 'Exeggutor',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Exeggutor!',
+    possibleColors: [PokemonColor.default]
+  },
+  cubone: {
+    id: 104,
+    name: 'Cubone',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Cubone!',
+    possibleColors: [PokemonColor.default]
+  },
+  marowak: {
+    id: 105,
+    name: 'Marowak',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Marowak!',
+    possibleColors: [PokemonColor.default]
+  },
+  hitmonlee: {
+    id: 106,
+    name: 'Hitmonlee',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Hitmonlee!',
+    possibleColors: [PokemonColor.default]
+  },
+  hitmonchan: {
+    id: 107,
+    name: 'Hitmonchan',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Hitmonchan!',
+    possibleColors: [PokemonColor.default]
+  },
+  lickitung: {
+    id: 108,
+    name: 'Lickitung',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Lickitung!',
+    possibleColors: [PokemonColor.default]
+  },
+  koffing: {
+    id: 109,
+    name: 'Koffing',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Koffing!',
+    possibleColors: [PokemonColor.default]
+  },
+  weezing: {
+    id: 110,
+    name: 'Weezing',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Weezing!',
+    possibleColors: [PokemonColor.default]
+  },
+  rhyhorn: {
+    id: 111,
+    name: 'Rhyhorn',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Rhyhorn!',
+    possibleColors: [PokemonColor.default]
+  },
+  rhydon: {
+    id: 112,
+    name: 'Rhydon',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Rhydon!',
+    possibleColors: [PokemonColor.default]
+  },
+  chansey: {
+    id: 113,
+    name: 'Chansey',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Chansey!',
+    possibleColors: [PokemonColor.default]
+  },
+  tangela: {
+    id: 114,
+    name: 'Tangela',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Tangela!',
+    possibleColors: [PokemonColor.default]
+  },
+  kangaskhan: {
+    id: 115,
+    name: 'Kangaskhan',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kangaskhan!',
+    possibleColors: [PokemonColor.default]
+  },
+  horsea: {
+    id: 116,
+    name: 'Horsea',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Horsea!',
+    possibleColors: [PokemonColor.default]
+  },
+  seadra: {
+    id: 117,
+    name: 'Seadra',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Seadra!',
+    possibleColors: [PokemonColor.default]
+  },
+  goldeen: {
+    id: 118,
+    name: 'Goldeen',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Goldeen!',
+    possibleColors: [PokemonColor.default]
+  },
+  seaking: {
+    id: 119,
+    name: 'Seaking',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Seaking!',
+    possibleColors: [PokemonColor.default]
+  },
+  staryu: {
+    id: 120,
+    name: 'Staryu',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Staryu!',
+    possibleColors: [PokemonColor.default]
+  },
+  starmie: {
+    id: 121,
+    name: 'Starmie',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Starmie!',
+    possibleColors: [PokemonColor.default]
+  },
+  mr_mime: {
+    id: 122,
+    name: 'Mr. Mime',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Mr. Mime!',
+    possibleColors: [PokemonColor.default]
+  },
+  scyther: {
+    id: 123,
+    name: 'Scyther',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Scyther!',
+    possibleColors: [PokemonColor.default]
+  },
+  jynx: {
+    id: 124,
+    name: 'Jynx',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Jynx!',
+    possibleColors: [PokemonColor.default]
+  },
+  electabuzz: {
+    id: 125,
+    name: 'Electabuzz',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Electabuzz!',
+    possibleColors: [PokemonColor.default]
+  },
+  magmar: {
+    id: 126,
+    name: 'Magmar',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Magmar!',
+    possibleColors: [PokemonColor.default]
+  },
+  pinsir: {
+    id: 127,
+    name: 'Pinsir',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Pinsir!',
+    possibleColors: [PokemonColor.default]
+  },
+  tauros: {
+    id: 128,
+    name: 'Tauros',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Tauros!',
+    possibleColors: [PokemonColor.default]
+  },
+  magikarp: {
+    id: 129,
+    name: 'Magikarp',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Magikarp!',
+    possibleColors: [PokemonColor.default]
+  },
+  gyarados: {
+    id: 130,
+    name: 'Gyarados',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Gyarados!',
+    possibleColors: [PokemonColor.default]
+  },
+  lapras: {
+    id: 131,
+    name: 'Lapras',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Lapras!',
+    possibleColors: [PokemonColor.default]
+  },
+  ditto: {
+    id: 132,
+    name: 'Ditto',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Ditto!',
+    possibleColors: [PokemonColor.default]
+  },
+  eevee: {
+    id: 133,
+    name: 'Eevee',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Eevee!',
+    possibleColors: [PokemonColor.default]
+  },
+  vaporeon: {
+    id: 134,
+    name: 'Vaporeon',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Vaporeon!',
+    possibleColors: [PokemonColor.default]
+  },
+  jolteon: {
+    id: 135,
+    name: 'Jolteon',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Jolteon!',
+    possibleColors: [PokemonColor.default]
+  },
+  flareon: {
+    id: 136,
+    name: 'Flareon',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Flareon!',
+    possibleColors: [PokemonColor.default]
+  },
+  porygon: {
+    id: 137,
+    name: 'Porygon',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Porygon!',
+    possibleColors: [PokemonColor.default]
+  },
+  omanyte: {
+    id: 138,
+    name: 'Omanyte',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Omanyte!',
+    possibleColors: [PokemonColor.default]
+  },
+  omastar: {
+    id: 139,
+    name: 'Omastar',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Omastar!',
+    possibleColors: [PokemonColor.default]
+  },
+  kabuto: {
+    id: 140,
+    name: 'Kabuto',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kabuto!',
+    possibleColors: [PokemonColor.default]
+  },
+  kabutops: {
+    id: 141,
+    name: 'Kabutops',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Kabutops!',
+    possibleColors: [PokemonColor.default]
+  },
+  aerodactyl: {
+    id: 142,
+    name: 'Aerodactyl',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Aerodactyl!',
+    possibleColors: [PokemonColor.default]
+  },
+  snorlax: {
+    id: 143,
+    name: 'Snorlax',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Snorlax!',
+    possibleColors: [PokemonColor.default]
+  },
+  articuno: {
+    id: 144,
+    name: 'Articuno',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Articuno!',
+    possibleColors: [PokemonColor.default]
+  },
+  zapdos: {
+    id: 145,
+    name: 'Zapdos',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Zapdos!',
+    possibleColors: [PokemonColor.default]
+  },
+  moltres: {
+    id: 146,
+    name: 'Moltres',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Moltres!',
+    possibleColors: [PokemonColor.default]
+  },
+  dratini: {
+    id: 147,
+    name: 'Dratini',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Dratini!',
+    possibleColors: [PokemonColor.default]
+  },
+  dragonair: {
+    id: 148,
+    name: 'Dragonair',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Dragonair!',
+    possibleColors: [PokemonColor.default]
+  },
   dragonite: {
     id: 149,
     name: 'Dragonite',
     generation: PokemonGeneration.Gen1,
-    cry: 'Draa!',
+    cry: 'Dragonite!',
+    possibleColors: [PokemonColor.default]
+  },
+  mewtwo: {
+    id: 150,
+    name: 'Mewtwo',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Mewtwo!',
+    possibleColors: [PokemonColor.default]
+  },
+  mew: {
+    id: 151,
+    name: 'Mew',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Mew!',
     possibleColors: [PokemonColor.default]
   },
 };
