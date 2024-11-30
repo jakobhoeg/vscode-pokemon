@@ -134,6 +134,7 @@ function addPokemonToPanel(
     floor: number,
     name: string,
     stateApi?: VscodeStateApi,
+    incrementCounter: boolean = true
 ): PokemonElement {
     var pokemonSpriteElement: HTMLImageElement = document.createElement('img');
     pokemonSpriteElement.className = 'pokemon';
@@ -173,7 +174,9 @@ function addPokemonToPanel(
             name,
             gen
         );
-        pokemonCounter++;
+        if (incrementCounter) {
+            pokemonCounter++;
+        }
         startAnimations(collisionElement, newPokemon, stateApi);
     } catch (e: any) {
         // Remove elements
@@ -252,6 +255,7 @@ function recoverState(
                 floor,
                 p.pokemonName ?? randomName(p.pokemonType ?? 'bulbasaur'),
                 stateApi,
+                false
             );
             allPokemon.push(newPokemon);
             recoveryMap.set(newPokemon.pokemon, p);
@@ -432,6 +436,7 @@ export function pokemonPanelApp(
                         command: 'info',
                         text: '👋 Removed pokemon ' + message.name,
                     });
+                    pokemonCounter--;
                 } else {
                     stateApi?.postMessage({
                         command: 'error',
