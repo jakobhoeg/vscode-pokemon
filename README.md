@@ -14,9 +14,9 @@
     <a href="https://github.com/jakobhoeg/vscode-pokemon/issues/new?assignees=&labels=feature&template=feature_request.md&title=">Request feature</a>
 </p>
 
-<!-- [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/tonybaloney.vscode-pets?color=blue&logo=visual-studio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw)
-[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/tonybaloney.vscode-pets?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw)
-[![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/tonybaloney.vscode-pets?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw) -->
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/jakobhoeg.vscode-pokemon)
+![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/jakobhoeg.vscode-pokemon)
+![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/jakobhoeg.vscode-pokemon)
 
 <div align="center">
 <picture>
@@ -28,29 +28,39 @@
 
 ## Installation
 
-<!-- Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=tonybaloney.vscode-pets&WT.mc_id=python-17801-anthonyshaw).
+Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon).
+
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/install.png)
 
 OR
 
-With VS Code open, search for `vscode-pets` in the extension panel (`Ctrl+Shift+X` on Windows/Linux or `Cmd(⌘)+Shift+X` on MacOS) and click install.
+With VS Code open, search for `vscode-pokemon` in the extension panel (`Ctrl+Shift+X` on Windows/Linux or `Cmd(⌘)+Shift+X` on MacOS) and click install.
 
 OR
 
 With VS Code open, launch VS Code Quick Open (`Ctrl+P` on Windows/Linux or `Cmd(⌘)+P` on MacOS), paste the following command, and press enter.
 
-`ext install tonybaloney.vscode-pets` -->
+`ext install jakobhoeg.vscode-pokemon`
 
 ## Using VS Code Pokémon
 
-<!-- Congrats on installing joy! Enjoy interacting with these cute pixelated pets. Read below to get a full understanding of this extension. Not convinced? Watch our extension spotlight on [Visual Studio Code](https://www.youtube.com/watch?v=aE6Ifj_KstI).
-
 After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS.  
 
-Run the "Start Pokemon coding session" command (`vscode-pets.start`) to see a cat in VS Code:
+Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a Bulbasaur in VS Code:
 
-![Default view](https://github.com/tonybaloney/vscode-pets/raw/main/docs/source/_static/pet-in-default-explorer.png)
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/usage.png)
 
-[Now checkout the documentation to see what else is possible!](https://tonybaloney.github.io/vscode-pets) -->
+Enjoy interacting with your favourite Pokémon!
+
+## Changing settings
+
+Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In the search bar, enter “vscode-pokemon" to see all available options.
+
+Set the size and position of the extension.
+
+## Upcoming features
+
+Extracting and making the .gif files takes quite some tedious manual work, but I'll be aiming to add gen 2 and 3 sprites very soon!
 
 ## Credits
 
