@@ -115,8 +115,8 @@ export class PokemonCollection implements IPokemonCollection {
                     if (
                         pokemonInCollection.pokemon.makeFriendsWith(potentialFriend.pokemon)
                     ) {
-                        potentialFriend.pokemon.showSpeechBubble('❤️', 2000);
-                        pokemonInCollection.pokemon.showSpeechBubble('❤️', 2000);
+                        potentialFriend.pokemon.showSpeechBubble(2000, true);
+                        pokemonInCollection.pokemon.showSpeechBubble(2000, true);
                     }
                 }
             });
@@ -137,7 +137,7 @@ export function createPokemon(
     pokemonType: string,
     el: HTMLImageElement,
     collision: HTMLDivElement,
-    speech: HTMLDivElement,
+    speech: HTMLImageElement,
     size: PokemonSize,
     left: number,
     bottom: number,

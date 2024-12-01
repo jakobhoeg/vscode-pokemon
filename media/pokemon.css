@@ -139,56 +139,36 @@ img.pokemon {
 .bubble {
 	position: absolute;
 	text-align: center;
-	background-color: #fff;
-	font-family: silkscreen, sans-serif;
-	width: 60px;
-	line-height: 1.4em;
-	margin: 0px auto;
-	border: 2px solid #333;
-	border-radius: 10px;
-	padding: 10px 0;
+	left: 50%;
+	transform: translateX(50%);
+	opacity: 0;
+	animation: fadeIn 0.2s forwards;
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+		transform: translateX(50%) translateY(10px);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translateX(50%) translateY(0);
+	}
 }
 
 .bubble-nano {
-	font-size: 9px;
+	width: 15px;
 }
 
 .bubble-small {
-	font-size: 10px;
+	width: 22.5px;
 }
 
 .bubble-medium {
-	font-size: 12px;
+	width: 30px;
 }
 
 .bubble-large {
-	font-size: 16px;
-}
-
-.bubble:before,
-.bubble:after {
-	content: ' ';
-	position: absolute;
-	width: 0;
-	height: 0;
-}
-
-.bubble-nano:before,
-.bubble-small:before,
-.bubble-medium:before,
-.bubble-large:before {
-	left: 10px;
-	bottom: -15px;
-	border: 7px solid;
-	border-color: #333 transparent transparent #333;
-}
-
-.bubble-nano:after,
-.bubble-small:after,
-.bubble-medium:after,
-.bubble-large:after {
-	left: 12px;
-	bottom: -10px;
-	border: 5px solid;
-	border-color: #fff transparent transparent #fff;
+	width: 37.5px;
 }

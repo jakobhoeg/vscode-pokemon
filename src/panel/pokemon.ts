@@ -11,7 +11,7 @@ export class Pokemon extends BasePokemonType {
     pokemonType: string,
     spriteElement: HTMLImageElement,
     collisionElement: HTMLDivElement,
-    speechElement: HTMLDivElement,
+    speechElement: HTMLImageElement,
     size: PokemonSize,
     left: number,
     bottom: number,
@@ -56,8 +56,8 @@ export class Pokemon extends BasePokemonType {
   }
 
 
-  showSpeechBubble(message: string = this.config.cry, duration: number = 3000) {
-    super.showSpeechBubble(message, duration);
+  showSpeechBubble(duration: number = 3000, friend: boolean) {
+    super.showSpeechBubble(duration, friend);
   }
 
   static getPokemonData(type: string): PokemonConfig | undefined {
