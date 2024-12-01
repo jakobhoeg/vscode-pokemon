@@ -38,7 +38,7 @@ export abstract class BasePokemonType implements IPokemonType {
     holdStateEnum: States | undefined;
     private el: HTMLImageElement;
     private collision: HTMLDivElement;
-    private speech: HTMLDivElement;
+    private speech: HTMLImageElement;
     private _left: number;
     private _bottom: number;
     pokemonRoot: string;
@@ -52,7 +52,7 @@ export abstract class BasePokemonType implements IPokemonType {
     constructor(
         spriteElement: HTMLImageElement,
         collisionElement: HTMLDivElement,
-        speechElement: HTMLDivElement,
+        speechElement: HTMLImageElement,
         size: PokemonSize,
         left: number,
         bottom: number,
@@ -205,8 +205,17 @@ export abstract class BasePokemonType implements IPokemonType {
         return !isStateAboveGround(this.currentStateEnum) && this.isMoving;
     }
 
-    showSpeechBubble(message: string, duration: number = 3000) {
-        this.speech.innerHTML = message;
+    showSpeechBubble(duration: number = 3000, friend: boolean = false) {
+        // Extract the media folder
+        const segments = this.pokemonRoot.split('/');
+        const basePath = segments.slice(0, segments.length - 3).join('/');
+
+        if (friend) {
+            this.speech.src = `${basePath}/heart.png`;
+        } else {
+            this.speech.src = `${basePath}/happy.png`;
+        }
+
         this.speech.style.display = 'block';
         setTimeout(() => {
             this.hideSpeechBubble();
@@ -225,7 +234,7 @@ export abstract class BasePokemonType implements IPokemonType {
         this.holdStateEnum = this.currentStateEnum;
         this.currentStateEnum = States.swipe;
         this.currentState = resolveState(this.currentStateEnum, this);
-        this.showSpeechBubble('👋');
+        this.showSpeechBubble();
     }
 
     chase(ballState: BallState, canvas: HTMLCanvasElement) {

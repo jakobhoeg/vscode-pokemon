@@ -33,7 +33,7 @@ export interface IPokemonType {
     makeFriendsWith(friend: IPokemonType): boolean;
     isPlaying: boolean;
 
-    showSpeechBubble(message: string, duration: number): void;
+    showSpeechBubble(duration: number, friend: boolean): void;
 }
 
 export class PokemonInstanceState {
