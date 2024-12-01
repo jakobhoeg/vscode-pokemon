@@ -60,7 +60,7 @@ Set the size and position of the extension.
 
 ## Upcoming features
 
-Extracting and making the .gif files takes quite some tedious manual work, but I'll be aiming to add gen 2 and 3 sprites very soon!
+Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 2 and Gen 3 sprites very soon!
 
 ## Credits
 
