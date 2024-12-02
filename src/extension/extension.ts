@@ -1089,7 +1089,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         this._update();
 
         // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programatically
+        // This happens when the user closes the panel or when the panel is closed programmatically
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
         // Update the content based on view changes
