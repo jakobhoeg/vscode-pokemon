@@ -43,6 +43,7 @@ export class PokemonInstanceState {
 export class PokemonElementState {
     pokemonState: PokemonInstanceState | undefined;
     pokemonGeneration: string | undefined;
+    originalSpriteSize: number | undefined;
     pokemonType: PokemonType | undefined;
     pokemonColor: PokemonColor | undefined;
     elLeft: string | undefined;

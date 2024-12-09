@@ -127,6 +127,7 @@ function addPokemonToPanel(
     pokemonType: PokemonType,
     basePokemonUri: string,
     gen: string,
+    originalSpriteSize: number,
     pokemonColor: PokemonColor,
     pokemonSize: PokemonSize,
     left: number,
@@ -172,7 +173,8 @@ function addPokemonToPanel(
             root,
             floor,
             name,
-            gen
+            gen,
+            originalSpriteSize
         );
         if (incrementCounter) {
             pokemonCounter++;
@@ -194,6 +196,7 @@ function addPokemonToPanel(
         pokemonColor,
         pokemonType,
         gen,
+        originalSpriteSize,
     );
 }
 
@@ -211,6 +214,7 @@ export function saveState(stateApi?: VscodeStateApi) {
             pokemonType: pokemonItem.type,
             pokemonState: pokemonItem.pokemon.getState(),
             pokemonGeneration: pokemonItem.generation,
+            originalSpriteSize: pokemonItem.originalSpriteSize,
             pokemonFriend: pokemonItem.pokemon.friend?.name ?? undefined,
             elLeft: pokemonItem.el.style.left,
             elBottom: pokemonItem.el.style.bottom,
@@ -248,6 +252,7 @@ function recoverState(
                 p.pokemonType ?? 'bulbasaur',
                 basePokemonUri,
                 p.pokemonGeneration ?? 'gen1',
+                p.originalSpriteSize ?? 32,
                 p.pokemonColor ?? PokemonColor.default,
                 pokemonSize,
                 parseInt(p.elLeft ?? '0'),
@@ -313,6 +318,7 @@ export function pokemonPanelApp(
     pokemonType: PokemonType,
     throwBallWithMouse: boolean,
     gen: string,
+    originalSpriteSize: number,
     stateApi?: VscodeStateApi,
 ) {
     const ballRadius: number = calculateBallRadius(pokemonSize);
@@ -366,6 +372,7 @@ export function pokemonPanelApp(
                 pokemonType,
                 basePokemonUri,
                 gen,
+                originalSpriteSize,
                 pokemonColor,
                 pokemonSize,
                 randomStartPosition(),
@@ -393,6 +400,7 @@ export function pokemonPanelApp(
                         message.type,
                         basePokemonUri,
                         message.generation,
+                        message.originalSpriteSize,
                         message.color,
                         pokemonSize,
                         randomStartPosition(),

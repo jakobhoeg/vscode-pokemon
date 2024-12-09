@@ -8,7 +8,7 @@ export const enum PokemonColor {
 
 export enum PokemonGeneration {
     Gen1 = 1,
-    // Gen2 = 2,
+    Gen2 = 2,
     // Gen3 = 3,
 }
 
@@ -22,6 +22,7 @@ export interface PokemonConfig {
     generation: PokemonGeneration;
     cry: string;
     possibleColors: PokemonColor[];
+    originalSpriteSize?: number,
 }
 
 export const enum PokemonSpeed {
