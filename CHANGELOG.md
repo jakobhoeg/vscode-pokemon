@@ -2,6 +2,14 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [1.0.2]
+
+- Fix: added missing Victreebel & Omastar
+
+## [1.0.1]
+
+- Bump version to reflex changes to readme
+
 ## [1.0.0]
 
 - Added all 1st generation Pokémon.
