@@ -1058,6 +1058,14 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Mew!',
     possibleColors: [PokemonColor.default]
   },
+  hooh: {
+    id: 255,
+    name: 'Ho-Oh',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ho-Oh!',
+    possibleColors: [PokemonColor.default],
+    originalSpriteSize: 64,
+  },
 };
 
 export function getAllPokemon(): PokemonType[] {
