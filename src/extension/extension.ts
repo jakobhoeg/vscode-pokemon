@@ -923,16 +923,16 @@ class PokemonWebviewContainer implements IPokemonPanel {
 			<body>
                 <canvas id="pokemonCanvas"></canvas>
                 <div id="pokemonContainer"></div>
-                <div id="foreground"></div>    
+                <div id="foreground"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     pokemonApp.pokemonPanelApp(
                         "${basePokemonUri}",
-                        "${this.theme()}", 
-                        ${this.themeKind()}, 
-                        "${this.pokemonColor()}", 
-                        "${this.pokemonSize()}", 
-                        "${this.pokemonType()}", 
+                        "${this.theme()}",
+                        ${this.themeKind()},
+                        "${this.pokemonColor()}",
+                        "${this.pokemonSize()}",
+                        "${this.pokemonType()}",
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}"
                     );
