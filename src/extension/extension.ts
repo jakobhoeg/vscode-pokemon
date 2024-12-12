@@ -15,7 +15,7 @@ import {
 import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import { getDefaultPokemon, getPokemonByGeneration, POKEMON_DATA } from '../common/pokemon-data';
+import { getDefaultPokemon, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -597,6 +597,39 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-pokemon.spawn-random-pokemon', async () => {
+            const panel = getPokemonPanel();
+            if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
+                await vscode.commands.executeCommand('pokemonView.focus');
+            }
+            if (panel) {
+                var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+                const spec = new PokemonSpecification(
+                    randomPokemonConfig.possibleColors[0],
+                    randomPokemonType,
+                    getConfiguredSize(),
+                    randomPokemonConfig.name,
+                );
+
+                panel.spawnPokemon(spec);
+                var collection = PokemonSpecification.collectionFromMemento(
+                    context,
+                    getConfiguredSize(),
+                );
+                collection.push(spec);
+                await storeCollectionAsMemento(context, collection);
+
+            } else {
+                await createPokemonPlayground(context);
+                await vscode.window.showInformationMessage(
+                    vscode.l10n.t(
+                        "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
+                    ),
+                );
+            }
+        }))
+
+    context.subscriptions.push(
         vscode.commands.registerCommand(
             'vscode-pokemon.remove-all-pokemon',
             async () => {
@@ -923,16 +956,16 @@ class PokemonWebviewContainer implements IPokemonPanel {
 			<body>
                 <canvas id="pokemonCanvas"></canvas>
                 <div id="pokemonContainer"></div>
-                <div id="foreground"></div>    
+                <div id="foreground"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     pokemonApp.pokemonPanelApp(
                         "${basePokemonUri}",
-                        "${this.theme()}", 
-                        ${this.themeKind()}, 
-                        "${this.pokemonColor()}", 
-                        "${this.pokemonSize()}", 
-                        "${this.pokemonType()}", 
+                        "${this.theme()}",
+                        ${this.themeKind()},
+                        "${this.pokemonColor()}",
+                        "${this.pokemonSize()}",
+                        "${this.pokemonType()}",
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}"
                     );

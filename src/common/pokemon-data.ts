@@ -1073,3 +1073,9 @@ export function getPokemonByGeneration(generation: PokemonGeneration): PokemonTy
 export function getDefaultPokemon(): PokemonType {
   return 'bulbasaur';
 }
+
+export function getRandomPokemonConfig(): [PokemonType, PokemonConfig] {
+  var keys = Object.keys(POKEMON_DATA);
+  var randomKey = keys[Math.floor(Math.random() * keys.length)];
+  return [randomKey as PokemonType, POKEMON_DATA[randomKey]];
+}
