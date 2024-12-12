@@ -64,6 +64,11 @@
                     "group": "navigation@1"
                 },
                 {
+                    "command": "vscode-pokemon.spawn-random-pokemon",
+                    "when": "view == pokemonView",
+                    "group": "navigation@2"
+                },
+                {
                     "command": "vscode-pokemon.delete-pokemon",
                     "when": "view == pokemonView",
                     "group": "navigation@3"

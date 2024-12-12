@@ -407,9 +407,7 @@ export function pokemonPanelApp(
                 break;
 
             case 'spawn-random-pokemon':
-
-                var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig()
-
+                var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
                 allPokemon.push(
                     addPokemonToPanel(
                         randomPokemonType,
