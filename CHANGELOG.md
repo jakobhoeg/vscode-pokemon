@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [1.1.0]
+
+- Feat: add functionality for adding a random Pokemon
+
 ## [1.0.2]
 
 - Fix: added missing Victreebel & Omastar
