@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -32,6 +32,7 @@
     "activationEvents": [
         "onCommand:vscode-pokemon.start",
         "onCommand:vscode-pokemon.spawn-pokemon",
+        "onCommand:vscode-pokemon.spawn-random-pokemon",
         "onCommand:vscode-pokemon.delete-pokemon",
         "onCommand:vscode-pokemon.remove-all-pokemon",
         "onCommand:vscode-pokemon.roll-call",
@@ -63,6 +64,11 @@
                     "group": "navigation@1"
                 },
                 {
+                    "command": "vscode-pokemon.spawn-random-pokemon",
+                    "when": "view == pokemonView",
+                    "group": "navigation@2"
+                },
+                {
                     "command": "vscode-pokemon.delete-pokemon",
                     "when": "view == pokemonView",
                     "group": "navigation@3"
@@ -92,6 +98,15 @@
                 "icon": {
                     "dark": "media/icon/dark-add.svg",
                     "light": "media/icon/light-add.svg"
+                }
+            },
+            {
+                "command": "vscode-pokemon.spawn-random-pokemon",
+                "title": "Spawn random additional pokemon",
+                "category": "Pokemon Coding",
+                "icon": {
+                    "dark": "media/icon/dark-random.svg",
+                    "light": "media/icon/light-random.svg"
                 }
             },
             {

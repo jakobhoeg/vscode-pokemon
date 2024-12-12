@@ -18,6 +18,7 @@ import {
     InvalidPokemonException,
 } from './pokemon-collection';
 import { BallState, PokemonElementState, PokemonPanelState } from './states';
+import { getRandomPokemonConfig } from '../common/pokemon-data';
 
 /* This is how the VS Code API can be invoked from the panel */
 declare global {
@@ -407,6 +408,25 @@ export function pokemonPanelApp(
                         floor,
                         floor,
                         message.name ?? randomName(message.type),
+                        stateApi,
+                    ),
+                );
+                saveState(stateApi);
+                break;
+
+            case 'spawn-random-pokemon':
+                var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+                allPokemon.push(
+                    addPokemonToPanel(
+                        randomPokemonType,
+                        basePokemonUri,
+                        randomPokemonConfig.generation.toString(),
+                        PokemonColor.default,
+                        pokemonSize,
+                        randomStartPosition(),
+                        floor,
+                        floor,
+                        randomName(randomPokemonConfig.name),
                         stateApi,
                     ),
                 );
