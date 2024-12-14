@@ -1451,6 +1451,294 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     possibleColors: [PokemonColor.default],
     originalSpriteSize: 64,
   },
+  snubbull: {
+    id: 209,
+    name: 'Snubbull',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Snubbull!',
+    possibleColors: [PokemonColor.default]
+  },
+  granbull: {
+    id: 210,
+    name: 'Granbull',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Granbull!',
+    possibleColors: [PokemonColor.default]
+  },
+  qwilfish: {
+    id: 211,
+    name: 'Qwilfish',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Qwilfish!',
+    possibleColors: [PokemonColor.default]
+  },
+  scizor: {
+    id: 212,
+    name: 'Scizor',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Scizor!',
+    possibleColors: [PokemonColor.default]
+  },
+  shuckle: {
+    id: 213,
+    name: 'Shuckle',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Shuckle!',
+    possibleColors: [PokemonColor.default]
+  },
+  heracross: {
+    id: 214,
+    name: 'Heracross',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Heracross!',
+    possibleColors: [PokemonColor.default]
+  },
+  sneasel: {
+    id: 215,
+    name: 'Sneasel',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Sneasel!',
+    possibleColors: [PokemonColor.default]
+  },
+  teddiursa: {
+    id: 216,
+    name: 'Teddiursa',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Teddiursa!',
+    possibleColors: [PokemonColor.default]
+  },
+  ursaring: {
+    id: 217,
+    name: 'Ursaring',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ursaring!',
+    possibleColors: [PokemonColor.default]
+  },
+  slugma: {
+    id: 218,
+    name: 'Slugma',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Slugma!',
+    possibleColors: [PokemonColor.default]
+  },
+  magcargo: {
+    id: 219,
+    name: 'Magcargo',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Magcargo!',
+    possibleColors: [PokemonColor.default]
+  },
+  swinub: {
+    id: 220,
+    name: 'Swinub',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Swinub!',
+    possibleColors: [PokemonColor.default]
+  },
+  piloswine: {
+    id: 221,
+    name: 'Piloswine',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Piloswine!',
+    possibleColors: [PokemonColor.default]
+  },
+  corsola: {
+    id: 222,
+    name: 'Corsola',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Corsola!',
+    possibleColors: [PokemonColor.default]
+  },
+  remoraid: {
+    id: 223,
+    name: 'Remoraid',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Remoraid!',
+    possibleColors: [PokemonColor.default]
+  },
+  octillery: {
+    id: 224,
+    name: 'Octillery',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Octillery!',
+    possibleColors: [PokemonColor.default]
+  },
+  delibird: {
+    id: 225,
+    name: 'Delibird',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Delibird!',
+    possibleColors: [PokemonColor.default]
+  },
+  mantine: {
+    id: 226,
+    name: 'Mantine',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Mantine!',
+    possibleColors: [PokemonColor.default]
+  },
+  skarmory: {
+    id: 227,
+    name: 'Skarmory',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Skarmory!',
+    possibleColors: [PokemonColor.default]
+  },
+  houndour: {
+    id: 228,
+    name: 'Houndour',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Houndour!',
+    possibleColors: [PokemonColor.default]
+  },
+  houndoom: {
+    id: 229,
+    name: 'Houndoom',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Houndoom!',
+    possibleColors: [PokemonColor.default]
+  },
+  kingdra: {
+    id: 230,
+    name: 'Kingdra',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Kingdra!',
+    possibleColors: [PokemonColor.default]
+  },
+  phanpy: {
+    id: 231,
+    name: 'Phanpy',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Phanpy!',
+    possibleColors: [PokemonColor.default]
+  },
+  donphan: {
+    id: 232,
+    name: 'Donphan',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Donphan!',
+    possibleColors: [PokemonColor.default]
+  },
+  porygon2: {
+    id: 233,
+    name: 'Porygon2',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Porygon2!',
+    possibleColors: [PokemonColor.default]
+  },
+  stantler: {
+    id: 234,
+    name: 'Stantler',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Stantler!',
+    possibleColors: [PokemonColor.default]
+  },
+  smeargle: {
+    id: 235,
+    name: 'Smeargle',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Smeargle!',
+    possibleColors: [PokemonColor.default]
+  },
+  tyrogue: {
+    id: 236,
+    name: 'Tyrogue',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Tyrogue!',
+    possibleColors: [PokemonColor.default]
+  },
+  hitmontop: {
+    id: 237,
+    name: 'Hitmontop',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Hitmontop!',
+    possibleColors: [PokemonColor.default]
+  },
+  smoochum: {
+    id: 238,
+    name: 'Smoochum',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Smoochum!',
+    possibleColors: [PokemonColor.default]
+  },
+  elekid: {
+    id: 239,
+    name: 'Elekid',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Elekid!',
+    possibleColors: [PokemonColor.default]
+  },
+  magby: {
+    id: 240,
+    name: 'Magby',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Magby!',
+    possibleColors: [PokemonColor.default]
+  },
+  miltank: {
+    id: 241,
+    name: 'Miltank',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Miltank!',
+    possibleColors: [PokemonColor.default]
+  },
+  blissey: {
+    id: 242,
+    name: 'Blissey',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Blissey!',
+    possibleColors: [PokemonColor.default]
+  },
+  raikou: {
+    id: 243,
+    name: 'Raikou',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Raikou!',
+    possibleColors: [PokemonColor.default]
+  },
+  ente: {
+    id: 244,
+    name: 'Entei',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Entei!',
+    possibleColors: [PokemonColor.default]
+  },
+  suicune: {
+    id: 245,
+    name: 'Suicune',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Suicune!',
+    possibleColors: [PokemonColor.default]
+  },
+  larvitar: {
+    id: 246,
+    name: 'Larvitar',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Larvitar!',
+    possibleColors: [PokemonColor.default]
+  },
+  pupitar: {
+    id: 247,
+    name: 'Pupitar',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Pupitar!',
+    possibleColors: [PokemonColor.default]
+  },
+  tyranitar: {
+    id: 248,
+    name: 'Tyranitar',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Tyranitar!',
+    possibleColors: [PokemonColor.default]
+  },
+  lugia: {
+    id: 249,
+    name: 'Lugia',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Lugia!',
+    possibleColors: [PokemonColor.default],
+    originalSpriteSize: 64
+  },
   hooh: {
     id: 255,
     name: 'Ho-Oh',
