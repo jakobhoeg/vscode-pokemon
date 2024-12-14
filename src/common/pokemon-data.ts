@@ -1058,6 +1058,223 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Mew!',
     possibleColors: [PokemonColor.default]
   },
+  chikorita: {
+    id: 152,
+    name: 'Chikorita',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Chikorita!',
+    possibleColors: [PokemonColor.default]
+  },
+  bayleef: {
+    id: 153,
+    name: 'Bayleef',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Bayleef!',
+    possibleColors: [PokemonColor.default]
+  },
+  meganium: {
+    id: 154,
+    name: 'Meganium',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Meganium!',
+    possibleColors: [PokemonColor.default]
+  },
+  cyndaquil: {
+    id: 155,
+    name: 'Cyndaquil',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Cyndaquil!',
+    possibleColors: [PokemonColor.default]
+  },
+  quilava: {
+    id: 156,
+    name: 'Quilava',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Quilava!',
+    possibleColors: [PokemonColor.default]
+  },
+  typhlosion: {
+    id: 157,
+    name: 'Typhlosion',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Typhlosion!',
+    possibleColors: [PokemonColor.default]
+  },
+  totodile: {
+    id: 158,
+    name: 'Totodile',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Totodile!',
+    possibleColors: [PokemonColor.default]
+  },
+  croconaw: {
+    id: 159,
+    name: 'Croconaw',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Croconaw!',
+    possibleColors: [PokemonColor.default]
+  },
+  feraligatr: {
+    id: 160,
+    name: 'Feraligatr',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Feraligatr!',
+    possibleColors: [PokemonColor.default]
+  },
+  sentret: {
+    id: 161,
+    name: 'Sentret',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Sentret!',
+    possibleColors: [PokemonColor.default]
+  },
+  furret: {
+    id: 162,
+    name: 'Furret',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Furret!',
+    possibleColors: [PokemonColor.default]
+  },
+  hoothoot: {
+    id: 163,
+    name: 'Hoothoot',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Hoothoot!',
+    possibleColors: [PokemonColor.default]
+  },
+  noctowl: {
+    id: 164,
+    name: 'Noctowl',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Noctowl!',
+    possibleColors: [PokemonColor.default]
+  },
+  ledyba: {
+    id: 165,
+    name: 'Ledyba',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ledyba!',
+    possibleColors: [PokemonColor.default]
+  },
+  ledian: {
+    id: 166,
+    name: 'Ledian',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ledian!',
+    possibleColors: [PokemonColor.default]
+  },
+  spinarak: {
+    id: 167,
+    name: 'Spinarak',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Spinarak!',
+    possibleColors: [PokemonColor.default]
+  },
+  ariados: {
+    id: 168,
+    name: 'Ariados',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ariados!',
+    possibleColors: [PokemonColor.default]
+  },
+  crobat: {
+    id: 169,
+    name: 'Crobat',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Crobat!',
+    possibleColors: [PokemonColor.default]
+  },
+  chinchou: {
+    id: 170,
+    name: 'Chinchou',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Chinchou!',
+    possibleColors: [PokemonColor.default]
+  },
+  lanturn: {
+    id: 171,
+    name: 'Lanturn',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Lanturn!',
+    possibleColors: [PokemonColor.default]
+  },
+  pichu: {
+    id: 172,
+    name: 'Pichu',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Pichu!',
+    possibleColors: [PokemonColor.default]
+  },
+  cleffa: {
+    id: 173,
+    name: 'Cleffa',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Cleffa!',
+    possibleColors: [PokemonColor.default]
+  },
+  igglybuff: {
+    id: 174,
+    name: 'Igglybuff',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Igglybuff!',
+    possibleColors: [PokemonColor.default]
+  },
+  togepi: {
+    id: 175,
+    name: 'Togepi',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Togepi!',
+    possibleColors: [PokemonColor.default]
+  },
+  togetic: {
+    id: 176,
+    name: 'Togetic',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Togetic!',
+    possibleColors: [PokemonColor.default]
+  },
+  natu: {
+    id: 177,
+    name: 'Natu',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Natu!',
+    possibleColors: [PokemonColor.default]
+  },
+  xatu: {
+    id: 178,
+    name: 'Xatu',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Xatu!',
+    possibleColors: [PokemonColor.default]
+  },
+  mareep: {
+    id: 179,
+    name: 'Mareep',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Mareep!',
+    possibleColors: [PokemonColor.default]
+  },
+  flaaffy: {
+    id: 180,
+    name: 'Flaaffy',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Flaaffy!',
+    possibleColors: [PokemonColor.default]
+  },
+  ampharos: {
+    id: 181,
+    name: 'Ampharos',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Ampharos!',
+    possibleColors: [PokemonColor.default]
+  },
+  bellossom: {
+    id: 182,
+    name: 'Bellossom',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Bellossom!',
+    possibleColors: [PokemonColor.default]
+  },
   hooh: {
     id: 255,
     name: 'Ho-Oh',
