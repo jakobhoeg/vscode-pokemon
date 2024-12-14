@@ -107,8 +107,9 @@ export class PokemonSpecification {
     size: PokemonSize;
     name: string;
     generation: string;
+    originalSpriteSize: number;
 
-    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string) {
+    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string, originalSpriteSize?: number) {
         this.color = color;
         this.type = type;
         this.size = size;
@@ -118,6 +119,7 @@ export class PokemonSpecification {
             this.name = name;
         }
         this.generation = generation || `gen${POKEMON_DATA[type].generation}`;
+        this.originalSpriteSize = POKEMON_DATA[type].originalSpriteSize || 32;
     }
 
     static fromConfiguration(): PokemonSpecification {
@@ -303,6 +305,7 @@ export function activate(context: vscode.ExtensionContext) {
                     spec.type,
                     spec.size,
                     spec.generation,
+                    spec.originalSpriteSize,
                     getConfiguredTheme(),
                     getConfiguredThemeKind(),
                     getThrowWithMouseConfiguration(),
@@ -350,6 +353,7 @@ export function activate(context: vscode.ExtensionContext) {
         spec.type,
         spec.size,
         spec.generation,
+        spec.originalSpriteSize,
         getConfiguredTheme(),
         getConfiguredThemeKind(),
         getThrowWithMouseConfiguration(),
@@ -701,6 +705,7 @@ export function activate(context: vscode.ExtensionContext) {
                     spec.type,
                     spec.size,
                     spec.generation,
+                    spec.originalSpriteSize,
                     getConfiguredTheme(),
                     getConfiguredThemeKind(),
                     getThrowWithMouseConfiguration(),
@@ -755,6 +760,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
     protected _pokemonType: PokemonType;
     protected _pokemonSize: PokemonSize;
     protected _pokemonGeneration: string;
+    protected _pokemonOriginalSpriteSize: number;
     protected _theme: Theme;
     protected _themeKind: vscode.ColorThemeKind;
     protected _throwBallWithMouse: boolean;
@@ -765,6 +771,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         type: PokemonType,
         size: PokemonSize,
         generation: string,
+        originalSpriteSize: number,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -774,6 +781,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         this._pokemonType = type;
         this._pokemonSize = size;
         this._pokemonGeneration = generation;
+        this._pokemonOriginalSpriteSize = originalSpriteSize;
         this._theme = theme;
         this._themeKind = themeKind;
         this._throwBallWithMouse = throwBallWithMouse;
@@ -793,6 +801,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
 
     public pokemonGeneration(): string {
         return this._pokemonGeneration;
+    }
+
+    public pokemonOriginalSpriteSize(): number {
+        return this._pokemonOriginalSpriteSize;
     }
 
     public theme(): Theme {
@@ -855,6 +867,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
             color: spec.color,
             name: spec.name,
             generation: spec.generation,
+            originalSpriteSize: spec.originalSpriteSize,
         });
         void this.getWebview().postMessage({
             command: 'set-size',
@@ -967,7 +980,8 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.pokemonSize()}",
                         "${this.pokemonType()}",
                         "${this.throwBallWithMouse()}",
-                        "${this.pokemonGeneration()}"
+                        "${this.pokemonGeneration()}",
+                        "${this.pokemonOriginalSpriteSize()}",
                     );
                 </script>
             </body>
@@ -1005,6 +1019,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         pokemonType: PokemonType,
         pokemonSize: PokemonSize,
         pokemonGeneration: string,
+        pokemonOriginalSpriteSize: number,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1045,6 +1060,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             pokemonType,
             pokemonSize,
             pokemonGeneration,
+            pokemonOriginalSpriteSize,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1077,6 +1093,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         pokemonType: PokemonType,
         pokemonSize: PokemonSize,
         pokemonGeneration: string,
+        pokemonOriginalSpriteSize: number,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1088,6 +1105,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             pokemonType,
             pokemonSize,
             pokemonGeneration,
+            pokemonOriginalSpriteSize,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1101,6 +1119,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         type: PokemonType,
         size: PokemonSize,
         generation: string,
+        originalSpriteSize: number,
         theme: Theme,
         themeKind: ColorThemeKind,
         throwBallWithMouse: boolean,
@@ -1111,6 +1130,7 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
             type,
             size,
             generation,
+            originalSpriteSize,
             theme,
             themeKind,
             throwBallWithMouse,
@@ -1220,6 +1240,7 @@ async function createPokemonPlayground(context: vscode.ExtensionContext) {
         spec.type,
         spec.size,
         spec.generation,
+        spec.originalSpriteSize,
         getConfiguredTheme(),
         getConfiguredThemeKind(),
         getThrowWithMouseConfiguration(),

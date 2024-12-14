@@ -10,6 +10,7 @@ export class PokemonElement {
     color: PokemonColor;
     type: PokemonType;
     generation: string;
+    originalSpriteSize: number;
     remove() {
         this.el.remove();
         this.collision.remove();
@@ -25,6 +26,7 @@ export class PokemonElement {
         color: PokemonColor,
         type: PokemonType,
         generation: string,
+        originalSpriteSize: number,
     ) {
         this.el = el;
         this.collision = collision;
@@ -33,6 +35,7 @@ export class PokemonElement {
         this.color = color;
         this.type = type;
         this.generation = generation;
+        this.originalSpriteSize = originalSpriteSize;
     }
 }
 
@@ -145,6 +148,7 @@ export function createPokemon(
     floor: number,
     name: string,
     generation: string,
+    originalSpriteSize: number,
 ): IPokemonType {
     if (!name) {
         throw new InvalidPokemonException('name is undefined');
@@ -163,7 +167,8 @@ export function createPokemon(
             floor,
             name,
             PokemonSpeed.normal,
-            generation
+            generation,
+            originalSpriteSize 
         );
     } catch (error) {
         throw new InvalidPokemonException(`Invalid Pokemon type: ${pokemonType}`);

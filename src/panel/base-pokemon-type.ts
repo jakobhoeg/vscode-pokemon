@@ -48,6 +48,7 @@ export abstract class BasePokemonType implements IPokemonType {
     private _speed: number;
     private _size: PokemonSize;
     private _generation: string;
+    private _originalSpriteSize: number;
 
     constructor(
         spriteElement: HTMLImageElement,
@@ -61,6 +62,7 @@ export abstract class BasePokemonType implements IPokemonType {
         name: string,
         speed: number,
         generation: string,
+        originalSpriteSize: number,
     ) {
         this.el = spriteElement;
         this.collision = collisionElement;
@@ -69,7 +71,8 @@ export abstract class BasePokemonType implements IPokemonType {
         this._floor = floor;
         this._left = left;
         this._bottom = bottom;
-        this.initSprite(size, left, bottom);
+        this._originalSpriteSize = originalSpriteSize;
+        this.initSprite(size, left, bottom, originalSpriteSize);
         this.currentStateEnum = this.sequence.startingState;
         this.currentState = resolveState(this.currentStateEnum, this);
 
@@ -82,8 +85,8 @@ export abstract class BasePokemonType implements IPokemonType {
         (this.constructor as any).count += 1;
     }
 
-    initSprite(pokemonSize: PokemonSize, left: number, bottom: number) {
-        const spriteSize = this.calculateSpriteWidth(pokemonSize);
+    initSprite(pokemonSize: PokemonSize, left: number, bottom: number, originalSpriteSize: number) {
+        const spriteSize = this.calculateSpriteWidth(pokemonSize, originalSpriteSize);
 
         this.el.style.left = `${left}px`;
         this.el.style.bottom = `${bottom}px`;
@@ -116,22 +119,22 @@ export abstract class BasePokemonType implements IPokemonType {
         this.collision.style.left = `${this._left}px`;
         this.collision.style.bottom = `${this._bottom}px`;
         this.speech.style.left = `${this._left}px`;
-        this.speech.style.bottom = `${this._bottom + this.calculateSpriteWidth(this._size)
+        this.speech.style.bottom = `${this._bottom + this.calculateSpriteWidth(this._size, this._originalSpriteSize)
             }px`;
     }
 
-    calculateSpriteWidth(size: PokemonSize): number {
+    calculateSpriteWidth(size: PokemonSize, originalSpriteSize: number): number {
         switch (size) {
             case PokemonSize.nano:
-                return 32;
+                return originalSpriteSize;
             case PokemonSize.small:
-                return 48;
+                return originalSpriteSize * 1.5;
             case PokemonSize.medium:
-                return 64;
+                return originalSpriteSize * 2;
             case PokemonSize.large:
-                return 80;
+                return originalSpriteSize * 2.5;
             default:
-                return 32;
+                return originalSpriteSize;
         }
     }
 

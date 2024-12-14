@@ -20,8 +20,9 @@ export class Pokemon extends BasePokemonType {
     name: string,
     speed: number,
     generation: string,
+    originalSpriteSize: number,
   ) {
-    super(spriteElement, collisionElement, speechElement, size, left, bottom, pokemonRoot, floor, name, speed, generation);
+    super(spriteElement, collisionElement, speechElement, size, left, bottom, pokemonRoot, floor, name, speed, generation, originalSpriteSize);
 
     this.config = POKEMON_DATA[pokemonType] || POKEMON_DATA.bulbasaur;
     this.label = pokemonType;
