@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [2.0.0]
+
+- Feat: add generation 2 Pokemon
+
 ## [1.1.0]
 
 - Feat: add functionality for adding a random Pokemon
