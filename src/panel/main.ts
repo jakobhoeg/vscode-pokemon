@@ -151,14 +151,14 @@ function addPokemonToPanel(
     );
 
     var speechBubbleElement: HTMLImageElement = document.createElement('img');
-    speechBubbleElement.className = `bubble bubble-${pokemonSize}`;
+    speechBubbleElement.className = `bubble bubble-${pokemonSize} b-${originalSpriteSize}`;
     speechBubbleElement.src = `${basePokemonUri}/heart.png`;
     (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
         speechBubbleElement,
     );
 
     const root = `${basePokemonUri}/${gen}/${pokemonType}/${pokemonColor}`;
-    console.log('Creating new pokemon : ', pokemonType, root, pokemonColor, pokemonSize, name);
+    console.log('Creating new pokemon : ', pokemonType, root, pokemonColor, pokemonSize, name, originalSpriteSize);
     try {
         if (!availableColors(pokemonType).includes(pokemonColor)) {
             throw new InvalidPokemonException('Invalid color for pokemon type');
@@ -421,6 +421,7 @@ export function pokemonPanelApp(
                         randomPokemonType,
                         basePokemonUri,
                         randomPokemonConfig.generation.toString(),
+                        randomPokemonConfig.originalSpriteSize ?? 32,
                         PokemonColor.default,
                         pokemonSize,
                         randomStartPosition(),

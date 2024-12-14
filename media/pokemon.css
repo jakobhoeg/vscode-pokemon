@@ -139,8 +139,7 @@ img.pokemon {
 .bubble {
 	position: absolute;
 	text-align: center;
-	left: 50%;
-	transform: translateX(50%);
+	margin: auto;
 	opacity: 0;
 	animation: fadeIn 0.2s forwards;
 }
@@ -171,4 +170,22 @@ img.pokemon {
 
 .bubble-large {
 	width: 37.5px;
+}
+
+/* Manually adjust the size teh bubble on 64x64px pokemon. Quick fix for now, TODO */
+.bubble-nano.b-64 {
+	margin-left: 15px;
+}
+
+.bubble-small.b-64 {
+	margin-left: 22.5px;
+}
+
+.bubble-medium.b-64 {
+	margin-left: 30px;
+}
+
+
+.bubble-large.b-64 {
+	margin-left: 37.5px;
 }
