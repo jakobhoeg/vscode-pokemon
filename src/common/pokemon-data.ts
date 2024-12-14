@@ -1275,6 +1275,182 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Bellossom!',
     possibleColors: [PokemonColor.default]
   },
+  marill: {
+    id: 183,
+    name: 'Marill',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Marill!',
+    possibleColors: [PokemonColor.default]
+  },
+  azumarill: {
+    id: 184,
+    name: 'Azumarill',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Azumarill!',
+    possibleColors: [PokemonColor.default]
+  },
+  sudowoodo: {
+    id: 185,
+    name: 'Sudowoodo',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Sudowoodo!',
+    possibleColors: [PokemonColor.default]
+  },
+  politoed: {
+    id: 186,
+    name: 'Politoed',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Politoed!',
+    possibleColors: [PokemonColor.default]
+  },
+  hoppip: {
+    id: 187,
+    name: 'Hoppip',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Hoppip!',
+    possibleColors: [PokemonColor.default]
+  },
+  skiploom: {
+    id: 188,
+    name: 'Skiploom',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Skiploom!',
+    possibleColors: [PokemonColor.default]
+  },
+  jumpluff: {
+    id: 189,
+    name: 'Jumpluff',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Jumpluff!',
+    possibleColors: [PokemonColor.default]
+  },
+  aipom: {
+    id: 190,
+    name: 'Aipom',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Aipom!',
+    possibleColors: [PokemonColor.default]
+  },
+  sunkern: {
+    id: 191,
+    name: 'Sunkern',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Sunkern!',
+    possibleColors: [PokemonColor.default]
+  },
+  sunflora: {
+    id: 192,
+    name: 'Sunflora',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Sunflora!',
+    possibleColors: [PokemonColor.default]
+  },
+  yanma: {
+    id: 193,
+    name: 'Yanma',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Yanma!',
+    possibleColors: [PokemonColor.default]
+  },
+  wooper: {
+    id: 194,
+    name: 'Wooper',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Wooper!',
+    possibleColors: [PokemonColor.default]
+  },
+  quagsire: {
+    id: 195,
+    name: 'Quagsire',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Quagsire!',
+    possibleColors: [PokemonColor.default]
+  },
+  espeon: {
+    id: 196,
+    name: 'Espeon',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Espeon!',
+    possibleColors: [PokemonColor.default]
+  },
+  umbreon: {
+    id: 197,
+    name: 'Umbreon',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Umbreon!',
+    possibleColors: [PokemonColor.default]
+  },
+  murkrow: {
+    id: 198,
+    name: 'Murkrow',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Murkrow!',
+    possibleColors: [PokemonColor.default]
+  },
+  slowking: {
+    id: 199,
+    name: 'Slowking',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Slowking!',
+    possibleColors: [PokemonColor.default]
+  },
+  misdreavus: {
+    id: 200,
+    name: 'Misdreavus',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Misdreavus!',
+    possibleColors: [PokemonColor.default]
+  },
+  wobbuffet: {
+    id: 202,
+    name: 'Wobbuffet',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Wobbuffet!',
+    possibleColors: [PokemonColor.default]
+  },
+  girafarig: {
+    id: 203,
+    name: 'Girafarig',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Girafarig!',
+    possibleColors: [PokemonColor.default]
+  },
+  pineco: {
+    id: 204,
+    name: 'Pineco',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Pineco!',
+    possibleColors: [PokemonColor.default]
+  },
+  forretress: {
+    id: 205,
+    name: 'Forretress',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Forretress!',
+    possibleColors: [PokemonColor.default]
+  },
+  dunsparce: {
+    id: 206,
+    name: 'Dunsparce',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Dunsparce!',
+    possibleColors: [PokemonColor.default]
+  },
+  gligar: {
+    id: 207,
+    name: 'Gligar',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Gligar!',
+    possibleColors: [PokemonColor.default]
+  },
+  steelix: {
+    id: 208,
+    name: 'Steelix',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Steelix!',
+    possibleColors: [PokemonColor.default],
+    originalSpriteSize: 64,
+  },
   hooh: {
     id: 255,
     name: 'Ho-Oh',
