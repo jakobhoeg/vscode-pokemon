@@ -848,7 +848,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Starmie!',
     possibleColors: [PokemonColor.default]
   },
-  mr_mime: {
+  mrmime: {
     id: 122,
     name: 'Mr. Mime',
     generation: PokemonGeneration.Gen1,
