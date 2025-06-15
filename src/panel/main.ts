@@ -89,6 +89,7 @@ function calculateFloor(size: PokemonSize, theme: Theme): number {
     return 0;
 }
 
+
 function handleMouseOver(e: MouseEvent) {
     var el = e.currentTarget as HTMLDivElement;
     allPokemon.pokemonCollection.forEach((element) => {
