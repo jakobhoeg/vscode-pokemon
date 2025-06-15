@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [2.0.1]
+
+- Fix: Entei typo
+
 ## [2.0.0]
 
 - Feat: add generation 2 Pokemon
