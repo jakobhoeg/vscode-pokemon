@@ -1696,7 +1696,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Raikou!',
     possibleColors: [PokemonColor.default]
   },
-  entei: {
+  ente: {
     id: 244,
     name: 'Entei',
     generation: PokemonGeneration.Gen2,
