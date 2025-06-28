@@ -1740,7 +1740,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     originalSpriteSize: 64
   },
   hooh: {
-    id: 255,
+    id: 250,
     name: 'Ho-Oh',
     generation: PokemonGeneration.Gen2,
     cry: 'Ho-Oh!',
