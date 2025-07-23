@@ -122,6 +122,7 @@ img.pokemon {
 	-webkit-transform: scaleX(-1);
 	transform: scaleX(-1);
 	position: absolute;
+	image-rendering: pixelated;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
