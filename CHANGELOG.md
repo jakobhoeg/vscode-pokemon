@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [2.0.2]
+
+- Fix: use pixelate image rendering
+
 ## [2.0.1]
 
 - Fix: Entei typo
