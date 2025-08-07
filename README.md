@@ -32,7 +32,7 @@
 
 ## Installation
 
-Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon).
+Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon) or the [Open VSX Registry](https://open-vsx.org/extension/jakobhoeg/vscode-pokemon).
 
 ![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/install.png)
 
