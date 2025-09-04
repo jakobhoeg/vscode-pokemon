@@ -2,25 +2,29 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [2.0.3]
+
+- fix: add Celebi + fix Ho-Oh id
+
 ## [2.0.2]
 
-- Fix: use pixelate image rendering
+- fix: use pixelate image rendering
 
 ## [2.0.1]
 
-- Fix: Entei typo
+- fix: Entei typo
 
 ## [2.0.0]
 
-- Feat: add generation 2 Pokemon
+- feat: add generation 2 Pokemon
 
 ## [1.1.0]
 
-- Feat: add functionality for adding a random Pokemon
+- feat: add functionality for adding a random Pokemon
 
 ## [1.0.2]
 
-- Fix: added missing Victreebel & Omastar
+- fix: added missing Victreebel & Omastar
 
 ## [1.0.1]
 
