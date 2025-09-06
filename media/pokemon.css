@@ -138,6 +138,7 @@ img.pokemon {
 }
 
 .bubble {
+	image-rendering: pixelated;
 	position: absolute;
 	text-align: center;
 	margin: auto;
