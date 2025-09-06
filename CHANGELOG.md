@@ -4,6 +4,10 @@ All notable changes to the "vscode-pokemon" extension will be documented in this
 
 ## [3.0.0]
 
+- fix: pixelate bubbles
+
+## [3.0.0]
+
 - feat: add generation 3 Pokémon
 
 ## [2.0.3]
