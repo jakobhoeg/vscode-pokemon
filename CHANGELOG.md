@@ -2,7 +2,7 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
-## [3.0.0]
+## [3.0.1]
 
 - fix: pixelate bubbles
 
