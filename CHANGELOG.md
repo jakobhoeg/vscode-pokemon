@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.0.0]
+
+- feat: add generation 3 Pokémon
+
 ## [2.0.3]
 
 - fix: add Celebi + fix Ho-Oh id
