@@ -30,7 +30,19 @@
 </picture>
 </div>
 
-Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_101#_chat-ux-improvements).
+<div align="center">
+
+Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_101#_chat-ux-improvements)!
+
+</div>
+
+## 💖 Support
+
+If you enjoy this project, please consider supporting me.  
+Manually creating the `.gif` files for each sprite takes a lot of time and effort.  
+Your sponsorship helps me dedicate more energy to improv and expand the project.
+
+[![GitHub Sponsor](https://img.shields.io/badge/Sponsor-❤-blue?style=flat&logo=github)](https://github.com/sponsors/jakobhoeg)
 
 ## Installation
 
@@ -66,7 +78,7 @@ Set the size and position of the extension.
 
 ## Upcoming features
 
-Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 2 and Gen 3 sprites very soon!
+Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 4 soon!
 
 ## Credits
 
