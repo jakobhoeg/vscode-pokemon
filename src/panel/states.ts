@@ -244,6 +244,12 @@ export class WalkRightState implements IState {
         this.pokemon.positionLeft(
             this.pokemon.left + this.pokemon.speed * this.speedMultiplier,
         );
+
+        // Random chance to stop in the middle
+        if (this.pokemon.isMoving && Math.random() < 0.01) {
+            return FrameResult.stateComplete;
+        }
+
         if (
             this.pokemon.isMoving &&
             this.pokemon.left >= this.leftBoundary - this.pokemon.width
@@ -271,9 +277,16 @@ export class WalkLeftState implements IState {
     }
 
     nextFrame(): FrameResult {
+        this.idleCounter++;
         this.pokemon.positionLeft(
             this.pokemon.left - this.pokemon.speed * this.speedMultiplier,
         );
+
+        // Random chance to stop in the middle
+        if (this.pokemon.isMoving && Math.random() < 0.01) {
+            return FrameResult.stateComplete;
+        }
+
         if (this.pokemon.isMoving && this.pokemon.left <= 0) {
             return FrameResult.stateComplete;
         } else if (!this.pokemon.isMoving && this.idleCounter > this.holdTime) {
