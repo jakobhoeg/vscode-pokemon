@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.1.1]
+
+- chore: update readme
+
 ## [3.1.0]
 
 - fix: stop randomly and change direction
