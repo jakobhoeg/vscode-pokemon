@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.1.0]
+
+- fix: stop randomly and change direction
+- fix: make default size medium
+
 ## [3.0.1]
 
 - fix: pixelate bubbles
