@@ -40,7 +40,7 @@ Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_1
 
 If you enjoy this project, please consider supporting me.  
 Manually creating the `.gif` files for each sprite takes a lot of time and effort.  
-Your sponsorship helps me dedicate more energy to improv and expand the project.
+Your sponsorship helps me dedicate more energy to improve and expand the project.
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-❤-blue?style=flat&logo=github)](https://github.com/sponsors/jakobhoeg)
 
