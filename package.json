@@ -144,7 +144,7 @@
                             "medium",
                             "large"
                         ],
-                        "default": "nano",
+                        "default": "medium",
                         "description": "Pokemon size"
                     },
                     "vscode-pokemon.position": {
