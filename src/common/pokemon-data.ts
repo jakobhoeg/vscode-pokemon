@@ -2958,6 +2958,12 @@ const EVOLUTION_MAP: { [key: string]: string[] } = {
   'metang': ['metagross']
 };
 
+/**
+ * Gets all possible evolutions for a given Pokemon type.
+ * @param pokemonType The Pokemon type to get evolutions for
+ * @returns Array of possible evolution types. Empty array if Pokemon cannot evolve.
+ *          For Pokemon with multiple evolution paths (like Eevee), returns all possibilities.
+ */
 export function getEvolution(pokemonType: PokemonType): PokemonType[] {
   const evolutions = EVOLUTION_MAP[pokemonType];
   if (evolutions && evolutions.length > 0) {
@@ -2970,6 +2976,11 @@ export function getEvolution(pokemonType: PokemonType): PokemonType[] {
   return [];
 }
 
+/**
+ * Checks if a Pokemon can evolve.
+ * @param pokemonType The Pokemon type to check
+ * @returns True if the Pokemon has at least one possible evolution, false otherwise
+ */
 export function canEvolve(pokemonType: PokemonType): boolean {
   return getEvolution(pokemonType).length > 0;
 }
