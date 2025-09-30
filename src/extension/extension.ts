@@ -117,6 +117,11 @@ function getAutoSpawnGenerations(): PokemonGeneration[] {
         .get<number[]>('autoSpawn.generations', [1, 2, 3]);
     
     // Convert numbers to PokemonGeneration enum values
+    // If empty array, return all generations
+    if (configGenerations.length === 0) {
+        return [PokemonGeneration.Gen1, PokemonGeneration.Gen2, PokemonGeneration.Gen3];
+    }
+    
     return configGenerations.map(gen => gen as PokemonGeneration);
 }
 
@@ -141,7 +146,7 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
 
     if (collection.length < maxPokemon) {
         // We have room for more pokemon, spawn a new one
-        const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations);
+        const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
         const spec = new PokemonSpecification(
             randomPokemonConfig.possibleColors[0],
             randomPokemonType,
@@ -199,7 +204,7 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                 panel.deletePokemon(pokemonToRemove.name!);
                 
                 // Spawn a new random pokemon
-                const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations);
+                const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
                 const newSpec = new PokemonSpecification(
                     randomPokemonConfig.possibleColors[0],
                     randomPokemonType,
