@@ -166,6 +166,44 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
+                    },
+                    "vscode-pokemon.autoSpawn.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Enable automatic spawning of Pokemon after a configurable amount of time"
+                    },
+                    "vscode-pokemon.autoSpawn.interval": {
+                        "type": "number",
+                        "default": 10,
+                        "minimum": 1,
+                        "maximum": 60,
+                        "description": "Time in minutes between automatic Pokemon spawns"
+                    },
+                    "vscode-pokemon.autoSpawn.maxPokemon": {
+                        "type": "number",
+                        "default": 6,
+                        "minimum": 1,
+                        "maximum": 20,
+                        "description": "Maximum number of Pokemon to spawn automatically"
+                    },
+                    "vscode-pokemon.autoSpawn.behavior": {
+                        "type": "string",
+                        "enum": [
+                            "evolve",
+                            "remove",
+                            "random"
+                        ],
+                        "default": "random",
+                        "description": "What to do when max Pokemon limit is reached: evolve a Pokemon, remove a Pokemon, or randomly choose between the two"
+                    },
+                    "vscode-pokemon.autoSpawn.generations": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "enum": [1, 2, 3]
+                        },
+                        "default": [1, 2, 3],
+                        "description": "Optional array of Pokemon generations to spawn from (1, 2, 3). Empty array means all generations."
                     }
                 }
             }

@@ -2763,3 +2763,224 @@ export function getRandomPokemonConfig(generations?: PokemonGeneration[]): [Poke
   const randomKey = keys[Math.floor(Math.random() * keys.length)];
   return [randomKey as PokemonType, POKEMON_DATA[randomKey]];
 }
+
+// Evolution mappings based on Pokemon ID progression
+// Values are arrays to support multiple, random, or branching evolutions
+const EVOLUTION_MAP: { [key: string]: string[] } = {
+  // Gen 1 evolutions
+  'bulbasaur': ['ivysaur'],
+  'ivysaur': ['venusaur'],
+  'charmander': ['charmeleon'],
+  'charmeleon': ['charizard'],
+  'squirtle': ['wartortle'],
+  'wartortle': ['blastoise'],
+  'caterpie': ['metapod'],
+  'metapod': ['butterfree'],
+  'weedle': ['kakuna'],
+  'kakuna': ['beedrill'],
+  'pidgey': ['pidgeotto'],
+  'pidgeotto': ['pidgeot'],
+  'rattata': ['raticate'],
+  'spearow': ['fearow'],
+  'ekans': ['arbok'],
+  'pichu': ['pikachu'],
+  'pikachu': ['raichu'],
+  'sandshrew': ['sandslash'],
+  'nidoran_female': ['nidorina'],
+  'nidorina': ['nidoqueen'],
+  'nidoran_male': ['nidorino'],
+  'nidorino': ['nidoking'],
+  'cleffa': ['clefairy'],
+  'clefairy': ['clefable'],
+  'vulpix': ['ninetales'],
+  'igglybuff': ['jigglypuff'],
+  'jigglypuff': ['wigglytuff'],
+  'zubat': ['golbat'],
+  'golbat': ['crobat'],
+  'oddish': ['gloom'],
+  'gloom': ['vileplume', 'bellossom'],
+  'paras': ['parasect'],
+  'venonat': ['venomoth'],
+  'diglett': ['dugtrio'],
+  'meowth': ['persian'],
+  'psyduck': ['golduck'],
+  'mankey': ['primeape'],
+  'growlithe': ['arcanine'],
+  'poliwag': ['poliwhirl'],
+  'poliwhirl': ['poliwrath', 'politoed'],
+  'abra': ['kadabra'],
+  'kadabra': ['alakazam'],
+  'machop': ['machoke'],
+  'machoke': ['machamp'],
+  'bellsprout': ['weepinbell'],
+  'weepinbell': ['victreebel'],
+  'tentacool': ['tentacruel'],
+  'geodude': ['graveler'],
+  'graveler': ['golem'],
+  'ponyta': ['rapidash'],
+  'slowpoke': ['slowbro'],
+  'magnemite': ['magneton'],
+  'magneton': ['magnezone'],
+  'doduo': ['dodrio'],
+  'seel': ['dewgong'],
+  'grimer': ['muk'],
+  'shellder': ['cloyster'],
+  'gastly': ['haunter'],
+  'haunter': ['gengar'],
+  'onix': ['steelix'],
+  'drowzee': ['hypno'],
+  'krabby': ['kingler'],
+  'voltorb': ['electrode'],
+  'exeggcute': ['exeggutor'],
+  'cubone': ['marowak'],
+  'tyrogue': ['hitmonlee'],
+  'koffing': ['weezing'],
+  'rhyhorn': ['rhydon'],
+  'rhydon': ['rhyperior'],
+  'chansey': ['blissey'],
+  'tangela': ['tangrowth'],
+  'horsea': ['seadra'],
+  'seadra': ['kingdra'],
+  'goldeen': ['seaking'],
+  'staryu': ['starmie'],
+  'magby': ['magmar'],
+  'magmar': ['magmortar'],
+  'elekid': ['electabuzz'],
+  'electabuzz': ['electivire'],
+  'smoochum': ['jynx'],
+  'magikarp': ['gyarados'],
+  'eevee': ['vaporeon', 'jolteon', 'flareon', 'espeon', 'umbreon'], // All possible Eevee evolutions
+  'omanyte': ['omastar'],
+  'kabuto': ['kabutops'],
+  'dratini': ['dragonair'],
+  'dragonair': ['dragonite'],
+  
+  // Gen 2 evolutions
+  'chikorita': ['bayleef'],
+  'bayleef': ['meganium'],
+  'cyndaquil': ['quilava'],
+  'quilava': ['typhlosion'],
+  'totodile': ['croconaw'],
+  'croconaw': ['feraligatr'],
+  'sentret': ['furret'],
+  'hoothoot': ['noctowl'],
+  'ledyba': ['ledian'],
+  'spinarak': ['ariados'],
+  'mareep': ['flaaffy'],
+  'flaaffy': ['ampharos'],
+  'azurill': ['marill'],
+  'marill': ['azumarill'],
+  'hoppip': ['skiploom'],
+  'skiploom': ['jumpluff'],
+  'aipom': ['ambipom'],
+  'sunkern': ['sunflora'],
+  'yanma': ['yanmega'],
+  'wooper': ['quagsire'],
+  'murkrow': ['honchkrow'],
+  'misdreavus': ['mismagius'],
+  'gligar': ['gliscor'],
+  'snubbull': ['granbull'],
+  'qwilfish': ['overqwil'],
+  'sneasel': ['weavile'],
+  'teddiursa': ['ursaring'],
+  'slugma': ['magcargo'],
+  'swinub': ['piloswine'],
+  'piloswine': ['mamoswine'],
+  'remoraid': ['octillery'],
+  'houndour': ['houndoom'],
+  'phanpy': ['donphan'],
+  'stantler': ['wyrdeer'],
+  'larvitar': ['pupitar'],
+  'pupitar': ['tyranitar'],
+  
+  // Gen 3 evolutions - only including the ones in our dataset
+  'treecko': ['grovyle'],
+  'grovyle': ['sceptile'],
+  'torchic': ['combusken'],
+  'combusken': ['blaziken'],
+  'mudkip': ['marshtomp'],
+  'marshtomp': ['swampert'],
+  'poochyena': ['mightyena'],
+  'zigzagoon': ['linoone'],
+  'linoone': ['obstagoon'],
+  'wurmple': ['silcoon', 'cascoon'], // Random branching evolution
+  'silcoon': ['beautifly'],
+  'cascoon': ['dustox'],
+  'lotad': ['lombre'],
+  'lombre': ['ludicolo'],
+  'seedot': ['nuzleaf'],
+  'nuzleaf': ['shiftry'],
+  'taillow': ['swellow'],
+  'wingull': ['pelipper'],
+  'ralts': ['kirlia'],
+  'kirlia': ['gardevoir'],
+  'surskit': ['masquerain'],
+  'shroomish': ['breloom'],
+  'slakoth': ['vigoroth'],
+  'vigoroth': ['slaking'],
+  'nincada': ['ninjask'],
+  'whismur': ['loudred'],
+  'loudred': ['exploud'],
+  'makuhita': ['hariyama'],
+  'nosepass': ['probopass'],
+  'skitty': ['delcatty'],
+  'aron': ['lairon'],
+  'lairon': ['aggron'],
+  'meditite': ['medicham'],
+  'electrike': ['manectric'],
+  'roselia': ['roserade'],
+  'gulpin': ['swalot'],
+  'carvanha': ['sharpedo'],
+  'wailmer': ['wailord'],
+  'numel': ['camerupt'],
+  'spoink': ['grumpig'],
+  'trapinch': ['vibrava'],
+  'vibrava': ['flygon'],
+  'cacnea': ['cacturne'],
+  'swablu': ['altaria'],
+  'barboach': ['whiscash'],
+  'corphish': ['crawdaunt'],
+  'baltoy': ['claydol'],
+  'lileep': ['cradily'],
+  'anorith': ['armaldo'],
+  'feebas': ['milotic'],
+  'shuppet': ['banette'],
+  'duskull': ['dusclops'],
+  'dusclops': ['dusknoir'],
+  'wynaut': ['wobbuffet'],
+  'snorunt': ['glalie'],
+  'spheal': ['sealeo'],
+  'sealeo': ['walrein'],
+  'clamperl': ['huntail', 'gorebyss'], // Random branching evolution
+  'bagon': ['shelgon'],
+  'shelgon': ['salamence'],
+  'beldum': ['metang'],
+  'metang': ['metagross']
+};
+
+/**
+ * Gets all possible evolutions for a given Pokemon type.
+ * @param pokemonType The Pokemon type to get evolutions for
+ * @returns Array of possible evolution types. Empty array if Pokemon cannot evolve.
+ *          For Pokemon with multiple evolution paths (like Eevee), returns all possibilities.
+ */
+export function getEvolution(pokemonType: PokemonType): PokemonType[] {
+  const evolutions = EVOLUTION_MAP[pokemonType];
+  if (evolutions && evolutions.length > 0) {
+    // Filter evolutions to only include those that exist in our POKEMON_DATA
+    const validEvolutions = evolutions.filter(evolution => 
+      POKEMON_DATA[evolution] && evolution !== pokemonType
+    );
+    return validEvolutions as PokemonType[];
+  }
+  return [];
+}
+
+/**
+ * Checks if a Pokemon can evolve.
+ * @param pokemonType The Pokemon type to check
+ * @returns True if the Pokemon has at least one possible evolution, false otherwise
+ */
+export function canEvolve(pokemonType: PokemonType): boolean {
+  return getEvolution(pokemonType).length > 0;
+}
