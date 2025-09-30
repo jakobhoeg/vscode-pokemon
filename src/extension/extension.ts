@@ -15,7 +15,7 @@ import {
 import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import { getDefaultPokemon, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
+import { getDefaultPokemon, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA, getEvolution, canEvolve } from '../common/pokemon-data';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -49,6 +49,7 @@ class PokemonQuickPickItem implements vscode.QuickPickItem {
 }
 
 let webviewViewProvider: PokemonWebviewViewProvider;
+let autoSpawnTimer: NodeJS.Timeout | undefined;
 
 function getConfiguredSize(): PokemonSize {
     var size = vscode.workspace
@@ -86,10 +87,161 @@ function getThrowWithMouseConfiguration(): boolean {
         .get<boolean>('throwBallWithMouse', true);
 }
 
+function getAutoSpawnEnabled(): boolean {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<boolean>('autoSpawn.enabled', false);
+}
+
+function getAutoSpawnInterval(): number {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<number>('autoSpawn.interval', 10);
+}
+
+function getAutoSpawnMaxPokemon(): number {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<number>('autoSpawn.maxPokemon', 6);
+}
+
+function getAutoSpawnBehavior(): 'evolve' | 'remove' | 'random' {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<'evolve' | 'remove' | 'random'>('autoSpawn.behavior', 'random');
+}
+
+function getAutoSpawnGenerations(): PokemonGeneration[] {
+    const configGenerations = vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<number[]>('autoSpawn.generations', [1, 2, 3]);
+    
+    // Convert numbers to PokemonGeneration enum values
+    return configGenerations.map(gen => gen as PokemonGeneration);
+}
+
 function updatePanelThrowWithMouse(): void {
     const panel = getPokemonPanel();
     if (panel !== undefined) {
         panel.setThrowWithMouse(getThrowWithMouseConfiguration());
+    }
+}
+
+async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void> {
+    const panel = getPokemonPanel();
+    if (!panel) {
+        return; // No active panel
+    }
+
+    // Get current pokemon collection
+    const collection = PokemonSpecification.collectionFromMemento(context, getConfiguredSize());
+    const maxPokemon = getAutoSpawnMaxPokemon();
+    const behavior = getAutoSpawnBehavior();
+    const generations = getAutoSpawnGenerations();
+
+    if (collection.length < maxPokemon) {
+        // We have room for more pokemon, spawn a new one
+        const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations);
+        const spec = new PokemonSpecification(
+            randomPokemonConfig.possibleColors[0],
+            randomPokemonType,
+            getConfiguredSize(),
+            randomPokemonConfig.name,
+        );
+
+        panel.spawnPokemon(spec);
+        collection.push(spec);
+        await storeCollectionAsMemento(context, collection);
+        
+        console.log(`Auto-spawned ${randomPokemonType} (${collection.length}/${maxPokemon})`);
+    } else {
+        // We've reached the max, decide what to do based on behavior
+        let actionTaken = false;
+        
+        if (behavior === 'evolve' || (behavior === 'random' && Math.random() < 0.5)) {
+            // Try to evolve a pokemon
+            const evolvablePokemon = collection.find(spec => canEvolve(spec.type));
+            if (evolvablePokemon) {
+                const evolution = getEvolution(evolvablePokemon.type);
+                if (evolution && POKEMON_DATA[evolution]) {
+                    // Remove old pokemon and replace with evolution
+                    panel.deletePokemon(evolvablePokemon.name!);
+                    
+                    const evolvedSpec = new PokemonSpecification(
+                        POKEMON_DATA[evolution].possibleColors[0],
+                        evolution,
+                        getConfiguredSize(),
+                        evolvablePokemon.name, // Keep the same name
+                        POKEMON_DATA[evolution].generation.toString(),
+                        POKEMON_DATA[evolution].originalSpriteSize
+                    );
+                    
+                    panel.spawnPokemon(evolvedSpec);
+                    
+                    // Update collection
+                    const index = collection.findIndex(spec => spec.name === evolvablePokemon.name);
+                    if (index !== -1) {
+                        collection[index] = evolvedSpec;
+                        await storeCollectionAsMemento(context, collection);
+                        console.log(`Auto-evolved ${evolvablePokemon.type} to ${evolution}`);
+                        actionTaken = true;
+                    }
+                }
+            }
+        }
+        
+        if (!actionTaken && (behavior === 'remove' || behavior === 'random')) {
+            // Remove a random pokemon and spawn a new one
+            if (collection.length > 0) {
+                const randomIndex = Math.floor(Math.random() * collection.length);
+                const pokemonToRemove = collection[randomIndex];
+                
+                panel.deletePokemon(pokemonToRemove.name!);
+                
+                // Spawn a new random pokemon
+                const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations);
+                const newSpec = new PokemonSpecification(
+                    randomPokemonConfig.possibleColors[0],
+                    randomPokemonType,
+                    getConfiguredSize(),
+                    randomPokemonConfig.name,
+                );
+                
+                panel.spawnPokemon(newSpec);
+                
+                // Update collection
+                collection[randomIndex] = newSpec;
+                await storeCollectionAsMemento(context, collection);
+                console.log(`Auto-removed ${pokemonToRemove.type} and spawned ${randomPokemonType}`);
+            }
+        }
+    }
+}
+
+function startAutoSpawnTimer(context: vscode.ExtensionContext): void {
+    stopAutoSpawnTimer(); // Clear any existing timer
+    
+    if (!getAutoSpawnEnabled()) {
+        return;
+    }
+    
+    const intervalMinutes = getAutoSpawnInterval();
+    const intervalMs = intervalMinutes * 60 * 1000; // Convert to milliseconds
+    
+    autoSpawnTimer = setInterval(() => {
+        autoSpawnPokemon(context).catch(error => {
+            console.error('Error in auto-spawn:', error);
+        });
+    }, intervalMs);
+    
+    console.log(`Auto-spawn timer started: ${intervalMinutes} minute intervals`);
+}
+
+function stopAutoSpawnTimer(): void {
+    if (autoSpawnTimer) {
+        clearInterval(autoSpawnTimer);
+        autoSpawnTimer = undefined;
+        console.log('Auto-spawn timer stopped');
     }
 }
 
@@ -685,6 +837,11 @@ export function activate(context: vscode.ExtensionContext) {
                 if (e.affectsConfiguration('vscode-pokemon.throwBallWithMouse')) {
                     updatePanelThrowWithMouse();
                 }
+
+                if (e.affectsConfiguration('vscode-pokemon.autoSpawn.enabled') ||
+                    e.affectsConfiguration('vscode-pokemon.autoSpawn.interval')) {
+                    startAutoSpawnTimer(context);
+                }
             },
         ),
     );
@@ -713,6 +870,21 @@ export function activate(context: vscode.ExtensionContext) {
             },
         });
     }
+
+    // Initialize auto-spawn timer
+    startAutoSpawnTimer(context);
+
+    // Add cleanup when extension is deactivated
+    context.subscriptions.push({
+        dispose: () => {
+            stopAutoSpawnTimer();
+        }
+    });
+}
+
+export function deactivate() {
+    stopAutoSpawnTimer();
+    spawnPokemonDeactivate();
 }
 
 function updateStatusBar(): void {
