@@ -167,27 +167,31 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
             // Try to evolve a pokemon
             const evolvablePokemon = collection.find(spec => canEvolve(spec.type));
             if (evolvablePokemon) {
-                const evolution = getEvolution(evolvablePokemon.type);
-                if (evolution && POKEMON_DATA[evolution]) {
-                    // Remove old pokemon and replace with evolution
-                    panel.deletePokemon(evolvablePokemon.name!);
-                    
-                    const evolvedSpec = new PokemonSpecification(
-                        POKEMON_DATA[evolution].possibleColors[0],
-                        evolution,
-                        getConfiguredSize(),
-                        evolvablePokemon.name, // Keep the same name
-                        POKEMON_DATA[evolution].generation.toString(),
-                        POKEMON_DATA[evolution].originalSpriteSize
-                    );
-                    
-                    panel.spawnPokemon(evolvedSpec);
-                    
-                    // Update collection
-                    const index = collection.findIndex(spec => spec.name === evolvablePokemon.name);
-                    if (index !== -1) {
-                        collection[index] = evolvedSpec;
-                        await storeCollectionAsMemento(context, collection);
+                const possibleEvolutions = getEvolution(evolvablePokemon.type);
+                if (possibleEvolutions.length > 0) {
+                    // Randomly select one evolution from the possible options
+                    const evolution = possibleEvolutions[Math.floor(Math.random() * possibleEvolutions.length)];
+                    if (POKEMON_DATA[evolution]) {
+                        // Remove old pokemon and replace with evolution
+                        panel.deletePokemon(evolvablePokemon.name!);
+                        
+                        const evolvedSpec = new PokemonSpecification(
+                            POKEMON_DATA[evolution].possibleColors[0],
+                            evolution,
+                            getConfiguredSize(),
+                            evolvablePokemon.name, // Keep the same name
+                            POKEMON_DATA[evolution].generation.toString(),
+                            POKEMON_DATA[evolution].originalSpriteSize
+                        );
+                        
+                        panel.spawnPokemon(evolvedSpec);
+                        
+                        // Update collection
+                        const index = collection.findIndex(spec => spec.name === evolvablePokemon.name);
+                        if (index !== -1) {
+                            collection[index] = evolvedSpec;
+                            await storeCollectionAsMemento(context, collection);
+                        }
                         console.log(`Auto-evolved ${evolvablePokemon.type} to ${evolution}`);
                         actionTaken = true;
                     }
