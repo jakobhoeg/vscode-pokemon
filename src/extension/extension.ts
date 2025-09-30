@@ -105,23 +105,23 @@ function getAutoSpawnMaxPokemon(): number {
         .get<number>('autoSpawn.maxPokemon', 6);
 }
 
-function getAutoSpawnBehavior(): 'evolve' | 'remove' | 'random' {
+function getAutoSpawnBehavior(): 'evolve' | 'replace' | 'random' | 'doNothing' {
     return vscode.workspace
         .getConfiguration('vscode-pokemon')
-        .get<'evolve' | 'remove' | 'random'>('autoSpawn.behavior', 'random');
+        .get<'evolve' | 'replace' | 'random' | 'doNothing'>('autoSpawn.behavior', 'random');
 }
 
 function getAutoSpawnGenerations(): PokemonGeneration[] {
     const configGenerations = vscode.workspace
         .getConfiguration('vscode-pokemon')
         .get<number[]>('autoSpawn.generations', [1, 2, 3]);
-    
+
     // Convert numbers to PokemonGeneration enum values
     // If empty array, return all generations
     if (configGenerations.length === 0) {
         return [PokemonGeneration.Gen1, PokemonGeneration.Gen2, PokemonGeneration.Gen3];
     }
-    
+
     return configGenerations.map(gen => gen as PokemonGeneration);
 }
 
@@ -157,12 +157,12 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
         panel.spawnPokemon(spec);
         collection.push(spec);
         await storeCollectionAsMemento(context, collection);
-        
+
         console.log(`Auto-spawned ${randomPokemonType} (${collection.length}/${maxPokemon})`);
     } else {
         // We've reached the max, decide what to do based on behavior
         let actionTaken = false;
-        
+
         if (behavior === 'evolve' || (behavior === 'random' && Math.random() < 0.5)) {
             // Try to evolve a pokemon
             const evolvablePokemon = collection.find(spec => canEvolve(spec.type));
@@ -174,7 +174,7 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                     if (POKEMON_DATA[evolution]) {
                         // Remove old pokemon and replace with evolution
                         panel.deletePokemon(evolvablePokemon.name!);
-                        
+
                         const evolvedSpec = new PokemonSpecification(
                             POKEMON_DATA[evolution].possibleColors[0],
                             evolution,
@@ -183,9 +183,9 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                             POKEMON_DATA[evolution].generation.toString(),
                             POKEMON_DATA[evolution].originalSpriteSize
                         );
-                        
+
                         panel.spawnPokemon(evolvedSpec);
-                        
+
                         // Update collection
                         const index = collection.findIndex(spec => spec.name === evolvablePokemon.name);
                         if (index !== -1) {
@@ -198,15 +198,15 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                 }
             }
         }
-        
-        if (!actionTaken && (behavior === 'remove' || behavior === 'random')) {
+
+        if (!actionTaken && (behavior === 'replace' || behavior === 'random')) {
             // Remove a random pokemon and spawn a new one
             if (collection.length > 0) {
                 const randomIndex = Math.floor(Math.random() * collection.length);
                 const pokemonToRemove = collection[randomIndex];
-                
+
                 panel.deletePokemon(pokemonToRemove.name!);
-                
+
                 // Spawn a new random pokemon
                 const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
                 const newSpec = new PokemonSpecification(
@@ -215,34 +215,38 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                     getConfiguredSize(),
                     randomPokemonConfig.name,
                 );
-                
+
                 panel.spawnPokemon(newSpec);
-                
+
                 // Update collection
                 collection[randomIndex] = newSpec;
                 await storeCollectionAsMemento(context, collection);
                 console.log(`Auto-removed ${pokemonToRemove.type} and spawned ${randomPokemonType}`);
             }
         }
+
+        if (!actionTaken && behavior === 'doNothing') {
+            console.log('Auto-spawn behavior set to doNothing. No action taken.');
+        }
     }
 }
 
 function startAutoSpawnTimer(context: vscode.ExtensionContext): void {
     stopAutoSpawnTimer(); // Clear any existing timer
-    
+
     if (!getAutoSpawnEnabled()) {
         return;
     }
-    
+
     const intervalMinutes = getAutoSpawnInterval();
     const intervalMs = intervalMinutes * 60 * 1000; // Convert to milliseconds
-    
+
     autoSpawnTimer = setInterval(() => {
         autoSpawnPokemon(context).catch(error => {
             console.error('Error in auto-spawn:', error);
         });
     }, intervalMs);
-    
+
     console.log(`Auto-spawn timer started: ${intervalMinutes} minute intervals`);
 }
 

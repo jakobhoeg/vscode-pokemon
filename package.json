@@ -176,25 +176,26 @@
                         "type": "number",
                         "default": 10,
                         "minimum": 1,
-                        "maximum": 60,
-                        "description": "Time in minutes between automatic Pokemon spawns"
+                        "maximum": 1440,
+                        "description": "Time in minutes between automatic Pokemon spawns, if enabled"
                     },
                     "vscode-pokemon.autoSpawn.maxPokemon": {
                         "type": "number",
                         "default": 6,
                         "minimum": 1,
-                        "maximum": 20,
-                        "description": "Maximum number of Pokemon to spawn automatically"
+                        "maximum": 30,
+                        "description": "Maximum number of Pokemon to spawn automatically, once reached the behavior setting will be applied"
                     },
                     "vscode-pokemon.autoSpawn.behavior": {
                         "type": "string",
                         "enum": [
                             "evolve",
-                            "remove",
-                            "random"
+                            "replace",
+                            "random",
+                            "doNothing"
                         ],
                         "default": "random",
-                        "description": "What to do when max Pokemon limit is reached: evolve a Pokemon, remove a Pokemon, or randomly choose between the two"
+                        "description": "What to do when max Pokemon limit is reached: evolve a Pokemon, replace a Pokemon, do nothing, or randomly choose between the options"
                     },
                     "vscode-pokemon.autoSpawn.generations": {
                         "type": "array",
