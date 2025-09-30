@@ -72,6 +72,11 @@
                     "command": "vscode-pokemon.delete-pokemon",
                     "when": "view == pokemonView",
                     "group": "navigation@3"
+                },
+                {
+                    "command": "vscode-pokemon.remove-all-pokemon",
+                    "when": "view == pokemonView",
+                    "group": "navigation@4"
                 }
             ]
         },
@@ -123,8 +128,8 @@
                 "title": "Remove all pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-trash.svg",
-                    "light": "media/icon/light-trash.svg"
+                    "dark": "media/icon/dark-dumpster.svg",
+                    "light": "media/icon/light-dumpster.svg"
                 }
             },
             {
