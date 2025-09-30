@@ -2742,8 +2742,24 @@ export function getDefaultPokemon(): PokemonType {
   return 'bulbasaur';
 }
 
-export function getRandomPokemonConfig(): [PokemonType, PokemonConfig] {
-  var keys = Object.keys(POKEMON_DATA);
-  var randomKey = keys[Math.floor(Math.random() * keys.length)];
+export function getRandomPokemonConfig(generations?: PokemonGeneration[]): [PokemonType, PokemonConfig] {
+  let keys: string[];
+  // If a generation filter was applied, filter the keys accordingly
+  // No generation filter applied, use all keys
+  if (generations && generations.length > 0) {
+    keys = Object.entries(POKEMON_DATA)
+      .filter(([, config]) => generations.includes(config.generation))
+      .map(([key]) => key);
+  } else {
+
+    keys = Object.keys(POKEMON_DATA);
+  }
+
+  // If a generation filter was applied but no Pokémon were found, should be impossible
+  if (keys.length === 0) {
+    throw new Error('No Pokémon found for the specified generations.');
+  }
+
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
   return [randomKey as PokemonType, POKEMON_DATA[randomKey]];
 }
