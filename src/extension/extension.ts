@@ -47,7 +47,6 @@ class PokemonQuickPickItem implements vscode.QuickPickItem {
     alwaysShow?: boolean | undefined;
     buttons?: readonly vscode.QuickInputButton[] | undefined;
 }
-
 let webviewViewProvider: PokemonWebviewViewProvider;
 let autoSpawnTimer: NodeJS.Timeout | undefined;
 
@@ -105,10 +104,10 @@ function getAutoSpawnMaxPokemon(): number {
         .get<number>('autoSpawn.maxPokemon', 6);
 }
 
-function getAutoSpawnBehavior(): 'evolve' | 'replace' | 'random' | 'doNothing' {
+function getAutoSpawnBehavior(): 'evolve' | 'replace' | 'random' | 'doNothing' | 'evolve_or_replace' | 'evolve_then_replace' {
     return vscode.workspace
         .getConfiguration('vscode-pokemon')
-        .get<'evolve' | 'replace' | 'random' | 'doNothing'>('autoSpawn.behavior', 'random');
+        .get<'evolve' | 'replace' | 'random' | 'doNothing' | 'evolve_or_replace' | 'evolve_then_replace'>('autoSpawn.behavior', 'evolve_or_replace');
 }
 
 function getAutoSpawnGenerations(): PokemonGeneration[] {
@@ -144,7 +143,18 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
     const behavior = getAutoSpawnBehavior();
     const generations = getAutoSpawnGenerations();
 
+    console.debug('autoSpawnPokemon: start', {
+        collectionSize: collection.length,
+        maxPokemon,
+        behavior,
+        generations,
+    });
+
+    // popup message for debugging
+    void vscode.window.showInformationMessage('Collection Details: ' + collection.map(spec => `${spec.name} (${spec.type})`).join(', '));
+
     if (collection.length < maxPokemon) {
+        void vscode.window.showInformationMessage('Performing auto-spawn: room for more pokemon');
         // We have room for more pokemon, spawn a new one
         const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
         const spec = new PokemonSpecification(
@@ -159,76 +169,113 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
         await storeCollectionAsMemento(context, collection);
 
         console.log(`Auto-spawned ${randomPokemonType} (${collection.length}/${maxPokemon})`);
-    } else {
-        // We've reached the max, decide what to do based on behavior
-        let actionTaken = false;
+        console.debug('autoSpawnPokemon: spawned', { type: randomPokemonType, name: spec.name, collectionSize: collection.length });
+        return;
+    }
 
-        if (behavior === 'evolve' || (behavior === 'random' && Math.random() < 0.5)) {
-            // Try to evolve a pokemon
-            const evolvablePokemon = collection.find(spec => canEvolve(spec.type));
-            if (evolvablePokemon) {
-                const possibleEvolutions = getEvolution(evolvablePokemon.type);
-                if (possibleEvolutions.length > 0) {
-                    // Randomly select one evolution from the possible options
-                    const evolution = possibleEvolutions[Math.floor(Math.random() * possibleEvolutions.length)];
-                    if (POKEMON_DATA[evolution]) {
-                        // Remove old pokemon and replace with evolution
-                        panel.deletePokemon(evolvablePokemon.name!);
+    // Behavior: do nothing
+    if (behavior === 'doNothing') {
+        return;
+    }
 
-                        const evolvedSpec = new PokemonSpecification(
-                            POKEMON_DATA[evolution].possibleColors[0],
-                            evolution,
-                            getConfiguredSize(),
-                            evolvablePokemon.name, // Keep the same name
-                            POKEMON_DATA[evolution].generation.toString(),
-                            POKEMON_DATA[evolution].originalSpriteSize
-                        );
+    // We've reached the max, decide what to do based on behavior
+    let actionTaken = false;
+    let attemptedEvolve = false;
 
-                        panel.spawnPokemon(evolvedSpec);
+    // single random decision reused for behaviors that require a 50/50 choice
+    const decision = Math.random();
 
-                        // Update collection
-                        const index = collection.findIndex(spec => spec.name === evolvablePokemon.name);
-                        if (index !== -1) {
-                            collection[index] = evolvedSpec;
-                            await storeCollectionAsMemento(context, collection);
-                        }
-                        console.log(`Auto-evolved ${evolvablePokemon.type} to ${evolution}`);
-                        actionTaken = true;
+    void void vscode.window.showInformationMessage(`Auto-spawn decision: ${decision}`);
+    // Evolve branch: covers explicit 'evolve', 'evolve_then_replace' (try evolve), and 50% choices for 'random' and 'evolve_or_replace'
+    if (
+        behavior === 'evolve' ||
+        (behavior === 'evolve_then_replace') ||
+        (behavior === 'random' && decision < 0.5) ||
+        (behavior === 'evolve_or_replace' && decision < 0.5)
+    ) {
+        console.debug('autoSpawnPokemon: considering evolve behavior');
+        attemptedEvolve = true;
+        const evolvablePokemon = collection.find(spec => canEvolve(spec.type));
+        console.debug('autoSpawnPokemon: evolvablePokemon', { found: !!evolvablePokemon, type: evolvablePokemon?.type, name: evolvablePokemon?.name });
+        if (evolvablePokemon) {
+            const possibleEvolutions = getEvolution(evolvablePokemon.type);
+            if (possibleEvolutions.length > 0) {
+                const evolution = possibleEvolutions[Math.floor(Math.random() * possibleEvolutions.length)];
+                if (POKEMON_DATA[evolution]) {
+                    // Remove old pokemon and replace with evolution
+                    if (evolvablePokemon.name) {
+                        panel.deletePokemon(evolvablePokemon.name);
+                        console.debug('autoSpawnPokemon: deleted by name', { name: evolvablePokemon.name });
+                    } else {
+                        panel.deletePokemonByType(evolvablePokemon.type);
+                        console.debug('autoSpawnPokemon: deleted by type', { type: evolvablePokemon.type });
                     }
+
+
+                    void vscode.window.showInformationMessage(`Auto-evolving ${evolvablePokemon.type} to ${evolution}`);
+
+                    // remove previous stage from collection
+                    const index = collection.findIndex(spec => spec === evolvablePokemon || spec.name === evolvablePokemon.name);
+                    void vscode.window.showInformationMessage('Index in collection: ' + index);
+                    if (index !== -1) {
+                        collection.splice(index, 1);
+                    }
+
+                    const evolvedSpec = new PokemonSpecification(
+                        POKEMON_DATA[evolution].possibleColors[0],
+                        evolution,
+                        getConfiguredSize(),
+                        evolvablePokemon.name, // Keep the same name
+                    );
+
+                    panel.spawnPokemon(evolvedSpec);
+                    collection.push(evolvedSpec);
+                    await storeCollectionAsMemento(context, collection);
+                    console.log(`Auto-evolved ${evolvablePokemon.type} to ${evolution}`);
+                    actionTaken = true;
                 }
             }
         }
+    }
 
-        if (!actionTaken && (behavior === 'replace' || behavior === 'random')) {
-            // Remove a random pokemon and spawn a new one
-            if (collection.length > 0) {
-                const randomIndex = Math.floor(Math.random() * collection.length);
-                const pokemonToRemove = collection[randomIndex];
+    // Replace branch: covers explicit 'replace', 'evolve_then_replace' (if not evolved), random choices, and evolve_or_replace's other half
+    if (!actionTaken && (
+        behavior === 'replace' ||
+        behavior === 'random' ||
+        (behavior === 'evolve_or_replace' && decision >= 0.5) ||
+        (behavior === 'evolve_or_replace' && attemptedEvolve) || // if we attempted evolve option but could not, still replace in this behavior even if decision was
+        behavior === 'evolve_then_replace'
+    )) {
+        console.debug('autoSpawnPokemon: considering replace behavior');
+        if (collection.length > 0) {
+            const randomIndex = Math.floor(Math.random() * collection.length);
+            const pokemonToRemove = collection[randomIndex];
+            console.debug('autoSpawnPokemon: replacing pokemon', { index: randomIndex, type: pokemonToRemove.type, name: pokemonToRemove.name });
 
-                panel.deletePokemon(pokemonToRemove.name!);
-
-                // Spawn a new random pokemon
-                const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
-                const newSpec = new PokemonSpecification(
-                    randomPokemonConfig.possibleColors[0],
-                    randomPokemonType,
-                    getConfiguredSize(),
-                    randomPokemonConfig.name,
-                );
-
-                panel.spawnPokemon(newSpec);
-
-                // Update collection
-                collection[randomIndex] = newSpec;
-                await storeCollectionAsMemento(context, collection);
-                console.log(`Auto-removed ${pokemonToRemove.type} and spawned ${randomPokemonType}`);
+            if (pokemonToRemove.name) {
+                panel.deletePokemon(pokemonToRemove.name);
+                console.debug('autoSpawnPokemon: deleted by name', { name: pokemonToRemove.name });
+            } else {
+                panel.deletePokemonByType(pokemonToRemove.type);
+                console.debug('autoSpawnPokemon: deleted by type', { type: pokemonToRemove.type });
             }
-        }
 
-        if (!actionTaken && behavior === 'doNothing') {
-            console.log('Auto-spawn behavior set to doNothing. No action taken.');
+            const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
+            const newSpec = new PokemonSpecification(
+                randomPokemonConfig.possibleColors[0],
+                randomPokemonType,
+                getConfiguredSize(),
+                randomPokemonConfig.name,
+            );
+
+            panel.spawnPokemon(newSpec);
+            collection[randomIndex] = newSpec;
+            await storeCollectionAsMemento(context, collection);
+            console.log(`Auto-removed ${pokemonToRemove.type} and spawned ${randomPokemonType}`);
+            actionTaken = true;
         }
     }
+
 }
 
 function startAutoSpawnTimer(context: vscode.ExtensionContext): void {
@@ -238,8 +285,8 @@ function startAutoSpawnTimer(context: vscode.ExtensionContext): void {
         return;
     }
 
-    const intervalMinutes = getAutoSpawnInterval();
-    const intervalMs = intervalMinutes * 60 * 1000; // Convert to milliseconds
+    const intervalSeconds = getAutoSpawnInterval();
+    const intervalMs = intervalSeconds * 1000; // Convert to milliseconds
 
     autoSpawnTimer = setInterval(() => {
         autoSpawnPokemon(context).catch(error => {
@@ -247,7 +294,7 @@ function startAutoSpawnTimer(context: vscode.ExtensionContext): void {
         });
     }, intervalMs);
 
-    console.log(`Auto-spawn timer started: ${intervalMinutes} minute intervals`);
+    console.log(`Auto-spawn timer started: ${intervalSeconds} second intervals`);
 }
 
 function stopAutoSpawnTimer(): void {
@@ -284,7 +331,8 @@ export class PokemonSpecification {
             this.name = name;
         }
         this.generation = generation || `gen${POKEMON_DATA[type].generation}`;
-        this.originalSpriteSize = POKEMON_DATA[type].originalSpriteSize || 32;
+        // Prefer provided originalSpriteSize if present, otherwise fall back to POKEMON_DATA
+        this.originalSpriteSize = typeof originalSpriteSize === 'number' ? originalSpriteSize : (POKEMON_DATA[type].originalSpriteSize || 32);
     }
 
     static fromConfiguration(): PokemonSpecification {
@@ -756,7 +804,7 @@ export function activate(context: vscode.ExtensionContext) {
                 await storeCollectionAsMemento(context, collection);
             } else {
                 await createPokemonPlayground(context);
-                await vscode.window.showInformationMessage(
+                await void vscode.window.showInformationMessage(
                     vscode.l10n.t(
                         "A Pokemon Playground has been created. You can now use the 'Spawn Additional Pokemon' Command to add more Pokemon.",
                     ),
@@ -790,13 +838,13 @@ export function activate(context: vscode.ExtensionContext) {
 
             } else {
                 await createPokemonPlayground(context);
-                await vscode.window.showInformationMessage(
+                await void vscode.window.showInformationMessage(
                     vscode.l10n.t(
                         "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
                     ),
                 );
             }
-        }))
+    }));
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
@@ -808,7 +856,7 @@ export function activate(context: vscode.ExtensionContext) {
                     await storeCollectionAsMemento(context, []);
                 } else {
                     await createPokemonPlayground(context);
-                    await vscode.window.showInformationMessage(
+                    await void vscode.window.showInformationMessage(
                         vscode.l10n.t(
                             "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
                         ),
@@ -926,6 +974,7 @@ interface IPokemonPanel {
     resetPokemon(): void;
     spawnPokemon(spec: PokemonSpecification): void;
     deletePokemon(pokemonName: string): void;
+    deletePokemonByType(pokemonType: PokemonType): void;
     listPokemon(): void;
     rollCall(): void;
     themeKind(): vscode.ColorThemeKind;
@@ -938,7 +987,7 @@ interface IPokemonPanel {
     setThrowWithMouse(newThrowWithMouse: boolean): void;
 }
 
-class PokemonWebviewContainer implements IPokemonPanel {
+export class PokemonWebviewContainer implements IPokemonPanel {
     protected _extensionUri: vscode.Uri;
     protected _disposables: vscode.Disposable[] = [];
     protected _pokemonColor: PokemonColor;
@@ -1075,6 +1124,13 @@ class PokemonWebviewContainer implements IPokemonPanel {
         });
     }
 
+    public deletePokemonByType(pokemonType: PokemonType) {
+        void this.getWebview().postMessage({
+            command: 'delete-pokemon-by-type',
+            type: pokemonType,
+        });
+    }
+
     protected getWebview(): vscode.Webview {
         throw new Error('Not implemented');
     }
@@ -1180,7 +1236,7 @@ function handleWebviewMessage(message: WebviewMessage) {
             void vscode.window.showErrorMessage(message.text);
             return;
         case 'info':
-            void vscode.window.showInformationMessage(message.text);
+            void void vscode.window.showInformationMessage(message.text);
             return;
     }
 }
@@ -1188,7 +1244,7 @@ function handleWebviewMessage(message: WebviewMessage) {
 /**
  * Manages pokemon coding webview panels
  */
-class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
+export class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
     /**
      * Track the currently panel. Only allow a single panel to exist at a time.
      */
@@ -1268,6 +1324,13 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
         void this.getWebview().postMessage({
             command: 'delete-pokemon',
             name: pokemonName,
+        });
+    }
+
+    public deletePokemonByType(pokemonType: PokemonType): void {
+        void this.getWebview().postMessage({
+            command: 'delete-pokemon-by-type',
+            type: pokemonType,
         });
     }
 

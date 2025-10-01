@@ -174,10 +174,10 @@
                     },
                     "vscode-pokemon.autoSpawn.interval": {
                         "type": "number",
-                        "default": 10,
+                        "default": 20,
                         "minimum": 1,
-                        "maximum": 1440,
-                        "description": "Time in minutes between automatic Pokemon spawns, if enabled"
+                        "maximum": 86400,
+                        "description": "Time in seconds between automatic Pokemon spawns, if enabled. Maximum is 1 day (86400 seconds)"
                     },
                     "vscode-pokemon.autoSpawn.maxPokemon": {
                         "type": "number",
@@ -192,10 +192,12 @@
                             "evolve",
                             "replace",
                             "random",
-                            "doNothing"
+                            "doNothing",
+                            "evolve_or_replace",
+                            "evolve_then_replace"
                         ],
-                        "default": "random",
-                        "description": "What to do when max Pokemon limit is reached: evolve a Pokemon, replace a Pokemon, do nothing, or randomly choose between the options"
+                        "default": "evolve_or_replace",
+                        "description": "What to do when max Pokemon limit is reached: evolve a Pokemon, replace a Pokemon, do nothing, randomly choose between the options, or use evolve-or-replace strategies"
                     },
                     "vscode-pokemon.autoSpawn.generations": {
                         "type": "array",
@@ -203,6 +205,7 @@
                             "type": "number",
                             "enum": [1, 2, 3]
                         },
+                        "uniqueItems": true,
                         "default": [1, 2, 3],
                         "description": "Optional array of Pokemon generations to spawn from (1, 2, 3). Empty array means all generations."
                     }
