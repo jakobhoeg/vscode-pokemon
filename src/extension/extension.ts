@@ -151,10 +151,9 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
     });
 
     // popup message for debugging
-    void vscode.window.showInformationMessage('Collection Details: ' + collection.map(spec => `${spec.name} (${spec.type})`).join(', '));
+    // void vscode.window.showInformationMessage('[Prior To Action] Collection Details : ' + collection.map(spec => `${spec.name} (${spec.type})`).join(', '));
 
     if (collection.length < maxPokemon) {
-        void vscode.window.showInformationMessage('Performing auto-spawn: room for more pokemon');
         // We have room for more pokemon, spawn a new one
         const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig(generations.length > 0 ? generations : undefined);
         const spec = new PokemonSpecification(
@@ -185,7 +184,6 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
     // single random decision reused for behaviors that require a 50/50 choice
     const decision = Math.random();
 
-    void void vscode.window.showInformationMessage(`Auto-spawn decision: ${decision}`);
     // Evolve branch: covers explicit 'evolve', 'evolve_then_replace' (try evolve), and 50% choices for 'random' and 'evolve_or_replace'
     if (
         behavior === 'evolve' ||
@@ -211,12 +209,8 @@ async function autoSpawnPokemon(context: vscode.ExtensionContext): Promise<void>
                         console.debug('autoSpawnPokemon: deleted by type', { type: evolvablePokemon.type });
                     }
 
-
-                    void vscode.window.showInformationMessage(`Auto-evolving ${evolvablePokemon.type} to ${evolution}`);
-
                     // remove previous stage from collection
                     const index = collection.findIndex(spec => spec === evolvablePokemon || spec.name === evolvablePokemon.name);
-                    void vscode.window.showInformationMessage('Index in collection: ' + index);
                     if (index !== -1) {
                         collection.splice(index, 1);
                     }
