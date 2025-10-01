@@ -78,19 +78,26 @@ Set the size and position of the extension.
 
 ## Auto-spawn settings (automatic Pokémon)
 
-The extension can automatically spawn Pokémon on a timer. Configure this under the `vscode-pokemon.autoSpawn` settings.
+
+The extension can automatically spawn Pokémon on a timer. All auto-spawn features and behaviors are new in this release. Configure these under the `vscode-pokemon.autoSpawn` settings:
 
 - `vscode-pokemon.autoSpawn.enabled` (boolean) — Enable automatic spawning.
-- `vscode-pokemon.autoSpawn.interval` (number, seconds) — Time in seconds between automatic spawn checks. Default: 20. Note: this value is now in seconds (was minutes in older versions); a one-time migration is applied where possible.
+- `vscode-pokemon.autoSpawn.interval` (number, seconds) — Time in seconds between automatic spawn checks. Default: 20.
 - `vscode-pokemon.autoSpawn.maxPokemon` (number) — Maximum number of Pokémon allowed. When the number of spawned Pokémon reaches this value, the extension will apply the configured behavior. Default: 6.
 - `vscode-pokemon.autoSpawn.generations` (array of numbers) — Which Pokémon generations to spawn from (1, 2, 3). Empty array means all generations.
 - `vscode-pokemon.autoSpawn.behavior` (string) — What to do when `maxPokemon` is reached. Options:
-  - `evolve` — Try to evolve one existing Pokémon (if an evolution exists). If an evolution occurs, no replacement is done during that cycle.
-  - `replace` — Remove a random Pokémon and spawn a new random one in its place.
-  - `random` — Randomly choose between evolve or replace (50/50) on each auto-spawn cycle.
-  - `doNothing` — Do not modify the collection once the maximum is reached.
-  - `evolve_or_replace` — Choose either evolve or replace at random (50/50). This behaves similarly to `random` but is a more explicit option for evolve-vs-replace choices.
-  - `evolve_then_replace` — Try to evolve an eligible Pokémon first. If no evolutions are possible, fall back to replacing a random Pokémon.
+  - `evolve`: Try to evolve an existing Pokémon
+  - `replace`: Replace a random Pokémon with a new one
+  - `random`: Randomly choose between evolve or replace
+  - `doNothing`: Take no action when the collection is full
+  - `evolve_or_replace`: Randomly choose between evolve or replace (explicit option)
+  - `evolve_then_replace`: Try to evolve, and if not possible, replace
+
+Other new features:
+- Support for multiple/branching evolutions (e.g., Eevee)
+- Generation filtering for auto-spawn
+- Debug logging for all auto-spawn actions
+
 
 Example scenarios
 - Keep a small, evolving collection: set `maxPokemon` to `3` and `behavior` to `evolve_then_replace`. The extension will try to evolve first and only replace when evolution isn't possible.
