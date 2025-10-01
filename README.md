@@ -3,7 +3,7 @@
 # VS Code Pokémon
 
 ![icon](https://github.com/jakobhoeg/vscode-pokemon/raw/main/icon.png)
-</div>    
+</div>
 
 <p align="center">
     Puts cute Pokémon in your code editor to boost productivity ✨
@@ -38,8 +38,8 @@ Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_1
 
 ## 💖 Support
 
-If you enjoy this project, please consider supporting me.  
-Manually creating the `.gif` files for each sprite takes a lot of time and effort.  
+If you enjoy this project, please consider supporting me.
+Manually creating the `.gif` files for each sprite takes a lot of time and effort.
 Your sponsorship helps me dedicate more energy to improve and expand the project.
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-❤-blue?style=flat&logo=github)](https://github.com/sponsors/jakobhoeg)
@@ -62,7 +62,7 @@ With VS Code open, launch VS Code Quick Open (`Ctrl+P` on Windows/Linux or `Cmd(
 
 ## Using VS Code Pokémon
 
-After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS.  
+After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS.
 
 Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a Bulbasaur in VS Code:
 
@@ -76,6 +76,34 @@ Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In t
 
 Set the size and position of the extension.
 
+## Auto-spawn settings (automatic Pokémon)
+
+
+The extension can automatically spawn Pokémon on a timer. All auto-spawn features and behaviors are new in this release. Configure these under the `vscode-pokemon.autoSpawn` settings:
+
+- `vscode-pokemon.autoSpawn.enabled` (boolean) — Enable automatic spawning.
+- `vscode-pokemon.autoSpawn.interval` (number, seconds) — Time in seconds between automatic spawn checks. Default: 20.
+- `vscode-pokemon.autoSpawn.maxPokemon` (number) — Maximum number of Pokémon allowed. When the number of spawned Pokémon reaches this value, the extension will apply the configured behavior. Default: 6.
+- `vscode-pokemon.autoSpawn.generations` (array of numbers) — Which Pokémon generations to spawn from (1, 2, 3). Empty array means all generations.
+- `vscode-pokemon.autoSpawn.behavior` (string) — What to do when `maxPokemon` is reached. Options:
+  - `evolve`: Try to evolve an existing Pokémon
+  - `replace`: Replace a random Pokémon with a new one
+  - `random`: Randomly choose between evolve or replace
+  - `doNothing`: Take no action when the collection is full
+  - `evolve_or_replace`: Randomly choose between evolve or replace (explicit option)
+  - `evolve_then_replace`: Try to evolve, and if not possible, replace
+
+Other new features:
+- Support for multiple/branching evolutions (e.g., Eevee)
+- Generation filtering for auto-spawn
+- Debug logging for all auto-spawn actions
+
+
+Example scenarios
+- Keep a small, evolving collection: set `maxPokemon` to `3` and `behavior` to `evolve_then_replace`. The extension will try to evolve first and only replace when evolution isn't possible.
+- Fast frequent spawns: set `autoSpawn.interval` to `60` (60 seconds) and `maxPokemon` to `6`. Use `replace` if you want the collection to frequently refresh with new types.
+- Leave the collection intact after it fills: set `behavior` to `doNothing` so the extension never removes or evolves Pokémon once the limit is reached.
+
 ## Upcoming features
 
 Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 4 soon!
@@ -85,7 +113,7 @@ Extracting and creating .gif files involves quite a bit of tedious manual work, 
 ### Sprite Sources
 - Pokemon Sprites: © The Pokémon Company / Nintendo / Game Freak
 - The sprites are used for non-commercial, fan project purposes only
-- Original sprite artwork belongs to the respective copyright holders 
+- Original sprite artwork belongs to the respective copyright holders
 
 ### Acknowledgments
 - All sprites are property of their original creators

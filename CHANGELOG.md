@@ -2,6 +2,27 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [Unreleased]
+
+## [Unreleased]
+
+- Add public API to delete Pokémon by type (`deletePokemonByType`)
+- Add unit tests for delete-by-type and delete-by-name actions
+- Add debug logging to all auto-spawn actions
+- Add new auto-spawn feature: automatically spawn Pokémon on a timer with configurable behaviors:
+	- `evolve`: Try to evolve an existing Pokémon
+	- `replace`: Replace a random Pokémon with a new one
+	- `random`: Randomly choose between evolve or replace
+	- `doNothing`: Take no action when the collection is full
+	- `evolve_or_replace`: Randomly choose between evolve or replace (explicit option)
+	- `evolve_then_replace`: Try to evolve, and if not possible, replace
+- Add support for multiple/branching evolutions (e.g., Eevee)
+- Add configurable auto-spawn: enable/disable, interval (in seconds), max Pokémon, and generation filtering
+- Adds evolution logic, with support for multiple evolutions
+- Update README with auto-spawn settings, migration notes, and examples
+- Add release notes for new features and migration
+- Minor bugfixes and refactors
+
 ## [3.1.1]
 
 - chore: update readme
