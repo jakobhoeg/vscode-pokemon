@@ -154,7 +154,7 @@
                             "explorer"
                         ],
                         "default": "explorer",
-                        "description": "VSCode pokemon webview position"
+                        "description": "VSCode pokemon webview position. 'panel' places it in a separate panel (like, 'explorer' places it in the explorer sidebar"
                     },
                     "vscode-pokemon.theme": {
                         "type": "string",
@@ -166,8 +166,58 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
+                    },
+                    "vscode-pokemon.keybinding.spawnPokemon": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Keyboard shortcut to spawn a specific pokemon (leave blank to disable, or set to a key combination like 'cmd+shift+s')"
+                    },
+                    "vscode-pokemon.keybinding.spawnRandomPokemon": {
+                        "type": "string",
+                        "default": "cmd+shift+l",
+                        "description": "Keyboard shortcut to spawn a random pokemon (leave blank to disable, or set to a key combination like 'cmd+shift+l')"
+                    },
+                    "vscode-pokemon.keybinding.deletePokemon": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Keyboard shortcut to delete a specific pokemon (leave blank to disable, or set to a key combination like 'cmd+shift+d')"
+                    },
+                    "vscode-pokemon.keybinding.removeAllPokemon": {
+                        "type": "string",
+                        "default": "cmd+shift+k",
+                        "description": "Keyboard shortcut to remove all pokemon (leave blank to disable, or set to a key combination like 'cmd+shift+k')"
                     }
                 }
+            }
+        ],
+"keybindings": [
+            {
+                "command": "vscode-pokemon.spawn-pokemon",
+                "key": "",
+                "mac": "",
+                "win": "",
+                "linux": ""
+            },
+            {
+                "command": "vscode-pokemon.spawn-random-pokemon",
+                "key": "cmd+shift+l",
+                "mac": "cmd+shift+l",
+                "win": "ctrl+shift+l",
+                "linux": "ctrl+shift+l"
+            },
+            {
+                "command": "vscode-pokemon.delete-pokemon",
+                "key": "",
+                "mac": "",
+                "win": "",
+                "linux": ""
+            },
+            {
+                "command": "vscode-pokemon.remove-all-pokemon",
+                "key": "cmd+shift+k",
+                "mac": "cmd+shift+k",
+                "win": "ctrl+shift+k",
+                "linux": "ctrl+shift+k"
             }
         ]
     },
