@@ -128,8 +128,8 @@
                 "title": "Remove all pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-dumpster.svg",
-                    "light": "media/icon/light-dumpster.svg"
+                    "dark": "media/icon/dark-dumpster-faint.svg",
+                    "light": "media/icon/light-dumpster-faint.svg"
                 }
             },
             {
