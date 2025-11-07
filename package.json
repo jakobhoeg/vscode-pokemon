@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "3.1.1",
+    "version": "3.2.1",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -38,6 +38,7 @@
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
+        "onCommand:vscode-pokemon.configure-keybindings",
         "onWebviewPanel:pokemonCoding",
         "onView:explorer",
         "onView:pokemonView",
@@ -131,10 +132,38 @@
                 "command": "vscode-pokemon.roll-call",
                 "title": "Roll-call",
                 "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.configure-keybindings",
+                "title": "Configure keybindings",
+                "category": "Pokemon Coding"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "vscode-pokemon.spawn-pokemon",
+                "key": "alt+shift+a",
+                "mac": "alt+shift+a"
+            },
+            {
+                "command": "vscode-pokemon.spawn-random-pokemon",
+                "key": "alt+shift+q",
+                "mac": "alt+shift+q"
+            },
+            {
+                "command": "vscode-pokemon.delete-pokemon",
+                "key": "alt+shift+d",
+                "mac": "alt+shift+d"
+            },
+            {
+                "command": "vscode-pokemon.remove-all-pokemon",
+                "key": "alt+shift+r",
+                "mac": "alt+shift+r"
             }
         ],
         "configuration": [
             {
+                "title": "VS Code Pokemon",
                 "properties": {
                     "vscode-pokemon.pokemonSize": {
                         "type": "string",

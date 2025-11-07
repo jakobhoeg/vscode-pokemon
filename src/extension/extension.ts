@@ -396,6 +396,45 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-pokemon.configure-keybindings', async () => {
+            const items: Array<vscode.QuickPickItem & { commandId: string }> = [
+                {
+                    label: vscode.l10n.t('Spawn additional pokemon'),
+                    description: 'vscode-pokemon.spawn-pokemon',
+                    commandId: 'vscode-pokemon.spawn-pokemon',
+                },
+                {
+                    label: vscode.l10n.t('Spawn random pokemon'),
+                    description: 'vscode-pokemon.spawn-random-pokemon',
+                    commandId: 'vscode-pokemon.spawn-random-pokemon',
+                },
+                {
+                    label: vscode.l10n.t('Remove pokemon'),
+                    description: 'vscode-pokemon.delete-pokemon',
+                    commandId: 'vscode-pokemon.delete-pokemon',
+                },
+                {
+                    label: vscode.l10n.t('Remove all pokemon'),
+                    description: 'vscode-pokemon.remove-all-pokemon',
+                    commandId: 'vscode-pokemon.remove-all-pokemon',
+                },
+            ];
+
+            const picked = await vscode.window.showQuickPick(items, {
+                placeHolder: vscode.l10n.t('Select a command to configure its keybinding'),
+                matchOnDescription: true,
+            });
+            if (!picked) {
+                return;
+            }
+            await vscode.commands.executeCommand(
+                'workbench.action.openGlobalKeybindings',
+                picked.commandId,
+            );
+        }),
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand(
             'vscode-pokemon.export-pokemon-list',
             async () => {
@@ -506,41 +545,112 @@ export function activate(context: vscode.ExtensionContext) {
                 await vscode.commands.executeCommand('pokemonView.focus');
             }
             if (panel) {
-                // First, select a generation
-                const generations = Object.values(PokemonGeneration)
-                    .filter(gen => typeof gen === 'number')
-                    .map(gen => ({
-                        label: `Generation ${gen}`,
-                        value: gen as PokemonGeneration,
-                        description: `Gen ${gen} Pokémon`
+                // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
+                const generationItems: Array<vscode.QuickPickItem & { isGeneration: true; gen: PokemonGeneration }> = Object
+                    .values(PokemonGeneration)
+                    .filter((gen) => typeof gen === 'number')
+                    .map((gen) => ({
+                        label: `$(folder) Generation ${gen}`,
+                        description: `Browse Gen ${gen} Pokémon`,
+                        isGeneration: true as const,
+                        gen: gen as PokemonGeneration,
                     }));
 
-                const selectedGeneration = await vscode.window.showQuickPick(
-                    generations,
-                    {
-                        placeHolder: vscode.l10n.t('Select a generation'),
-                    }
+                const allPokemonOptions: Array<vscode.QuickPickItem & { value: PokemonType; isGeneration: false }> = Object
+                    .entries(POKEMON_DATA)
+                    .map(([type, config]) => ({
+                        label: config.name,
+                        value: type as PokemonType,
+                        description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
+                        isGeneration: false as const,
+                    }));
+
+                const qp = vscode.window.createQuickPick<
+                    vscode.QuickPickItem & { isGeneration?: boolean; gen?: PokemonGeneration; value?: PokemonType }
+                >();
+                qp.placeholder = vscode.l10n.t('Select a generation or start typing to search for a Pokémon...');
+                qp.matchOnDescription = true;
+
+                const setGenerationOnlyItems = () => {
+                    qp.items = [
+                        { label: 'Generations', kind: vscode.QuickPickItemKind.Separator },
+                        ...generationItems,
+                    ];
+                };
+
+                const setWithSearchResults = (query: string) => {
+                    const q = query.toLowerCase().trim();
+                    const results = allPokemonOptions.filter((opt) =>
+                        opt.label.toLowerCase().includes(q) || (opt.description?.toLowerCase().includes(q) ?? false),
+                    );
+                    qp.items = [
+                        { label: 'Generations', kind: vscode.QuickPickItemKind.Separator },
+                        ...generationItems,
+                        { label: 'Results', kind: vscode.QuickPickItemKind.Separator },
+                        ...results,
+                    ];
+                };
+
+                setGenerationOnlyItems();
+
+                let selectedPokemonType: { label: string; value: PokemonType } | undefined;
+
+                const disposables: vscode.Disposable[] = [];
+
+                disposables.push(
+                    qp.onDidChangeValue((val) => {
+                        if (val && val.trim().length > 0) {
+                            setWithSearchResults(val);
+                        } else {
+                            setGenerationOnlyItems();
+                        }
+                    }),
                 );
 
-                if (!selectedGeneration) {
-                    console.log('Cancelled Spawning Pokemon - No Generation Selected');
+                disposables.push(
+                    qp.onDidAccept(async () => {
+                        const sel = qp.selectedItems[0] as any;
+                        if (!sel) {
+                            qp.hide();
+                            return;
+                        }
+                        if (sel.isGeneration) {
+                            const pokemonInGeneration = getPokemonByGeneration(sel.gen as PokemonGeneration);
+                            const pokemonOptions = pokemonInGeneration.map((type) => ({
+                                label: POKEMON_DATA[type].name,
+                                value: type,
+                                description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`,
+                            }));
+                            const picked = await vscode.window.showQuickPick(pokemonOptions, {
+                                placeHolder: vscode.l10n.t('Select a Pokémon'),
+                            });
+                            if (picked) {
+                                selectedPokemonType = picked;
+                            }
+                        } else {
+                            selectedPokemonType = sel as any;
+                        }
+                        qp.hide();
+                    }),
+                );
+
+                const closed = new Promise<void>((resolve) => {
+                    disposables.push(
+                        qp.onDidHide(() => {
+                            disposables.forEach((d) => d.dispose());
+                            qp.dispose();
+                            resolve();
+                        }),
+                    );
+                });
+
+                qp.show();
+                await closed;
+
+                if (!selectedPokemonType) {
+                    console.log('Cancelled Spawning Pokemon - No Selection');
                     return;
                 }
-
-                // Get Pokémon from selected generation
-                const pokemonInGeneration = getPokemonByGeneration(selectedGeneration.value);
-                const pokemonOptions = pokemonInGeneration.map(type => ({
-                    label: POKEMON_DATA[type].name,
-                    value: type,
-                    description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`
-                }));
-
-                const selectedPokemonType = await vscode.window.showQuickPick(
-                    pokemonOptions,
-                    {
-                        placeHolder: vscode.l10n.t('Select a Pokémon'),
-                    }
-                );
 
                 if (!selectedPokemonType) {
                     console.log('Cancelled Spawning Pokemon - No Pokémon Selected');
