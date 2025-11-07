@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.2.1]
+
+- feat: add better search functionality
+- feat: add hotkeys
+
 ## [3.1.1]
 
 - chore: update readme
