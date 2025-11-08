@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -142,8 +142,8 @@
         "keybindings": [
             {
                 "command": "vscode-pokemon.spawn-pokemon",
-                "key": "alt+shift+a",
-                "mac": "alt+shift+a"
+                "key": "alt+shift+w",
+                "mac": "alt+shift+w"
             },
             {
                 "command": "vscode-pokemon.spawn-random-pokemon",
@@ -157,8 +157,8 @@
             },
             {
                 "command": "vscode-pokemon.remove-all-pokemon",
-                "key": "alt+shift+r",
-                "mac": "alt+shift+r"
+                "key": "alt+shift+backspace",
+                "mac": "alt+shift+backspace"
             }
         ],
         "configuration": [

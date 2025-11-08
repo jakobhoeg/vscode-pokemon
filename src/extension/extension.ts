@@ -615,22 +615,71 @@ export function activate(context: vscode.ExtensionContext) {
                             return;
                         }
                         if (sel.isGeneration) {
+                            // Don't hide the first quick pick yet - dispose it manually
                             const pokemonInGeneration = getPokemonByGeneration(sel.gen as PokemonGeneration);
                             const pokemonOptions = pokemonInGeneration.map((type) => ({
                                 label: POKEMON_DATA[type].name,
                                 value: type,
                                 description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`,
                             }));
+
+                            // Manually dispose the first quick pick to prevent race condition
+                            disposables.forEach((d) => d.dispose());
+                            qp.dispose();
+
                             const picked = await vscode.window.showQuickPick(pokemonOptions, {
                                 placeHolder: vscode.l10n.t('Select a Pokémon'),
                             });
                             if (picked) {
                                 selectedPokemonType = picked;
+
+                                // Handle the rest of the flow
+                                var pokemonColor: PokemonColor = DEFAULT_COLOR;
+                                const possibleColors = availableColors(selectedPokemonType.value);
+
+                                if (possibleColors.length > 1) {
+                                    var selectedColor = await vscode.window.showQuickPick(
+                                        localize.stringListAsQuickPickItemList<PokemonColor>(
+                                            possibleColors,
+                                        ),
+                                        {
+                                            placeHolder: vscode.l10n.t('Select a color'),
+                                        },
+                                    );
+                                    if (!selectedColor) {
+                                        console.log('Cancelled Spawning Pokemon - No Color Selected');
+                                        return;
+                                    }
+                                    pokemonColor = selectedColor.value;
+                                } else {
+                                    pokemonColor = possibleColors[0];
+                                }
+
+                                const name = await vscode.window.showInputBox({
+                                    placeHolder: vscode.l10n.t('Leave blank for a random name'),
+                                    prompt: vscode.l10n.t('Name your Pokémon'),
+                                    value: randomName(selectedPokemonType.value),
+                                });
+
+                                const spec = new PokemonSpecification(
+                                    pokemonColor,
+                                    selectedPokemonType.value,
+                                    getConfiguredSize(),
+                                    name,
+                                );
+
+                                panel.spawnPokemon(spec);
+                                var collection = PokemonSpecification.collectionFromMemento(
+                                    context,
+                                    getConfiguredSize(),
+                                );
+                                collection.push(spec);
+                                await storeCollectionAsMemento(context, collection);
                             }
                         } else {
                             selectedPokemonType = sel as any;
+                            qp.hide();
                         }
-                        qp.hide();
                     }),
                 );
 

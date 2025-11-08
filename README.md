@@ -70,6 +70,22 @@ Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a
 
 Enjoy interacting with your favourite Pokémon!
 
+## Keyboard Shortcuts
+
+VS Code Pokémon comes with default keyboard shortcuts to make managing your Pokémon quick and easy:
+
+![Keybindings](https://github.com/jakobhoeg/vscode-pokemon/raw/main/keybindings.png)
+
+### Configuring Keyboard Shortcuts
+
+You can customize these shortcuts to match your preferences:
+
+1. Open the command palette (`Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS)
+2. Run the **`Pokemon Coding: Configure keybindings`** command
+3. Select the command you want to customize
+4. VS Code will open the Keyboard Shortcuts editor filtered to that command
+5. Click the pencil icon next to the command and press your desired key combination
+
 ## Changing settings
 
 Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In the search bar, enter “vscode-pokemon" to see all available options.
