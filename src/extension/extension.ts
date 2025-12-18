@@ -15,7 +15,7 @@ import {
 import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import { getDefaultPokemon, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
+import { getDefaultPokemon as getDefaultPokemonType, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -23,7 +23,7 @@ const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
 const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
 const DEFAULT_POKEMON_SCALE = PokemonSize.medium;
 const DEFAULT_COLOR = PokemonColor.default;
-const DEFAULT_POKEMON_TYPE = getDefaultPokemon();
+const DEFAULT_POKEMON_TYPE = getDefaultPokemonType();
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
 
@@ -86,6 +86,32 @@ function getThrowWithMouseConfiguration(): boolean {
         .get<boolean>('throwBallWithMouse', true);
 }
 
+interface IDefaultPokemonConfig {
+    type: PokemonType;
+    name?: string;
+}
+
+function getConfiguredDefaultPokemon(): PokemonSpecification[] {
+    const defaultConfig = vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<IDefaultPokemonConfig[]>('defaultPokemon', []);
+
+    const size = getConfiguredSize();
+    const result: PokemonSpecification[] = [];
+
+    for (const config of defaultConfig) {
+        // Validate that the pokemon type exists
+        if (POKEMON_DATA[config.type]) {
+            const name = config.name || randomName(config.type);
+            result.push(new PokemonSpecification(DEFAULT_COLOR, config.type, size, name));
+        } else {
+            console.warn(`Invalid pokemon type in defaultPokemon config: ${config.type}`);
+        }
+    }
+
+    return result;
+}
+
 function updatePanelThrowWithMouse(): void {
     const panel = getPokemonPanel();
     if (panel !== undefined) {
@@ -109,7 +135,7 @@ export class PokemonSpecification {
     generation: string;
     originalSpriteSize: number;
 
-    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string, originalSpriteSize?: number) {
+    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string) {
         this.color = color;
         this.type = type;
         this.size = size;
@@ -312,10 +338,21 @@ export function activate(context: vscode.ExtensionContext) {
                 );
 
                 if (PokemonPanel.currentPanel) {
-                    var collection = PokemonSpecification.collectionFromMemento(
-                        context,
-                        getConfiguredSize(),
-                    );
+                    // First, check if there are configured default pokemon
+                    const defaultPokemon = getConfiguredDefaultPokemon();
+                    let collection: PokemonSpecification[];
+
+                    if (defaultPokemon.length > 0) {
+                        // Use configured default pokemon
+                        collection = defaultPokemon;
+                    } else {
+                        // Fall back to memento (saved pokemon from previous session)
+                        collection = PokemonSpecification.collectionFromMemento(
+                            context,
+                            getConfiguredSize(),
+                        );
+                    }
+
                     collection.forEach((item) => {
                         PokemonPanel.currentPanel?.spawnPokemon(item);
                     });
@@ -348,6 +385,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const spec = PokemonSpecification.fromConfiguration();
     webviewViewProvider = new PokemonWebviewViewProvider(
+        context,
         context.extensionUri,
         spec.color,
         spec.type,
@@ -790,7 +828,7 @@ export function activate(context: vscode.ExtensionContext) {
                     ),
                 );
             }
-        }))
+        }));
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
@@ -1350,8 +1388,35 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
     public static readonly viewType = 'pokemonView';
 
     private _webviewView?: vscode.WebviewView;
+    private _context: vscode.ExtensionContext;
 
-    resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
+    constructor(
+        context: vscode.ExtensionContext,
+        extensionUri: vscode.Uri,
+        color: PokemonColor,
+        type: PokemonType,
+        size: PokemonSize,
+        generation: string,
+        originalSpriteSize: number,
+        theme: Theme,
+        themeKind: ColorThemeKind,
+        throwBallWithMouse: boolean,
+    ) {
+        super(
+            extensionUri,
+            color,
+            type,
+            size,
+            generation,
+            originalSpriteSize,
+            theme,
+            themeKind,
+            throwBallWithMouse,
+        );
+        this._context = context;
+    }
+
+    async resolveWebviewView(webviewView: vscode.WebviewView): Promise<void> {
         this._webviewView = webviewView;
 
         webviewView.webview.options = getWebviewOptions(this._extensionUri);
@@ -1362,6 +1427,33 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
             null,
             this._disposables,
         );
+
+        const defaultPokemon = getConfiguredDefaultPokemon();
+        let collection: PokemonSpecification[];
+
+        if (defaultPokemon.length > 0) {
+            // Use configured default pokemon
+            collection = defaultPokemon;
+        } else {
+            // Fall back to memento (saved pokemon from previous session)
+            collection = PokemonSpecification.collectionFromMemento(
+                this._context,
+                getConfiguredSize(),
+            );
+        }
+
+        // Small delay to ensure webview is fully loaded
+        setTimeout(() => {
+            // Reset any existing pokemon before spawning new ones
+            this.resetPokemon();
+
+            collection.forEach((item) => {
+                this.spawnPokemon(item);
+            });
+        }, 100);
+
+        // Store the collection in the memento
+        await storeCollectionAsMemento(this._context, collection);
     }
 
     update() {

@@ -3,7 +3,7 @@
 # VS Code Pokémon
 
 ![icon](https://github.com/jakobhoeg/vscode-pokemon/raw/main/icon.png)
-</div>    
+</div>
 
 <p align="center">
     Puts cute Pokémon in your code editor to boost productivity ✨
@@ -38,8 +38,8 @@ Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_1
 
 ## 💖 Support
 
-If you enjoy this project, please consider supporting me.  
-Manually creating the `.gif` files for each sprite takes a lot of time and effort.  
+If you enjoy this project, please consider supporting me.
+Manually creating the `.gif` files for each sprite takes a lot of time and effort.
 Your sponsorship helps me dedicate more energy to improve and expand the project.
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-❤-blue?style=flat&logo=github)](https://github.com/sponsors/jakobhoeg)
@@ -62,7 +62,7 @@ With VS Code open, launch VS Code Quick Open (`Ctrl+P` on Windows/Linux or `Cmd(
 
 ## Using VS Code Pokémon
 
-After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS.  
+After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS.
 
 Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a Bulbasaur in VS Code:
 
@@ -92,6 +92,35 @@ Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In t
 
 Set the size and position of the extension.
 
+### Default Pokémon
+
+You can configure specific Pokémon to automatically appear when you start a coding session. This saves you from having to manually spawn your favorite Pokémon each time.
+
+To configure default Pokémon, add the following to your `settings.json`:
+
+```json
+{
+  "vscode-pokemon.defaultPokemon": [
+    {
+      "type": "pikachu",
+      "name": "Sparky"
+    },
+    {
+      "type": "charizard",
+      "name": "Flame"
+    },
+    {
+      "type": "mewtwo"
+    }
+  ]
+}
+```
+
+- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"bulbasaur"`)
+- **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
+
+If no default Pokémon are configured, the extension will load the Pokémon from your previous session.
+
 ## Upcoming features
 
 Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 4 soon!
@@ -101,7 +130,7 @@ Extracting and creating .gif files involves quite a bit of tedious manual work, 
 ### Sprite Sources
 - Pokemon Sprites: © The Pokémon Company / Nintendo / Game Freak
 - The sprites are used for non-commercial, fan project purposes only
-- Original sprite artwork belongs to the respective copyright holders 
+- Original sprite artwork belongs to the respective copyright holders
 
 ### Acknowledgments
 - All sprites are property of their original creators

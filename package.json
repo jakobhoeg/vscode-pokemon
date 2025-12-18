@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "3.2.2",
+    "version": "3.3.0",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -53,7 +53,8 @@
                     "type": "webview",
                     "id": "pokemonView",
                     "name": "VS Code Pokémon",
-                    "when": "vscode-pokemon.position == 'explorer'"
+                    "when": "vscode-pokemon.position == 'explorer'",
+                    "icon": "media/icon/dark-add.svg"
                 }
             ]
         },
@@ -195,6 +196,27 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
+                    },
+                    "vscode-pokemon.defaultPokemon": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "Pokemon type (e.g., 'pikachu', 'charizard', 'bulbasaur')"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Custom name for the pokemon (optional)"
+                                }
+                            },
+                            "required": [
+                                "type"
+                            ]
+                        },
+                        "default": [],
+                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"charizard\"}]"
                     }
                 }
             }
