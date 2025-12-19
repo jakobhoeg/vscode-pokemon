@@ -94,7 +94,7 @@ Set the size and position of the extension.
 
 ### Default Pokémon
 
-You can configure specific Pokémon to automatically appear when you first start using the extension. This is useful for setting up your preferred team without having to manually spawn them when you switch between repositories.
+You can configure specific Pokémon to automatically appear when you first start using the extension. This is useful for setting up your preferred team without having to manually spawn them when you open new windows.
 
 To configure default Pokémon, add the following to your `settings.json`:
 
@@ -121,7 +121,7 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 **Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
 - You start the extension for the first time
-- You open a new repository
+- You open a new windows/repository
 - You have removed all Pokémon (no saved session exists)
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
