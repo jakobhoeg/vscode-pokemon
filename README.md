@@ -110,7 +110,7 @@ To configure default Pokémon, add the following to your `settings.json`:
       "name": "Flame"
     },
     {
-      "type": "mewtwo"
+      "type": "articuno"
     }
   ]
 }
@@ -118,6 +118,12 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 - **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
 - **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
+
+**Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
+- You start the extension for the first time
+- You have removed all Pokémon (no saved session exists)
+
+To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
 ## Upcoming features
 
