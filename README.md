@@ -94,7 +94,7 @@ Set the size and position of the extension.
 
 ### Default Pokémon
 
-You can configure specific Pokémon to automatically appear when you start a coding session. This saves you from having to manually spawn your favorite Pokémon each time.
+You can configure specific Pokémon to automatically appear when you first start using the extension. This is useful for setting up your preferred team without having to manually spawn them when you switch sessions.
 
 To configure default Pokémon, add the following to your `settings.json`:
 
@@ -116,10 +116,8 @@ To configure default Pokémon, add the following to your `settings.json`:
 }
 ```
 
-- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"bulbasaur"`)
+- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
 - **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
-
-If no default Pokémon are configured, the extension will load the Pokémon from your previous session.
 
 ## Upcoming features
 

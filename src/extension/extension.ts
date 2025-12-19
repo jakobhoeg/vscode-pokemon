@@ -338,19 +338,15 @@ export function activate(context: vscode.ExtensionContext) {
                 );
 
                 if (PokemonPanel.currentPanel) {
-                    // First, check if there are configured default pokemon
-                    const defaultPokemon = getConfiguredDefaultPokemon();
-                    let collection: PokemonSpecification[];
+                    // First, check if there are saved pokemon from previous session
+                    let collection = PokemonSpecification.collectionFromMemento(
+                        context,
+                        getConfiguredSize(),
+                    );
 
-                    if (defaultPokemon.length > 0) {
-                        // Use configured default pokemon
-                        collection = defaultPokemon;
-                    } else {
-                        // Fall back to memento (saved pokemon from previous session)
-                        collection = PokemonSpecification.collectionFromMemento(
-                            context,
-                            getConfiguredSize(),
-                        );
+                    if (collection.length === 0) {
+                        // Fall back to configured default pokemon if no saved session
+                        collection = getConfiguredDefaultPokemon();
                     }
 
                     collection.forEach((item) => {
@@ -1428,18 +1424,16 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
             this._disposables,
         );
 
-        const defaultPokemon = getConfiguredDefaultPokemon();
-        let collection: PokemonSpecification[];
+        // Load pokemon after the webview is ready
+        // First check if there are saved pokemon from previous session
+        let collection = PokemonSpecification.collectionFromMemento(
+            this._context,
+            getConfiguredSize(),
+        );
 
-        if (defaultPokemon.length > 0) {
-            // Use configured default pokemon
-            collection = defaultPokemon;
-        } else {
-            // Fall back to memento (saved pokemon from previous session)
-            collection = PokemonSpecification.collectionFromMemento(
-                this._context,
-                getConfiguredSize(),
-            );
+        if (collection.length === 0) {
+            // Fall back to configured default pokemon if no saved session
+            collection = getConfiguredDefaultPokemon();
         }
 
         // Small delay to ensure webview is fully loaded
