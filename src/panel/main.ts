@@ -32,6 +32,7 @@ declare global {
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
+var globalShowReplacementMessages: boolean = true;
 
 function calculateBallRadius(size: PokemonSize): number {
     if (size === PokemonSize.nano) {
@@ -102,9 +103,72 @@ function handleMouseOver(e: MouseEvent) {
     });
 }
 
+let lastAgeUpdateTime = Date.now();
+
+function replacePokemonWithRandom(
+    pokemonElement: PokemonElement,
+    stateApi?: VscodeStateApi
+): PokemonElement {
+    // Get current position and properties from existing pokemon
+    const left = parseInt(pokemonElement.el.style.left || '0');
+    const bottom = parseInt(pokemonElement.el.style.bottom || '0');
+
+    // Extract basePokemonUri from image src
+    const existingImageSrc = pokemonElement.el.src;
+    const genMatch = existingImageSrc.match(/(.+)\/gen\d+\//);
+    const basePokemonUri = genMatch ? genMatch[1] : existingImageSrc.substring(0, existingImageSrc.indexOf('/gen'));
+
+    // Get size from speech bubble class
+    const speechClasses = pokemonElement.speech.className;
+    const sizeMatch = speechClasses.match(/bubble-(\w+)/);
+    const pokemonSize = sizeMatch ? sizeMatch[1] as PokemonSize : PokemonSize.medium;
+
+    // Get floor from existing pokemon
+    const floor = pokemonElement.pokemon.floor;
+
+    // Get random pokemon configuration from all available generations
+    const [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+    const targetGeneration = `gen${randomPokemonConfig.generation}`;
+
+    // Remove old pokemon
+    const oldName = pokemonElement.pokemon.name;
+    allPokemon.remove(oldName);
+
+    // Create new pokemon at same position with potentially different generation
+    const newPokemon = addPokemonToPanel(
+        randomPokemonType,
+        basePokemonUri,
+        targetGeneration,
+        randomPokemonConfig.originalSpriteSize ?? 32,
+        PokemonColor.default,
+        pokemonSize,
+        left,
+        bottom,
+        floor,
+        randomPokemonConfig.name,
+        stateApi,
+        false, // Don't increment counter since we're replacing
+        pokemonElement.replacementInterval
+    );
+
+    allPokemon.push(newPokemon);
+
+    if (stateApi && globalShowReplacementMessages) {
+        stateApi.postMessage({
+            command: 'info',
+            text: `🔄 ${oldName} was replaced with ${newPokemon.pokemon.name}!`,
+        });
+    }
+
+    return newPokemon;
+}
+
 function startAnimations(
     collision: HTMLDivElement,
     pokemon: IPokemonType,
+    basePokemonUri: string,
+    pokemonSize: PokemonSize,
+    floor: number,
     stateApi?: VscodeStateApi,
 ) {
     if (!stateApi) {
@@ -113,6 +177,21 @@ function startAnimations(
 
     collision.addEventListener('mouseover', handleMouseOver);
     setInterval(() => {
+        // Age tracking, update ages every ~6 seconds (1/10th of a minute)
+        const currentTime = Date.now();
+        if (currentTime - lastAgeUpdateTime >= 6000) {
+            allPokemon.pokemonCollection.forEach((pokemonItem) => {
+                pokemonItem.ageInMinutes += 0.1;
+
+                // Check if this pokemon should be replaced
+                if (pokemonItem.replacementInterval > 0 &&
+                    pokemonItem.ageInMinutes >= pokemonItem.replacementInterval) {
+                    replacePokemonWithRandom(pokemonItem, stateApi);
+                }
+            });
+            lastAgeUpdateTime = currentTime;
+        }
+
         var updates = allPokemon.seekNewFriends();
         updates.forEach((message) => {
             stateApi?.postMessage({
@@ -137,7 +216,8 @@ function addPokemonToPanel(
     floor: number,
     name: string,
     stateApi?: VscodeStateApi,
-    incrementCounter: boolean = true
+    incrementCounter: boolean = true,
+    replacementInterval: number = 0
 ): PokemonElement {
     var pokemonSpriteElement: HTMLImageElement = document.createElement('img');
     pokemonSpriteElement.className = 'pokemon';
@@ -181,7 +261,7 @@ function addPokemonToPanel(
         if (incrementCounter) {
             pokemonCounter++;
         }
-        startAnimations(collisionElement, newPokemon, stateApi);
+        startAnimations(collisionElement, newPokemon, basePokemonUri, pokemonSize, floor, stateApi);
     } catch (e: any) {
         // Remove elements
         pokemonSpriteElement.remove();
@@ -190,7 +270,7 @@ function addPokemonToPanel(
         throw e;
     }
 
-    return new PokemonElement(
+    const element = new PokemonElement(
         pokemonSpriteElement,
         collisionElement,
         speechBubbleElement,
@@ -199,7 +279,10 @@ function addPokemonToPanel(
         pokemonType,
         gen,
         originalSpriteSize,
+        replacementInterval,
     );
+    element.ageInMinutes = 0;
+    return element;
 }
 
 export function saveState(stateApi?: VscodeStateApi) {
@@ -220,6 +303,8 @@ export function saveState(stateApi?: VscodeStateApi) {
             pokemonFriend: pokemonItem.pokemon.friend?.name ?? undefined,
             elLeft: pokemonItem.el.style.left,
             elBottom: pokemonItem.el.style.bottom,
+            pokemonAgeInMinutes: pokemonItem.ageInMinutes,
+            pokemonReplacementInterval: pokemonItem.replacementInterval,
         });
     });
     state.pokemonCounter = pokemonCounter;
@@ -262,8 +347,11 @@ function recoverState(
                 floor,
                 p.pokemonName ?? randomName(p.pokemonType ?? 'bulbasaur'),
                 stateApi,
-                false
+                false,
+                p.pokemonReplacementInterval ?? 0
             );
+            // Restore age if available, otherwise set to 0 for new session
+            (newPokemon as PokemonElement).ageInMinutes = p.pokemonAgeInMinutes ?? 0;
             allPokemon.push(newPokemon);
             recoveryMap.set(newPokemon.pokemon, p);
         } catch (InvalidPokemonException) {
@@ -321,6 +409,7 @@ export function pokemonPanelApp(
     throwBallWithMouse: boolean,
     gen: string,
     originalSpriteSize: number,
+    showReplacementMessages: boolean,
     stateApi?: VscodeStateApi,
 ) {
     const ballRadius: number = calculateBallRadius(pokemonSize);
@@ -328,6 +417,10 @@ export function pokemonPanelApp(
     if (!stateApi) {
         stateApi = acquireVsCodeApi();
     }
+
+    // Set global replacement message setting
+    globalShowReplacementMessages = showReplacementMessages;
+
     // Apply Theme backgrounds
     const foregroundEl = document.getElementById('foreground');
     if (theme !== Theme.none) {
@@ -410,6 +503,8 @@ export function pokemonPanelApp(
                         floor,
                         message.name ?? randomName(message.type),
                         stateApi,
+                        true,
+                        message.replacementInterval ?? 0,
                     ),
                 );
                 saveState(stateApi);

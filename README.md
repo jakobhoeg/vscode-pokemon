@@ -107,7 +107,8 @@ To configure default Pokémon, add the following to your `settings.json`:
     },
     {
       "type": "charizard",
-      "name": "Flame"
+      "name": "Flame",
+      "replacementInterval": 15
     },
     {
       "type": "articuno"
@@ -118,6 +119,7 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 - **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
 - **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
+- **`replacementInterval`** (optional): How long (in minutes) before this Pokémon is automatically replaced with a random one. Set to `0` or omit to never replace automatically
 
 **Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
 - You start the extension for the first time
@@ -125,6 +127,35 @@ To configure default Pokémon, add the following to your `settings.json`:
 - You have removed all Pokémon (no saved session exists)
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
+
+### Automatic Replacement
+
+You can configure Pokémon to automatically replace themselves with random ones after a specified time interval. This feature adds variety to your coding sessions!
+
+#### Global Default Replacement Interval
+Set a default replacement interval for all newly spawned Pokémon:
+
+```json
+{
+  "vscode-pokemon.defaultReplacementInterval": 30
+}
+```
+
+This setting controls the default interval (in minutes) for automatic replacement. Set to `0` to disable automatic replacement by default.
+
+#### Per-Pokémon Replacement Intervals
+When spawning individual Pokémon, you'll be prompted to set a custom replacement interval, or you can configure them in your default Pokémon list (see above).
+
+#### Replacement Notifications
+Control whether you see notifications when Pokémon are automatically replaced:
+
+```json
+{
+  "vscode-pokemon.showReplacementMessages": false
+}
+```
+
+Set to `false` to disable replacement notification messages. Default is `true` (notifications enabled).
 
 ## Upcoming features
 
