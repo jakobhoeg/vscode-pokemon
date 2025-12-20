@@ -21,11 +21,21 @@ const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
 const EXTRA_POKEMON_KEY_COLORS = EXTRA_POKEMON_KEY + '.colors';
 const EXTRA_POKEMON_KEY_NAMES = EXTRA_POKEMON_KEY + '.names';
+const EXTRA_POKEMON_KEY_REPLACEMENT_INTERVALS = EXTRA_POKEMON_KEY + '.replacementIntervals';
 const DEFAULT_POKEMON_SCALE = PokemonSize.medium;
 const DEFAULT_COLOR = PokemonColor.default;
 const DEFAULT_POKEMON_TYPE = getDefaultPokemonType();
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
+
+// Helper function to pad numbers with leading zeros (ES6 compatible)
+function padStart(str: string, targetLength: number, padString: string = '0'): string {
+    if (str.length >= targetLength) {
+        return str;
+    }
+    const pad = padString.repeat(Math.ceil((targetLength - str.length) / padString.length));
+    return pad.substring(0, targetLength - str.length) + str;
+}
 
 class PokemonQuickPickItem implements vscode.QuickPickItem {
     constructor(
@@ -86,9 +96,22 @@ function getThrowWithMouseConfiguration(): boolean {
         .get<boolean>('throwBallWithMouse', true);
 }
 
+function getDefaultReplacementInterval(): number {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<number>('defaultReplacementInterval', 0);
+}
+
+function getShowReplacementMessages(): boolean {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<boolean>('showReplacementMessages', true);
+}
+
 interface IDefaultPokemonConfig {
     type: PokemonType;
     name?: string;
+    replacementInterval?: number;
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -103,7 +126,8 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
         // Validate that the pokemon type exists
         if (POKEMON_DATA[config.type]) {
             const name = config.name || randomName(config.type);
-            result.push(new PokemonSpecification(DEFAULT_COLOR, config.type, size, name));
+            const replacementInterval = config.replacementInterval ?? getDefaultReplacementInterval();
+            result.push(new PokemonSpecification(DEFAULT_COLOR, config.type, size, name, undefined, replacementInterval));
         } else {
             console.warn(`Invalid pokemon type in defaultPokemon config: ${config.type}`);
         }
@@ -134,8 +158,9 @@ export class PokemonSpecification {
     name: string;
     generation: string;
     originalSpriteSize: number;
+    replacementInterval: number;
 
-    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string) {
+    constructor(color: PokemonColor, type: PokemonType, size: PokemonSize, name?: string, generation?: string, replacementInterval?: number) {
         this.color = color;
         this.type = type;
         this.size = size;
@@ -146,6 +171,7 @@ export class PokemonSpecification {
         }
         this.generation = generation || `gen${POKEMON_DATA[type].generation}`;
         this.originalSpriteSize = POKEMON_DATA[type].originalSpriteSize || 32;
+        this.replacementInterval = replacementInterval ?? getDefaultReplacementInterval();
     }
 
     static fromConfiguration(): PokemonSpecification {
@@ -164,7 +190,7 @@ export class PokemonSpecification {
             type = DEFAULT_POKEMON_TYPE;
         }
 
-        return new PokemonSpecification(color, type, getConfiguredSize());
+        return new PokemonSpecification(color, type, getConfiguredSize(), undefined, undefined, getDefaultReplacementInterval());
     }
 
     static collectionFromMemento(
@@ -183,6 +209,10 @@ export class PokemonSpecification {
             EXTRA_POKEMON_KEY_NAMES,
             [],
         );
+        var contextReplacementIntervals = context.globalState.get<number[]>(
+            EXTRA_POKEMON_KEY_REPLACEMENT_INTERVALS,
+            [],
+        );
         var result: PokemonSpecification[] = new Array();
         for (let index = 0; index < contextTypes.length; index++) {
             result.push(
@@ -191,6 +221,8 @@ export class PokemonSpecification {
                     contextTypes[index],
                     size,
                     contextNames[index],
+                    undefined,
+                    contextReplacementIntervals?.[index] ?? getDefaultReplacementInterval(),
                 ),
             );
         }
@@ -205,18 +237,22 @@ export async function storeCollectionAsMemento(
     var contextTypes = new Array(collection.length);
     var contextColors = new Array(collection.length);
     var contextNames = new Array(collection.length);
+    var contextReplacementIntervals = new Array(collection.length);
     for (let index = 0; index < collection.length; index++) {
         contextTypes[index] = collection[index].type;
         contextColors[index] = collection[index].color;
         contextNames[index] = collection[index].name;
+        contextReplacementIntervals[index] = collection[index].replacementInterval;
     }
     await context.globalState.update(EXTRA_POKEMON_KEY_TYPES, contextTypes);
     await context.globalState.update(EXTRA_POKEMON_KEY_COLORS, contextColors);
     await context.globalState.update(EXTRA_POKEMON_KEY_NAMES, contextNames);
+    await context.globalState.update(EXTRA_POKEMON_KEY_REPLACEMENT_INTERVALS, contextReplacementIntervals);
     context.globalState.setKeysForSync([
         EXTRA_POKEMON_KEY_TYPES,
         EXTRA_POKEMON_KEY_COLORS,
         EXTRA_POKEMON_KEY_NAMES,
+        EXTRA_POKEMON_KEY_REPLACEMENT_INTERVALS,
     ]);
 }
 
@@ -283,6 +319,8 @@ async function handleRemovePokemonMessage(
                                 item.type,
                                 PokemonSize.medium,
                                 item.name,
+                                undefined,
+                                getDefaultReplacementInterval(),
                             );
                         });
                     await storeCollectionAsMemento(this, collection);
@@ -552,6 +590,8 @@ export function activate(context: vscode.ExtensionContext) {
                                 pokemon.type,
                                 pokemon.size,
                                 pokemon.name,
+                                undefined,
+                                pokemon.replacementInterval ?? getDefaultReplacementInterval(),
                             );
                             collection.push(pokemonSpec);
                             if (panel !== undefined) {
@@ -580,22 +620,22 @@ export function activate(context: vscode.ExtensionContext) {
             }
             if (panel) {
                 // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
-                const generationItems: Array<vscode.QuickPickItem & { isGeneration: true; gen: PokemonGeneration }> = Object
-                    .values(PokemonGeneration)
-                    .filter((gen) => typeof gen === 'number')
-                    .map((gen) => ({
+                const generationItems: Array<vscode.QuickPickItem & { isGeneration: true; gen: PokemonGeneration }> = (Object.keys(PokemonGeneration) as Array<keyof typeof PokemonGeneration>)
+                    .filter((key) => !isNaN(Number(PokemonGeneration[key])))
+                    .map((key) => PokemonGeneration[key] as PokemonGeneration)
+                    .map((gen: PokemonGeneration) => ({
                         label: `$(folder) Generation ${gen}`,
                         description: `Browse Gen ${gen} Pokémon`,
                         isGeneration: true as const,
-                        gen: gen as PokemonGeneration,
+                        gen: gen,
                     }));
 
                 const allPokemonOptions: Array<vscode.QuickPickItem & { value: PokemonType; isGeneration: false }> = Object
-                    .entries(POKEMON_DATA)
-                    .map(([type, config]) => ({
-                        label: config.name,
+                    .keys(POKEMON_DATA)
+                    .map((type: string) => ({
+                        label: POKEMON_DATA[type].name,
                         value: type as PokemonType,
-                        description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
+                        description: `#${padStart(POKEMON_DATA[type].id.toString(), 4, '0')} - Gen ${POKEMON_DATA[type].generation}`,
                         isGeneration: false as const,
                     }));
 
@@ -654,7 +694,7 @@ export function activate(context: vscode.ExtensionContext) {
                             const pokemonOptions = pokemonInGeneration.map((type) => ({
                                 label: POKEMON_DATA[type].name,
                                 value: type,
-                                description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`,
+                                description: `#${padStart(POKEMON_DATA[type].id.toString(), 4, '0')}`,
                             }));
 
                             // Manually dispose the first quick pick to prevent race condition
@@ -695,11 +735,33 @@ export function activate(context: vscode.ExtensionContext) {
                                     value: randomName(selectedPokemonType.value),
                                 });
 
+                                const defaultReplacementInterval = getDefaultReplacementInterval();
+                                const replacementIntervalInput = await vscode.window.showInputBox({
+                                    placeHolder: `${defaultReplacementInterval}`,
+                                    prompt: vscode.l10n.t('Replacement interval (minutes). 0 = never replace automatically'),
+                                    value: defaultReplacementInterval.toString(),
+                                    validateInput: (value) => {
+                                        const num = parseFloat(value);
+                                        if (isNaN(num) || num < 0) {
+                                            return 'Please enter a valid number >= 0';
+                                        }
+                                        return null;
+                                    }
+                                });
+
+                                if (replacementIntervalInput === undefined) {
+                                    return; // User cancelled
+                                }
+
+                                const replacementInterval = parseFloat(replacementIntervalInput) || 0;
+
                                 const spec = new PokemonSpecification(
                                     pokemonColor,
                                     selectedPokemonType.value,
                                     getConfiguredSize(),
                                     name,
+                                    undefined,
+                                    replacementInterval,
                                 );
 
                                 panel.spawnPokemon(spec);
@@ -768,11 +830,33 @@ export function activate(context: vscode.ExtensionContext) {
                     value: randomName(selectedPokemonType.value),
                 });
 
+                const defaultReplacementInterval = getDefaultReplacementInterval();
+                const replacementIntervalInput = await vscode.window.showInputBox({
+                    placeHolder: `${defaultReplacementInterval}`,
+                    prompt: vscode.l10n.t('Replacement interval (minutes). 0 = never replace automatically'),
+                    value: defaultReplacementInterval.toString(),
+                    validateInput: (value) => {
+                        const num = parseFloat(value);
+                        if (isNaN(num) || num < 0) {
+                            return 'Please enter a valid number >= 0';
+                        }
+                        return null;
+                    }
+                });
+
+                if (replacementIntervalInput === undefined) {
+                    return; // User cancelled
+                }
+
+                const replacementInterval = parseFloat(replacementIntervalInput) || 0;
+
                 const spec = new PokemonSpecification(
                     pokemonColor,
                     selectedPokemonType.value,
                     getConfiguredSize(),
                     name,
+                    undefined,
+                    replacementInterval,
                 );
 
                 panel.spawnPokemon(spec);
@@ -806,6 +890,8 @@ export function activate(context: vscode.ExtensionContext) {
                     randomPokemonType,
                     getConfiguredSize(),
                     randomPokemonConfig.name,
+                    undefined,
+                    getDefaultReplacementInterval(),
                 );
 
                 panel.spawnPokemon(spec);
@@ -1000,6 +1086,12 @@ class PokemonWebviewContainer implements IPokemonPanel {
         return this._pokemonOriginalSpriteSize;
     }
 
+    public replacementInterval(): number {
+        return vscode.workspace
+            .getConfiguration('vscode-pokemon')
+            .get<number>('defaultReplacementInterval', 0) ?? 0;
+    }
+
     public theme(): Theme {
         return this._theme;
     }
@@ -1061,6 +1153,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
             name: spec.name,
             generation: spec.generation,
             originalSpriteSize: spec.originalSpriteSize,
+            replacementInterval: spec.replacementInterval,
         });
         void this.getWebview().postMessage({
             command: 'set-size',
@@ -1175,6 +1268,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",
+                        ${getShowReplacementMessages()},
                     );
                 </script>
             </body>

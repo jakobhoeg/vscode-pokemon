@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.4.0]
+
+- feat: add option to periodically replace pokemon with random new ones
+
 ## [3.3.0]
 
 - feat: add default pokemon configurable through settings.json

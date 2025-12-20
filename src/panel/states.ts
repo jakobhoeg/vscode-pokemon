@@ -50,6 +50,8 @@ export class PokemonElementState {
     elBottom: string | undefined;
     pokemonName: string | undefined;
     pokemonFriend: string | undefined;
+    pokemonAgeInMinutes: number | undefined;
+    pokemonReplacementInterval: number | undefined;
 }
 
 export class PokemonPanelState {

@@ -11,6 +11,8 @@ export class PokemonElement {
     type: PokemonType;
     generation: string;
     originalSpriteSize: number;
+    ageInMinutes: number = 0;
+    replacementInterval: number = 0;
     remove() {
         this.el.remove();
         this.collision.remove();
@@ -27,6 +29,7 @@ export class PokemonElement {
         type: PokemonType,
         generation: string,
         originalSpriteSize: number,
+        replacementInterval: number = 0,
     ) {
         this.el = el;
         this.collision = collision;
@@ -36,6 +39,7 @@ export class PokemonElement {
         this.type = type;
         this.generation = generation;
         this.originalSpriteSize = originalSpriteSize;
+        this.replacementInterval = replacementInterval;
     }
 }
 
@@ -168,7 +172,7 @@ export function createPokemon(
             name,
             PokemonSpeed.normal,
             generation,
-            originalSpriteSize 
+            originalSpriteSize
         );
     } catch (error) {
         throw new InvalidPokemonException(`Invalid Pokemon type: ${pokemonType}`);

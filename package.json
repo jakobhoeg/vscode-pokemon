@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -197,6 +197,16 @@
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
                     },
+                    "vscode-pokemon.defaultReplacementInterval": {
+                        "type": "number",
+                        "default": 0,
+                        "description": "Default replacement interval in minutes for newly spawned Pokemon. If > 0, Pokemon will be automatically replaced with a random one after this duration. 0 = never replace."
+                    },
+                    "vscode-pokemon.showReplacementMessages": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Show notification messages when Pokemon are automatically replaced. Set to false to disable replacement notifications."
+                    },
                     "vscode-pokemon.defaultPokemon": {
                         "type": "array",
                         "items": {
@@ -209,6 +219,10 @@
                                 "name": {
                                     "type": "string",
                                     "description": "Custom name for the pokemon (optional)"
+                                },
+                                "replacementInterval": {
+                                    "type": "number",
+                                    "description": "How long (in minutes) before this pokemon is automatically replaced with a random one. 0 = never replace (optional)"
                                 }
                             },
                             "required": [
@@ -216,7 +230,7 @@
                             ]
                         },
                         "default": [],
-                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"charizard\"}]"
+                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name' and 'replacementInterval'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\", \"replacementInterval\": 10}, {\"type\": \"charizard\"}]"
                     }
                 }
             }
