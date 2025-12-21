@@ -190,6 +190,30 @@ function addPokemonToPanel(
         throw e;
     }
 
+    pokemonSpriteElement.style.opacity = '0';
+
+    const pokeballEl = document.createElement('div');
+    pokeballEl.classList.add('pokeball-sprite');
+
+    pokeballEl.style.left = `${left}px`;
+    pokeballEl.style.bottom = `${bottom}px`;
+
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(pokeballEl);
+
+    pokeballEl.offsetHeight;
+    pokeballEl.classList.add('pokeball-open');
+
+    pokeballEl.addEventListener('animationend', (e) => {
+    if (e.animationName !== 'pokeball-open') {
+        return;
+    }
+
+    pokeballEl.remove();
+    pokemonSpriteElement.classList.add('spawn-pop');
+    pokemonSpriteElement.style.opacity = '1';
+    saveState(stateApi);
+    });
+
     return new PokemonElement(
         pokemonSpriteElement,
         collisionElement,
