@@ -201,6 +201,8 @@ img.pokemon {
   background-position: 0 0;
   image-rendering: pixelated;    
   background-size: 64px 2048px;
+  z-index: 1001; /* render pokeball above collision and foreground */
+  pointer-events: none; /* don't block mouse interactions */
 }
 .pokeball-sprite.pokeball-open {
   animation: pokeball-open 0.8s steps(9) forwards;
@@ -216,7 +218,7 @@ img.pokemon {
   opacity: 1 !important;
 }
 @keyframes pokemon-pop {
-  0% { transform: scale(0.4); opacity: 0; }
-  60% { transform: scale(1.15); opacity: 1; }
+  0% { transform: scale(0.4); opacity: 0; filter: brightness(150%); }
+  60% { transform: scale(1.15); opacity: 1; filter: brightness(100%); }
   100% { transform: scale(1); opacity: 1; }
 }

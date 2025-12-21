@@ -204,11 +204,12 @@ function addPokemonToPanel(
     pokeballEl.classList.add('pokeball-open');
 
     pokeballEl.addEventListener('animationend', (e) => {
-    if (e.animationName !== 'pokeball-open') {
-        return;
+        if (e.animationName !== 'pokeball-open') {
+            return;
     }
-
     pokeballEl.remove();
+
+    // Show pokemon
     pokemonSpriteElement.classList.add('spawn-pop');
     pokemonSpriteElement.style.opacity = '1';
     saveState(stateApi);
@@ -272,8 +273,11 @@ function recoverState(
     }
 
     var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
+    console.log('recoverState: saved pokemon count =', state?.pokemonStates?.length ?? 0);
     state?.pokemonStates?.forEach((p) => {
+        console.log('Recovering pokemon ', p.pokemonType, p.pokemonName);
         try {
+            console.log('Adding pokemon to panel for recovery');
             var newPokemon = addPokemonToPanel(
                 p.pokemonType ?? 'bulbasaur',
                 basePokemonUri,
@@ -393,6 +397,7 @@ export function pokemonPanelApp(
     if (!state) {
         console.log('No state, starting a new session.');
         pokemonCounter = 1;
+        console.log('adding pokemon to panel for new session');
         allPokemon.push(
             addPokemonToPanel(
                 pokemonType,
@@ -421,6 +426,7 @@ export function pokemonPanelApp(
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case 'spawn-pokemon':
+                console.log('adding pokemon to panel from message', message);
                 allPokemon.push(
                     addPokemonToPanel(
                         message.type,
@@ -441,6 +447,7 @@ export function pokemonPanelApp(
 
             case 'spawn-random-pokemon':
                 var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+                console.log('adding random pokemon to panel from message');
                 allPokemon.push(
                     addPokemonToPanel(
                         randomPokemonType,
