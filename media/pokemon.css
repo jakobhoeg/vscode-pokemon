@@ -196,6 +196,7 @@ img.pokemon {
   --frame-size: 32px;
   --frames: 8;
 
+  position: absolute;
   width: var(--frame-size);
   height: var(--frame-size);
 
@@ -215,36 +216,6 @@ img.pokemon {
     background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));
   }
 }
-
-
-.pokeball-throw {
-  position: absolute;
-  left: var(--target-x);
-  bottom: var(--target-y);
-
-  pointer-events: none;
-  z-index: 1001;
-
-  animation: pokeball-throw 0.7s cubic-bezier(.17,.67,.83,.67) forwards;
-}
-
-@keyframes pokeball-throw {
-  0% {
-    transform: translate(-30px, -50px) scale(0.8);
-    opacity: 0;
-  }
-
-  50% {
-    transform: translate(-10px, -60px) scale(0.95);
-    opacity: 0.7;
-  }
-
-  100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-}
-
 
 
 .pokemon.spawn-pop {

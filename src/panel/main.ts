@@ -192,38 +192,28 @@ function addPokemonToPanel(
 
     pokemonSpriteElement.style.opacity = '0';
 
-    const throwEl = document.createElement('div');
-    throwEl.classList.add('pokeball-throw');
-
-    // final pos = Pokémon size / 2
-    throwEl.style.setProperty('--target-x', `${left+16}px`);
-    throwEl.style.setProperty('--target-y', `${bottom+16}px`);
-
     const pokeballEl = document.createElement('div');
     pokeballEl.classList.add('pokeball-sprite');
 
-    
-    throwEl.appendChild(pokeballEl);
+    // Position pokeball at pokemon location + pokemon center offset
+    pokeballEl.style.left = `${left+16}px`;
+    pokeballEl.style.bottom = `${bottom+16}px`;
 
-    const container = document.getElementById('pokemonContainer') as HTMLDivElement;
-    container.appendChild(throwEl);
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(pokeballEl);
 
-    throwEl.addEventListener(
-    'animationend',
-    () => {
-        pokeballEl.classList.add('pokeball-open');
-    },
-    { once: true }
-    );
+    pokeballEl.offsetHeight;
+    pokeballEl.classList.add('pokeball-open');
 
     pokeballEl.addEventListener('animationend', (e) => {
-    if (e.animationName !== 'pokeball-open') {
-        return;
+        if (e.animationName !== 'pokeball-open') {
+            return;
     }
+    pokeballEl.remove();
 
-    throwEl.remove();
+    // Show pokemon
     pokemonSpriteElement.classList.add('spawn-pop');
     pokemonSpriteElement.style.opacity = '1';
+    saveState(stateApi);
     });
 
     return new PokemonElement(
