@@ -126,6 +126,35 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
+### Pokémon Language
+
+You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese.
+
+#### Using the Command
+
+1. Open the command palette (`Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS)
+2. Run the **`Pokemon Coding: Change Pokemon language`** command
+3. Select your preferred language from the list
+
+#### Using Settings
+
+You can also configure the language directly in your `settings.json`:
+
+```json
+{
+  "vscode-pokemon.pokemonLanguage": "fr-FR"
+}
+```
+
+Available options:
+- **`auto`** (default): Automatically uses VS Code's language setting
+- **`en-US`**: English (US) names
+- **`fr-FR`**: French names (e.g., "Bulbizarre", "Salamèche", "Dracaufeu")
+- **`de-DE`**: German names (e.g., "Bisasam", "Glumanda", "Glurak")
+- **`ja-JP`**: Japanese names (e.g., "フシギダネ", "ヒトカゲ", "リザードン")
+
+**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, and 3.
+
 ## Features
 
 Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 5 when possible.
