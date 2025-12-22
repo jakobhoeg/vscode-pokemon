@@ -192,27 +192,38 @@ function addPokemonToPanel(
 
     pokemonSpriteElement.style.opacity = '0';
 
+    const throwEl = document.createElement('div');
+    throwEl.classList.add('pokeball-throw');
+
+    // final pos = Pokémon size / 2
+    throwEl.style.setProperty('--target-x', `${left+16}px`);
+    throwEl.style.setProperty('--target-y', `${bottom+16}px`);
+
     const pokeballEl = document.createElement('div');
     pokeballEl.classList.add('pokeball-sprite');
 
-    pokeballEl.style.left = `${left}px`;
-    pokeballEl.style.bottom = `${bottom}px`;
+    
+    throwEl.appendChild(pokeballEl);
 
-    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(pokeballEl);
+    const container = document.getElementById('pokemonContainer') as HTMLDivElement;
+    container.appendChild(throwEl);
 
-    pokeballEl.offsetHeight;
-    pokeballEl.classList.add('pokeball-open');
+    throwEl.addEventListener(
+    'animationend',
+    () => {
+        pokeballEl.classList.add('pokeball-open');
+    },
+    { once: true }
+    );
 
     pokeballEl.addEventListener('animationend', (e) => {
-        if (e.animationName !== 'pokeball-open') {
-            return;
+    if (e.animationName !== 'pokeball-open') {
+        return;
     }
-    pokeballEl.remove();
 
-    // Show pokemon
+    throwEl.remove();
     pokemonSpriteElement.classList.add('spawn-pop');
     pokemonSpriteElement.style.opacity = '1';
-    saveState(stateApi);
     });
 
     return new PokemonElement(
@@ -424,6 +435,7 @@ export function pokemonPanelApp(
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
         const message = event.data; // The json data that the extension sent
+        console.log('Received message in panel:', message);
         switch (message.command) {
             case 'spawn-pokemon':
                 console.log('adding pokemon to panel from message', message);

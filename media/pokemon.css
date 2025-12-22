@@ -193,24 +193,58 @@ img.pokemon {
 }
 
 .pokeball-sprite {
-  position: absolute;
-  width: 64px;             
-  height: 64px;            
-  background-image: url('pokeball_sprite_sheet.png');
+  --frame-size: 32px;
+  --frames: 8;
+
+  width: var(--frame-size);
+  height: var(--frame-size);
+
+  background-image: url('pokeball_sprite_sheet2.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  image-rendering: pixelated;    
-  background-size: 64px 2048px;
-  z-index: 1001; /* render pokeball above collision and foreground */
-  pointer-events: none; /* don't block mouse interactions */
+  background-size: var(--frame-size)
+                   calc(var(--frame-size) * var(--frames));
+
+  image-rendering: pixelated;
 }
 .pokeball-sprite.pokeball-open {
-  animation: pokeball-open 0.8s steps(9) forwards;
+  animation: pokeball-open 0.6s steps(var(--frames)) forwards;
 }
 @keyframes pokeball-open {
-  from { background-position-y: 0; }
-  to   { background-position-y: calc(-64px * 9); } 
+  to {
+    background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));
+  }
 }
+
+
+.pokeball-throw {
+  position: absolute;
+  left: var(--target-x);
+  bottom: var(--target-y);
+
+  pointer-events: none;
+  z-index: 1001;
+
+  animation: pokeball-throw 0.7s cubic-bezier(.17,.67,.83,.67) forwards;
+}
+
+@keyframes pokeball-throw {
+  0% {
+    transform: translate(-30px, -50px) scale(0.8);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate(-10px, -60px) scale(0.95);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
 
 
 .pokemon.spawn-pop {
