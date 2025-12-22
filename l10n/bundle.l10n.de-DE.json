@@ -1,0 +1,15 @@
+{
+	"Spawn Pokemon": "Pokémon erscheinen lassen",
+	"Pokemon Panel": "Pokémon-Panel",
+	"Select a Pokemon": "Wähle ein Pokémon",
+	"Select a color": "Wähle eine Farbe",
+	"Select the Pokemon to remove.": "Wähle das Pokémon zum Entfernen.",
+	"Leave blank for a random name": "Leer lassen für einen zufälligen Namen",
+	"Name your Pokemon": "Benenne dein Pokémon",
+	"Cancelled Spawning Pokemon": "Pokémon-Erscheinen abgebrochen",
+	"A Pokemon Playground has been created. You can now use the \"Spawn Additional Pokemon\" Command to add more Pokemon.": "Ein Pokémon-Center wurde erstellt. Du kannst jetzt den Befehl \"Zusätzliches Pokémon erscheinen lassen\" verwenden, um weitere Pokémon hinzuzufügen.",
+	"A Pokemon Playground has been created. You can now use the \"Remove All Pokemon\" Command to remove all Pokemon.": "Ein Pokémon-Center wurde erstellt. Du kannst jetzt den Befehl \"Alle Pokémon entfernen\" verwenden, um alle Pokémon zu entfernen.",
+	"default": "Standard",
+	"shiny": "Schillernd"
+}
+

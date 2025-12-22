@@ -1,0 +1,15 @@
+{
+	"Spawn Pokemon": "ポケモンを出現させる",
+	"Pokemon Panel": "ポケモンパネル",
+	"Select a Pokemon": "ポケモンを選択",
+	"Select a color": "色を選択",
+	"Select the Pokemon to remove.": "削除するポケモンを選択してください。",
+	"Leave blank for a random name": "ランダムな名前の場合は空白のまま",
+	"Name your Pokemon": "ポケモンに名前を付ける",
+	"Cancelled Spawning Pokemon": "ポケモンの出現をキャンセルしました",
+	"A Pokemon Playground has been created. You can now use the \"Spawn Additional Pokemon\" Command to add more Pokemon.": "ポケモンセンターが作成されました。これで「追加のポケモンを出現させる」コマンドを使用して、さらにポケモンを追加できます。",
+	"A Pokemon Playground has been created. You can now use the \"Remove All Pokemon\" Command to remove all Pokemon.": "ポケモンセンターが作成されました。これで「すべてのポケモンを削除」コマンドを使用して、すべてのポケモンを削除できます。",
+	"default": "デフォルト",
+	"shiny": "色違い"
+}
+

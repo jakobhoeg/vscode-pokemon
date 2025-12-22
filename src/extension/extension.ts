@@ -1,21 +1,21 @@
 import * as vscode from 'vscode';
 import { ColorThemeKind } from 'vscode';
+import * as localize from '../common/localize';
+import { randomName } from '../common/names';
+import { getDefaultPokemon as getDefaultPokemonType, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
 import {
-    PokemonSize,
-    PokemonColor,
-    PokemonType,
-    ExtPosition,
-    Theme,
-    WebviewMessage,
     ALL_COLORS,
     ALL_SCALES,
     ALL_THEMES,
+    ExtPosition,
+    PokemonColor,
     PokemonGeneration,
+    PokemonSize,
+    PokemonType,
+    Theme,
+    WebviewMessage,
 } from '../common/types';
-import { randomName } from '../common/names';
-import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import { getDefaultPokemon as getDefaultPokemonType, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -316,6 +316,9 @@ function getWebview(): vscode.Webview | undefined {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    // Reset the Pokemon translations cache at startup to load the correct language
+    localize.resetPokemonTranslationsCache();
+    
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-pokemon.start', async () => {
             if (
@@ -469,6 +472,60 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-pokemon.change-pokemon-language', async () => {
+            const config = vscode.workspace.getConfiguration('vscode-pokemon');
+            const currentLanguage = config.get<string>('pokemonLanguage', 'auto');
+
+            // Language display names and flags (official Pokemon languages only)
+            const languageLabels: { [key: string]: { label: string; description: string } } = {
+                'auto': { label: '$(globe) Auto', description: 'Use VS Code language' },
+                'en-US': { label: '🇺🇸 English (US)', description: 'English names' },
+                'fr-FR': { label: '🇫🇷 Français (FR)', description: 'Noms français' },
+                'de-DE': { label: '🇩🇪 Deutsch (DE)', description: 'Deutsche Namen' },
+                'ja-JP': { label: '🇯🇵 日本語 (JP)', description: '日本語名' },
+            } as { [key: string]: { label: string; description: string } };
+
+            const languageOptions: Array<vscode.QuickPickItem & { value: string }> = [
+                {
+                    label: languageLabels['auto'].label,
+                    description: languageLabels['auto'].description,
+                    detail: currentLanguage === 'auto' ? 'Current' : undefined,
+                    value: 'auto',
+                },
+                ...localize.SUPPORTED_LOCALES.map((locale) => ({
+                    label: languageLabels[locale]?.label || locale,
+                    description: languageLabels[locale]?.description || locale,
+                    detail: currentLanguage === locale ? 'Current' : undefined,
+                    value: locale,
+                })),
+            ];
+
+            const picked = await vscode.window.showQuickPick(languageOptions, {
+                placeHolder: vscode.l10n.t('Select language for Pokemon names'),
+            });
+
+            if (!picked) {
+                return;
+            }
+
+            // Update configuration persistently
+            await config.update('pokemonLanguage', picked.value, vscode.ConfigurationTarget.Global);
+            
+            // Reset translation cache to force reload
+            localize.resetPokemonTranslationsCache();
+            
+            // Preload translations with the new language
+            // This ensures the cache is immediately available
+            const testPokemon: PokemonType = 'bulbasaur';
+            localize.getLocalizedPokemonName(testPokemon);
+            
+            await vscode.window.showInformationMessage(
+                vscode.l10n.t('Pokemon language changed to {0}. The change will persist after restart.', picked.label),
+            );
+        }),
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand(
             'vscode-pokemon.export-pokemon-list',
             async () => {
@@ -593,7 +650,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const allPokemonOptions: Array<vscode.QuickPickItem & { value: PokemonType; isGeneration: false }> = Object
                     .entries(POKEMON_DATA)
                     .map(([type, config]) => ({
-                        label: config.name,
+                        label: localize.getLocalizedPokemonName(type as PokemonType),
                         value: type as PokemonType,
                         description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
                         isGeneration: false as const,
@@ -652,7 +709,7 @@ export function activate(context: vscode.ExtensionContext) {
                             // Don't hide the first quick pick yet - dispose it manually
                             const pokemonInGeneration = getPokemonByGeneration(sel.gen as PokemonGeneration);
                             const pokemonOptions = pokemonInGeneration.map((type) => ({
-                                label: POKEMON_DATA[type].name,
+                                label: localize.getLocalizedPokemonName(type),
                                 value: type,
                                 description: `#${POKEMON_DATA[type].id.toString().padStart(4, '0')}`,
                             }));
@@ -877,6 +934,11 @@ export function activate(context: vscode.ExtensionContext) {
 
                 if (e.affectsConfiguration('vscode-pokemon.throwBallWithMouse')) {
                     updatePanelThrowWithMouse();
+                }
+
+                if (e.affectsConfiguration('vscode-pokemon.pokemonLanguage')) {
+                    // Reset the Pokemon translations cache when the language changes
+                    localize.resetPokemonTranslationsCache();
                 }
             },
         ),
