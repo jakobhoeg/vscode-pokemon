@@ -39,6 +39,7 @@
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
         "onCommand:vscode-pokemon.configure-keybindings",
+        "onCommand:vscode-pokemon.change-pokemon-language",
         "onWebviewPanel:pokemonCoding",
         "onView:explorer",
         "onView:pokemonView",
@@ -138,6 +139,11 @@
                 "command": "vscode-pokemon.configure-keybindings",
                 "title": "Configure keybindings",
                 "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.change-pokemon-language",
+                "title": "Change Pokemon language",
+                "category": "Pokemon Coding"
             }
         ],
         "keybindings": [
@@ -223,6 +229,18 @@
                         "default": 8192,
                         "minimum": 1,
                         "description": "Odds (1 in N) for a Pokémon to be shiny. Lower = more shinies. Default is 8192."
+                    },
+                    "vscode-pokemon.pokemonLanguage": {
+                        "type": "string",
+                        "enum": [
+                            "auto",
+                            "en-US",
+                            "fr-FR",
+                            "de-DE",
+                            "ja-JP"
+                        ],
+                        "default": "auto",
+                        "description": "Language for Pokemon names. 'auto' uses VS Code's language, or you can choose a specific language (e.g., 'fr-FR' for French, 'en-US' for English, 'de-DE' for German, 'ja-JP' for Japanese). Only official Pokemon languages are supported."
                     }
                 }
             }

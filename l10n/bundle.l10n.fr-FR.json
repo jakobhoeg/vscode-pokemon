@@ -1,0 +1,14 @@
+{
+	"A Pokemon Playground has been created. You can now use the \"Remove All Pokemon\" Command to remove all Pokemon.": "Un Centre Pokémon a été créé. Vous pouvez maintenant utiliser la commande \"Retirer tous les Pokémon\" pour retirer tous les Pokémon.",
+	"A Pokemon Playground has been created. You can now use the \"Spawn Additional Pokemon\" Command to add more Pokemon.": "Un Centre Pokémon a été créé. Vous pouvez maintenant utiliser la commande \"Faire apparaître un Pokémon supplémentaire\" pour ajouter plus de Pokémon.",
+	"Cancelled Spawning Pokemon": "Apparition de Pokémon annulée",
+	"Leave blank for a random name": "Laisser vide pour un nom aléatoire",
+	"Name your Pokemon": "Nommer votre Pokémon",
+	"Pokemon Panel": "Panneau Pokémon",
+	"Select a Pokemon": "Sélectionner un Pokémon",
+	"Select a color": "Sélectionner une couleur",
+	"Select the Pokemon to remove.": "Sélectionner le Pokémon à retirer.",
+	"Spawn Pokemon": "Apparition d'un Pokémon",
+	"default": "Par défaut",
+	"shiny": "Chromatique"
+}
