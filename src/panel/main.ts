@@ -228,6 +228,67 @@ function addPokemonToPanel(
     );
 }
 
+
+function removePokemonFromPanel(message: any, stateApi?: VscodeStateApi) {
+    if (!stateApi) {
+        stateApi = acquireVsCodeApi();
+    }
+    // Remove elements
+    var pokemon = allPokemon.locate(message.name);
+
+    if (!pokemon) {
+    stateApi?.postMessage({
+      command: 'error',
+      text: `Could not find pokemon ${message.name}`,
+    });
+    return;
+    }
+
+    var pokemonSpriteElement = pokemon.el;
+    console.log('Removing pokemon ', message.name);
+    console.log('pokemon:', pokemon);
+
+    // pokemon fade out
+    pokemonSpriteElement.classList.add('fade-out');
+
+    const pokeballEl = document.createElement('div');
+    pokeballEl.classList.add('pokeball-sprite');
+    
+    pokeballEl.style.left = `${pokemon.pokemon.left + 16}px`;
+    pokeballEl.style.bottom = `${pokemon.pokemon.bottom + 16}px`;
+
+    const container = document.getElementById('pokemonContainer') as HTMLDivElement;
+    container.appendChild(pokeballEl);
+
+    pokeballEl.offsetHeight;
+    pokeballEl.classList.add('pokeball-close');
+
+    pokemonSpriteElement.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'pokemon-fade-out') {
+            return;
+        }
+        pokemonSpriteElement.remove();
+    }, { once: true });
+
+    pokeballEl.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'pokeball-close') {
+            return;
+        }
+
+        pokeballEl.remove();
+
+        // 🔥 maintenant seulement on modifie l'état
+        allPokemon.remove(message.name);
+        saveState(stateApi);
+        pokemonCounter--;
+
+        stateApi?.postMessage({
+        command: 'info',
+        text: '👋 Removed pokemon ' + message.name,
+        });
+    }, { once: true });
+}
+
 export function saveState(stateApi?: VscodeStateApi) {
     if (!stateApi) {
         stateApi = acquireVsCodeApi();
@@ -491,21 +552,7 @@ export function pokemonPanelApp(
                     });
                 });
             case 'delete-pokemon':
-                var pokemon = allPokemon.locate(message.name);
-                if (pokemon) {
-                    allPokemon.remove(message.name);
-                    saveState(stateApi);
-                    stateApi?.postMessage({
-                        command: 'info',
-                        text: '👋 Removed pokemon ' + message.name,
-                    });
-                    pokemonCounter--;
-                } else {
-                    stateApi?.postMessage({
-                        command: 'error',
-                        text: `Could not find pokemon ${message.name}`,
-                    });
-                }
+                removePokemonFromPanel(message, stateApi);
                 break;
             case 'reset-pokemon':
                 allPokemon.reset();
