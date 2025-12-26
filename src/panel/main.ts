@@ -555,6 +555,10 @@ export function pokemonPanelApp(
                 removePokemonFromPanel(message, stateApi);
                 break;
             case 'reset-pokemon':
+                allPokemon.pokemonCollection.forEach((pokemon) => {
+                    removePokemonFromPanel({ name: pokemon.pokemon.name }, stateApi);
+                });
+                //leave the old code as a fallback
                 allPokemon.reset();
                 pokemonCounter = 0;
                 saveState(stateApi);
