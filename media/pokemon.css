@@ -191,3 +191,26 @@ img.pokemon {
 .bubble-large.b-64 {
 	margin-left: 37.5px;
 }
+
+/* ============================================================================
+   Retro Clock Display
+   ============================================================================ */
+
+#clock {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 6; /* Above foreground (5) but below collision (999) */
+	font-family: 'silkscreen', monospace;
+	font-size: 18px;
+	color: var(--vscode-foreground);
+	background-color: var(--vscode-editor-background);
+	padding: 4px 8px;
+	border: 2px solid var(--vscode-foreground);
+	border-radius: 4px;
+	opacity: 0.9;
+	user-select: none; /* Prevent text selection */
+	pointer-events: none; /* Allow clicks to pass through */
+	image-rendering: pixelated; /* Maintain retro aesthetic */
+	text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}

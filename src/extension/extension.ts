@@ -86,6 +86,16 @@ function getThrowWithMouseConfiguration(): boolean {
         .get<boolean>('throwBallWithMouse', true);
 }
 
+/**
+ * Get the clock display configuration setting
+ * @returns true if the retro clock should be displayed, false otherwise
+ */
+function getShowClockConfiguration(): boolean {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<boolean>('showClock', true);
+}
+
 interface IDefaultPokemonConfig {
     type: PokemonType;
     name?: string;
@@ -940,6 +950,16 @@ export function activate(context: vscode.ExtensionContext) {
                     // Reset the Pokemon translations cache when the language changes
                     localize.resetPokemonTranslationsCache();
                 }
+
+                if (e.affectsConfiguration('vscode-pokemon.showClock')) {
+                    const panel = getPokemonPanel();
+                    if (panel) {
+                        panel.update();
+                    }
+                    if (webviewViewProvider) {
+                        webviewViewProvider.update();
+                    }
+                }
             },
         ),
     );
@@ -1019,6 +1039,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
     protected _theme: Theme;
     protected _themeKind: vscode.ColorThemeKind;
     protected _throwBallWithMouse: boolean;
+    protected _showClock: boolean;
 
     constructor(
         extensionUri: vscode.Uri,
@@ -1040,6 +1061,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         this._theme = theme;
         this._themeKind = themeKind;
         this._throwBallWithMouse = throwBallWithMouse;
+        this._showClock = getShowClockConfiguration();
     }
 
     public pokemonColor(): PokemonColor {
@@ -1074,6 +1096,14 @@ class PokemonWebviewContainer implements IPokemonPanel {
         return this._throwBallWithMouse;
     }
 
+    /**
+     * Get the current clock display setting
+     * @returns true if the clock should be displayed
+     */
+    public showClock(): boolean {
+        return this._showClock;
+    }
+
     public updatePokemonColor(newColor: PokemonColor) {
         this._pokemonColor = newColor;
     }
@@ -1093,6 +1123,14 @@ class PokemonWebviewContainer implements IPokemonPanel {
     public updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind) {
         this._theme = newTheme;
         this._themeKind = themeKind;
+    }
+
+    /**
+     * Update the clock display setting from configuration
+     * Called when the showClock configuration changes
+     */
+    public updateShowClock(): void {
+        this._showClock = getShowClockConfiguration();
     }
 
     public setThrowWithMouse(newThrowWithMouse: boolean): void {
@@ -1150,6 +1188,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
     }
 
     protected _update() {
+        this.updateShowClock();
         const webview = this.getWebview();
         webview.html = this._getHtmlForWebview(webview);
     }
@@ -1225,6 +1264,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
                 <canvas id="pokemonCanvas"></canvas>
                 <div id="pokemonContainer"></div>
                 <div id="foreground"></div>
+                <div id="clock" style="display: ${this.showClock() ? 'block' : 'none'};"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     pokemonApp.pokemonPanelApp(
@@ -1237,6 +1277,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",
+                        ${this.showClock()},
                     );
                 </script>
             </body>

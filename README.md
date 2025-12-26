@@ -126,6 +126,20 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
+### Retro Clock Display
+
+The extension includes a retro-style clock in the top-right corner of the Pokémon panel, displaying the current time in HH:MM:SS format using the pixelated Silkscreen font.
+
+You can toggle the clock display in your settings:
+
+```json
+{
+  "vscode-pokemon.showClock": true
+}
+```
+
+Set to `false` to hide the clock if you prefer a cleaner view.
+
 ### Pokémon Language
 
 You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese.

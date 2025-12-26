@@ -1,24 +1,23 @@
 // This script will be run within the webview itself
 import { randomName } from '../common/names';
+import { getRandomPokemonConfig } from '../common/pokemon-data';
 import {
-    PokemonSize,
+    ColorThemeKind,
     PokemonColor,
+    PokemonSize,
     PokemonType,
     Theme,
-    ColorThemeKind,
     WebviewMessage,
 } from '../common/types';
-import { IPokemonType } from './states';
 import {
+    availableColors,
     createPokemon,
+    InvalidPokemonException,
+    IPokemonCollection,
     PokemonCollection,
     PokemonElement,
-    IPokemonCollection,
-    availableColors,
-    InvalidPokemonException,
 } from './pokemon-collection';
-import { BallState, PokemonElementState, PokemonPanelState } from './states';
-import { getRandomPokemonConfig } from '../common/pokemon-data';
+import { IPokemonType, PokemonElementState, PokemonPanelState } from './states';
 
 /* This is how the VS Code API can be invoked from the panel */
 declare global {
@@ -321,6 +320,7 @@ export function pokemonPanelApp(
     throwBallWithMouse: boolean,
     gen: string,
     originalSpriteSize: number,
+    showClock: boolean,
     stateApi?: VscodeStateApi,
 ) {
     const ballRadius: number = calculateBallRadius(pokemonSize);
@@ -391,6 +391,11 @@ export function pokemonPanelApp(
     }
 
     initCanvas();
+
+    // Initialize clock if enabled
+    if (showClock) {
+        initClock();
+    }
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
@@ -486,6 +491,43 @@ export function pokemonPanelApp(
         }
     });
 }
+
+let clockInterval: NodeJS.Timeout | undefined;
+
+/**
+ * Initialize and start the retro-style clock display
+ * Updates the clock element every second with current time in HH:MM:SS format
+ * Uses the Silkscreen font for a pixelated retro aesthetic
+ */
+function initClock(): void {
+    const clockElement = document.getElementById('clock');
+    if (!clockElement) {
+        return;
+    }
+
+    // Clear any existing interval to avoid memory leaks
+    if (clockInterval) {
+        clearInterval(clockInterval);
+    }
+
+    function updateClock(): void {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        if (clockElement) {
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+
+    // Update immediately on initialization
+    updateClock();
+
+    // Update every second (1000ms)
+    clockInterval = setInterval(updateClock, 1000);
+}
+
 window.addEventListener('resize', function () {
     initCanvas();
 });

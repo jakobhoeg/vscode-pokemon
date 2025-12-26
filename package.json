@@ -235,6 +235,11 @@
                         ],
                         "default": "auto",
                         "description": "Language for Pokemon names. 'auto' uses VS Code's language, or you can choose a specific language (e.g., 'fr-FR' for French, 'en-US' for English, 'de-DE' for German, 'ja-JP' for Japanese). Only official Pokemon languages are supported."
+                    },
+                    "vscode-pokemon.showClock": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Display a retro-style clock in the top-right corner of the Pokemon panel"
                     }
                 }
             }
