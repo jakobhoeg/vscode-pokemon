@@ -196,8 +196,8 @@ function addPokemonToPanel(
     pokeballEl.classList.add('pokeball-sprite');
 
     // Position pokeball at pokemon location + pokemon center offset
-    pokeballEl.style.left = `${left+16}px`;
-    pokeballEl.style.bottom = `${bottom+16}px`;
+    pokeballEl.style.left = `${left}px`;
+    pokeballEl.style.bottom = `${bottom}px`;
 
     (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(pokeballEl);
 
