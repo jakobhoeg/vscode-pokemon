@@ -254,8 +254,8 @@ function removePokemonFromPanel(message: any, stateApi?: VscodeStateApi) {
     const pokeballEl = document.createElement('div');
     pokeballEl.classList.add('pokeball-sprite');
     
-    pokeballEl.style.left = `${pokemon.pokemon.left + 16}px`;
-    pokeballEl.style.bottom = `${pokemon.pokemon.bottom + 16}px`;
+    pokeballEl.style.left = `${pokemon.pokemon.left}px`;
+    pokeballEl.style.bottom = `${pokemon.pokemon.bottom}px`;
 
     const container = document.getElementById('pokemonContainer') as HTMLDivElement;
     container.appendChild(pokeballEl);
