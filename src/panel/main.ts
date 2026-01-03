@@ -204,16 +204,36 @@ function addPokemonToPanel(
     pokeballEl.offsetHeight;
     pokeballEl.classList.add('pokeball-open');
 
-    pokeballEl.addEventListener('animationend', (e) => {
-        if (e.animationName !== 'pokeball-open') {
-            return;
-    }
-    pokeballEl.remove();
+    // show pokemon earlier while pokeball animation is still running
+    const computed = window.getComputedStyle(pokeballEl);
+    const durationStr = (computed.animationDuration || '0s').split(',')[0].trim();
+    const durationMs = durationStr.endsWith('ms')
+      ? parseFloat(durationStr)
+      : parseFloat(durationStr) * 1000;
 
-    // Show pokemon
-    pokemonSpriteElement.classList.add('spawn-pop');
-    pokemonSpriteElement.style.opacity = '1';
-    saveState(stateApi);
+    const spawnRatio = 0.8; 
+    const spawnDelay = Math.max(0, durationMs * spawnRatio);
+
+    let spawned = false;
+    const showPokemon = () => {
+      if (spawned) {
+        return;
+      }
+      spawned = true;
+      pokemonSpriteElement.classList.add('spawn-pop');
+      pokemonSpriteElement.style.opacity = '1';
+      saveState(stateApi);
+    };
+
+    const spawnTimeout = setTimeout(showPokemon, spawnDelay);
+
+    pokeballEl.addEventListener('animationend', (e) => {
+      if (e.animationName !== 'pokeball-open') {
+        return;
+      }
+      pokeballEl.remove();
+      clearTimeout(spawnTimeout);
+      showPokemon();
     });
 
     return new PokemonElement(
@@ -555,13 +575,16 @@ export function pokemonPanelApp(
                 removePokemonFromPanel(message, stateApi);
                 break;
             case 'reset-pokemon':
-                allPokemon.pokemonCollection.forEach((pokemon) => {
+                const pokemonToRemove = [...allPokemon.pokemonCollection];
+                pokemonToRemove.forEach((pokemon) => {
                     removePokemonFromPanel({ name: pokemon.pokemon.name }, stateApi);
                 });
-                //leave the old code as a fallback
-                allPokemon.reset();
-                pokemonCounter = 0;
-                saveState(stateApi);
+                // Wait for animations to complete before resetting
+                setTimeout(() => {
+                    allPokemon.reset();
+                    pokemonCounter = 0;
+                    saveState(stateApi);
+                }, 500);
                 break;
             case 'pause-pokemon':
                 pokemonCounter = 1;
