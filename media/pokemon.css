@@ -230,11 +230,28 @@ img.pokemon {
 .pokemon.spawn-pop {
   animation: pokemon-pop 220ms ease-out;
   opacity: 1 !important;
+  will-change: transform, opacity, filter;
 }
+
 @keyframes pokemon-pop {
-  0% { transform: scale(0.4); opacity: 0; filter: brightness(150%); }
-  60% { transform: scale(1.15); opacity: 1; filter: brightness(100%); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+    filter: saturate(0) brightness(3) contrast(1);
+  }
+  40% {
+    filter: saturate(0.3) brightness(1.8) contrast(1.05);
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+    filter: saturate(0.8) brightness(1.1) contrast(1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: none;
+  }
 }
 
 .pokemon.fade-out {
@@ -242,8 +259,21 @@ img.pokemon {
 }
 
 @keyframes pokemon-fade-out {
-	0% { transform: scale(1); opacity: 1; }
-	60% { transform: scale(1.15); opacity: 1; filter: brightness(100%); }
-	100% { transform: scale(0.4); opacity: 0; filter: brightness(150%); }
-	
+  0% {
+	opacity: 1;
+	filter: none;
+  }
+  40% {
+	transform: scale(1.15);
+	filter: saturate(0.8) brightness(1.1) contrast(1);
+  }
+  60% {
+	opacity: 0.4;
+	filter: saturate(0.3) brightness(1.8) contrast(1.05);
+  }
+  100% {
+	transform: scale(0.4);
+	opacity: 0;
+	filter: saturate(0) brightness(3) contrast(1);
+  }
 }
