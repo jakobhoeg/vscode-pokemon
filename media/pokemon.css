@@ -207,7 +207,7 @@ img.pokemon {
                    calc(var(--frame-size) * var(--frames));
 
   image-rendering: pixelated;
-  z-index: 1001;
+  z-index: 0;
 }
 .pokeball-sprite.pokeball-open {
   animation: pokeball-open 0.6s steps(var(--frames)) forwards;
