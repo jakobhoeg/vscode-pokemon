@@ -1437,14 +1437,14 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
         }
 
         // Small delay to ensure webview is fully loaded
-        setTimeout(() => {
-            // Reset any existing pokemon before spawning new ones
-            this.resetPokemon();
+        // setTimeout(() => {
+        //     // Reset any existing pokemon before spawning new ones
+        //     this.resetPokemon();
 
-            collection.forEach((item) => {
-                this.spawnPokemon(item);
-            });
-        }, 100);
+        //     collection.forEach((item) => {
+        //         this.spawnPokemon(item);
+        //     });
+        // }, 100);
 
         // Store the collection in the memento
         await storeCollectionAsMemento(this._context, collection);

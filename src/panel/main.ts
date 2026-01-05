@@ -190,6 +190,52 @@ function addPokemonToPanel(
         throw e;
     }
 
+    pokemonSpriteElement.style.opacity = '0';
+
+    const pokeballEl = document.createElement('div');
+    pokeballEl.classList.add('pokeball-sprite');
+
+    // Position pokeball at pokemon location + pokemon center offset
+    pokeballEl.style.left = `${left}px`;
+    pokeballEl.style.bottom = `${bottom}px`;
+
+    (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(pokeballEl);
+
+    pokeballEl.offsetHeight;
+    pokeballEl.classList.add('pokeball-open');
+
+    // show pokemon earlier while pokeball animation is still running
+    const computed = window.getComputedStyle(pokeballEl);
+    const durationStr = (computed.animationDuration || '0s').split(',')[0].trim();
+    const durationMs = durationStr.endsWith('ms')
+      ? parseFloat(durationStr)
+      : parseFloat(durationStr) * 1000;
+
+    const spawnRatio = 0.7;
+    const spawnDelay = Math.max(0, durationMs * spawnRatio);
+
+    let spawned = false;
+    const showPokemon = () => {
+      if (spawned) {
+        return;
+      }
+      spawned = true;
+      pokemonSpriteElement.classList.add('spawn-pop');
+      pokemonSpriteElement.style.opacity = '1';
+      saveState(stateApi);
+    };
+
+    const spawnTimeout = setTimeout(showPokemon, spawnDelay);
+
+    pokeballEl.addEventListener('animationend', (e) => {
+      if (e.animationName !== 'pokeball-open') {
+        return;
+      }
+      pokeballEl.remove();
+      clearTimeout(spawnTimeout);
+      showPokemon();
+    });
+
     return new PokemonElement(
         pokemonSpriteElement,
         collisionElement,
@@ -200,6 +246,67 @@ function addPokemonToPanel(
         gen,
         originalSpriteSize,
     );
+}
+
+
+function removePokemonFromPanel(message: any, stateApi?: VscodeStateApi) {
+    if (!stateApi) {
+        stateApi = acquireVsCodeApi();
+    }
+    // Remove elements
+    var pokemon = allPokemon.locate(message.name);
+
+    if (!pokemon) {
+    stateApi?.postMessage({
+      command: 'error',
+      text: `Could not find pokemon ${message.name}`,
+    });
+    return;
+    }
+
+    var pokemonSpriteElement = pokemon.el;
+    console.log('Removing pokemon ', message.name);
+    console.log('pokemon:', pokemon);
+
+    // pokemon fade out
+    pokemonSpriteElement.classList.add('fade-out');
+
+    const pokeballEl = document.createElement('div');
+    pokeballEl.classList.add('pokeball-sprite');
+    
+    pokeballEl.style.left = `${pokemon.pokemon.left}px`;
+    pokeballEl.style.bottom = `${pokemon.pokemon.bottom}px`;
+
+    const container = document.getElementById('pokemonContainer') as HTMLDivElement;
+    container.appendChild(pokeballEl);
+
+    pokeballEl.offsetHeight;
+    pokeballEl.classList.add('pokeball-close');
+
+    pokemonSpriteElement.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'pokemon-fade-out') {
+            return;
+        }
+        pokemonSpriteElement.remove();
+    }, { once: true });
+
+    pokeballEl.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'pokeball-close') {
+            return;
+        }
+
+        pokeballEl.remove();
+
+        // 🔥 maintenant seulement on modifie l'état
+        allPokemon.remove(message.name);
+        saveState(stateApi);
+        pokemonCounter--;
+
+        stateApi?.postMessage({
+        command: 'info',
+        text: '👋 Removed pokemon ' + message.name,
+        });
+    }, { once: true });
 }
 
 export function saveState(stateApi?: VscodeStateApi) {
@@ -248,8 +355,11 @@ function recoverState(
     }
 
     var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
+    console.log('recoverState: saved pokemon count =', state?.pokemonStates?.length ?? 0);
     state?.pokemonStates?.forEach((p) => {
+        console.log('Recovering pokemon ', p.pokemonType, p.pokemonName);
         try {
+            console.log('Adding pokemon to panel for recovery');
             var newPokemon = addPokemonToPanel(
                 p.pokemonType ?? 'bulbasaur',
                 basePokemonUri,
@@ -369,6 +479,7 @@ export function pokemonPanelApp(
     if (!state) {
         console.log('No state, starting a new session.');
         pokemonCounter = 1;
+        console.log('adding pokemon to panel for new session');
         allPokemon.push(
             addPokemonToPanel(
                 pokemonType,
@@ -395,8 +506,10 @@ export function pokemonPanelApp(
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', (event): void => {
         const message = event.data; // The json data that the extension sent
+        console.log('Received message in panel:', message);
         switch (message.command) {
             case 'spawn-pokemon':
+                console.log('adding pokemon to panel from message', message);
                 allPokemon.push(
                     addPokemonToPanel(
                         message.type,
@@ -417,6 +530,7 @@ export function pokemonPanelApp(
 
             case 'spawn-random-pokemon':
                 var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+                console.log('adding random pokemon to panel from message');
                 allPokemon.push(
                     addPokemonToPanel(
                         randomPokemonType,
@@ -458,26 +572,19 @@ export function pokemonPanelApp(
                     });
                 });
             case 'delete-pokemon':
-                var pokemon = allPokemon.locate(message.name);
-                if (pokemon) {
-                    allPokemon.remove(message.name);
-                    saveState(stateApi);
-                    stateApi?.postMessage({
-                        command: 'info',
-                        text: '👋 Removed pokemon ' + message.name,
-                    });
-                    pokemonCounter--;
-                } else {
-                    stateApi?.postMessage({
-                        command: 'error',
-                        text: `Could not find pokemon ${message.name}`,
-                    });
-                }
+                removePokemonFromPanel(message, stateApi);
                 break;
             case 'reset-pokemon':
-                allPokemon.reset();
-                pokemonCounter = 0;
-                saveState(stateApi);
+                const pokemonToRemove = [...allPokemon.pokemonCollection];
+                pokemonToRemove.forEach((pokemon) => {
+                    removePokemonFromPanel({ name: pokemon.pokemon.name }, stateApi);
+                });
+                // Wait for animations to complete before resetting
+                setTimeout(() => {
+                    allPokemon.reset();
+                    pokemonCounter = 0;
+                    saveState(stateApi);
+                }, 500);
                 break;
             case 'pause-pokemon':
                 pokemonCounter = 1;

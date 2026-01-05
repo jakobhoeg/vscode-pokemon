@@ -191,3 +191,89 @@ img.pokemon {
 .bubble-large.b-64 {
 	margin-left: 37.5px;
 }
+
+.pokeball-sprite {
+  --frame-size: 64px;
+  --frames: 6;
+
+  position: absolute;
+  width: var(--frame-size);
+  height: var(--frame-size);
+
+  background-image: url('pokeball_sprite_sheet.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: var(--frame-size)
+                   calc(var(--frame-size) * var(--frames));
+
+  image-rendering: pixelated;
+  z-index: 0;
+}
+.pokeball-sprite.pokeball-open {
+  animation: pokeball-open 0.45s steps(var(--frames)) forwards;
+}
+@keyframes pokeball-open {
+  to {
+    background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));
+  }
+}
+
+.pokeball-sprite.pokeball-close {
+  animation: pokeball-close 0.6s steps(var(--frames)) backwards;
+}
+
+@keyframes pokeball-close {
+  from { background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));}
+  to   { background-position-y: 0; }
+}
+
+.pokemon.spawn-pop {
+  animation: pokemon-pop 150ms ease-out;
+  opacity: 1 !important;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes pokemon-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+    filter: saturate(0) brightness(3) contrast(1);
+  }
+  40% {
+    filter: saturate(0.3) brightness(1.8) contrast(1.05);
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+    filter: saturate(0.8) brightness(1.1) contrast(1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: none;
+  }
+}
+
+.pokemon.fade-out {
+  animation: pokemon-fade-out 220ms ease-out;
+}
+
+@keyframes pokemon-fade-out {
+  0% {
+	opacity: 1;
+	filter: none;
+  }
+  40% {
+	transform: scale(1.15);
+	filter: saturate(0.8) brightness(1.1) contrast(1);
+  }
+  60% {
+	opacity: 0.4;
+	filter: saturate(0.3) brightness(1.8) contrast(1.05);
+  }
+  100% {
+	transform: scale(0.4);
+	opacity: 0;
+	filter: saturate(0) brightness(3) contrast(1);
+  }
+}
