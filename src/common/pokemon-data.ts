@@ -2380,11 +2380,11 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Whiscash!',
     possibleColors: [PokemonColor.default],
   },
-  corpish: {
+  corphish: {
     id: 341,
-    name: 'Corpish',
+    name: 'Corphish',
     generation: PokemonGeneration.Gen3,
-    cry: 'Corpish!',
+    cry: 'Corphish!',
     possibleColors: [PokemonColor.default],
   },
   crawdaunt: {
