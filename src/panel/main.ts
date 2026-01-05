@@ -211,7 +211,7 @@ function addPokemonToPanel(
       ? parseFloat(durationStr)
       : parseFloat(durationStr) * 1000;
 
-    const spawnRatio = 0.8; 
+    const spawnRatio = 0.7;
     const spawnDelay = Math.max(0, durationMs * spawnRatio);
 
     let spawned = false;
