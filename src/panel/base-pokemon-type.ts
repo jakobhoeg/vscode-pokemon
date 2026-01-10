@@ -288,16 +288,15 @@ export abstract class BasePokemonType implements IPokemonType {
 
     nextFrame() {
         const hasAltFace = this.checkWalkFace('walk_alt');
-
-        if (
-            this.currentState.horizontalDirection === HorizontalDirection.left &&
-            !hasAltFace
-        ) {
-            this.faceLeft();
-        } else if (
-            this.currentState.horizontalDirection === HorizontalDirection.right &&
-            !hasAltFace
-        ) {
+        if (!hasAltFace) {
+            if (this.currentState.horizontalDirection === HorizontalDirection.left) {
+                this.faceLeft();
+            } else if (
+                this.currentState.horizontalDirection === HorizontalDirection.right
+            ) {
+                this.faceRight();
+            }
+        } else {
             this.faceRight();
         }
         this.setAnimation(this.currentState.spriteLabel, hasAltFace);
