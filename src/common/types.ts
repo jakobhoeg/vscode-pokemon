@@ -31,7 +31,6 @@ export const enum PokemonExtraSprite {
     leftFacing = 'left_facing',
 }
 
-
 export const enum PokemonSpeed {
     still = 0,
     verySlow = 1,
