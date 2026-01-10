@@ -3,6 +3,7 @@
 import {
   PokemonColor,
   PokemonConfig,
+  PokemonExtraSprite,
   PokemonGeneration,
   PokemonType,
 } from './types';
@@ -2970,6 +2971,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Torterra!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   chimchar: {
     id: 390,
@@ -3054,6 +3056,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Kricketot!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   kricketune: {
     id: 402,
@@ -3061,6 +3064,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Kricketune!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   shinx: {
     id: 403,
@@ -3096,6 +3100,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Roserade!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   cranidos: {
     id: 408,
@@ -3264,6 +3269,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Ambipom!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   drifloon: {
     id: 425,
@@ -3285,6 +3291,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Buneary!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   lopunny: {
     id: 428,
@@ -3397,6 +3404,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Gible!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   gabite: {
     id: 444,
@@ -3411,6 +3419,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Garchomp!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   munchlax: {
     id: 446,
@@ -3425,6 +3434,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Riolu!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   lucario: {
     id: 448,
@@ -3586,6 +3596,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Togekiss!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   yanmega: {
     id: 469,
@@ -3677,6 +3688,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Rotom!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   rotom_frost: {
     id: 479,
@@ -3808,6 +3820,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Shaymin!',
     possibleColors: [PokemonColor.default],
+    extraSprites: [PokemonExtraSprite.leftFacing]
   },
   arceus: {
     id: 493,

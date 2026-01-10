@@ -1,4 +1,5 @@
-import { PokemonColor, PokemonSize, PokemonSpeed } from '../common/types';
+import { POKEMON_DATA } from '../common/pokemon-data';
+import { PokemonColor, PokemonExtraSprite, PokemonSize, PokemonSpeed } from '../common/types';
 import { ISequenceTree } from './sequences';
 import {
     States,
@@ -253,8 +254,8 @@ export abstract class BasePokemonType implements IPokemonType {
         this.el.style.transform = 'scaleX(1)';
     }
 
-    setAnimation(face: string, hasAltFace: boolean) {
-        const validFace = !hasAltFace && (face === "walk_alt") ? "walk" : face;
+    setAnimation(face: string, hasLeftFacingSprite: boolean | undefined) {
+        const validFace = !hasLeftFacingSprite && (face === "walk_left") ? "walk" : face;
 
         if (this.el.src.endsWith(`_${validFace}_8fps.gif`)) {
             return;
@@ -279,16 +280,10 @@ export abstract class BasePokemonType implements IPokemonType {
         return possibleNextStates[idx];
     }
 
-    checkWalkFace(face: string): boolean {
-        // Check if the image exists by creating a temporary image element
-        const testImage = new Image();
-        testImage.src = `${this.pokemonRoot}_${face}_8fps.gif`;
-        return testImage.complete && testImage.naturalWidth !== 0;
-    }
-
     nextFrame() {
-        const hasAltFace = this.checkWalkFace('walk_alt');
-        if (!hasAltFace) {
+        const hasLeftFacingSprite = POKEMON_DATA[this.label]?.extraSprites?.includes(PokemonExtraSprite.leftFacing);
+        
+        if (!hasLeftFacingSprite) {
             if (this.currentState.horizontalDirection === HorizontalDirection.left) {
                 this.faceLeft();
             } else if (
@@ -299,7 +294,7 @@ export abstract class BasePokemonType implements IPokemonType {
         } else {
             this.faceRight();
         }
-        this.setAnimation(this.currentState.spriteLabel, hasAltFace);
+        this.setAnimation(this.currentState.spriteLabel, hasLeftFacingSprite);
 
         // What's my buddy doing?
         if (

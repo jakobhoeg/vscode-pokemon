@@ -23,8 +23,14 @@ export interface PokemonConfig {
     generation: PokemonGeneration;
     cry: string;
     possibleColors: PokemonColor[];
-    originalSpriteSize?: number,
+    originalSpriteSize?: number;
+    extraSprites?: PokemonExtraSprite[];
 }
+
+export const enum PokemonExtraSprite {
+    leftFacing = 'left_facing',
+}
+
 
 export const enum PokemonSpeed {
     still = 0,

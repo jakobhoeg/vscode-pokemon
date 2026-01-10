@@ -226,7 +226,7 @@ export class IdleWithBallState extends AbstractStaticState {
 export class WalkRightState implements IState {
     label = States.walkRight;
     pokemon: IPokemonType;
-    spriteLabel = 'walk_alt';
+    spriteLabel = 'walk';
     horizontalDirection = HorizontalDirection.right;
     leftBoundary: number;
     speedMultiplier = 1;
@@ -264,7 +264,7 @@ export class WalkRightState implements IState {
 
 export class WalkLeftState implements IState {
     label = States.walkLeft;
-    spriteLabel = 'walk';
+    spriteLabel = 'walk_left';
     horizontalDirection = HorizontalDirection.left;
     pokemon: IPokemonType;
     speedMultiplier = 1;
