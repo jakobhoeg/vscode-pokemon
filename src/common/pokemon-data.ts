@@ -1,4 +1,11 @@
-import { PokemonColor, PokemonConfig, PokemonGeneration, PokemonType } from "./types";
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
+import {
+  PokemonColor,
+  PokemonConfig,
+  PokemonGeneration,
+  PokemonType,
+} from './types';
 
 export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
   bulbasaur: {
