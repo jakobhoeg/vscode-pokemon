@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonGeneration, PokemonSize, PokemonSpeed } from '../common/types';
+import { PokemonColor, PokemonSize, PokemonSpeed } from '../common/types';
 import { ISequenceTree } from './sequences';
 import {
     States,
@@ -253,11 +253,13 @@ export abstract class BasePokemonType implements IPokemonType {
         this.el.style.transform = 'scaleX(1)';
     }
 
-    setAnimation(face: string) {
-        if (this.el.src.endsWith(`_${face}_8fps.gif`)) {
+    setAnimation(face: string, hasAltFace: boolean) {
+        const validFace = !hasAltFace && (face === "walk_alt") ? "walk" : face;
+
+        if (this.el.src.endsWith(`_${validFace}_8fps.gif`)) {
             return;
         }
-        this.el.src = `${this.pokemonRoot}_${face}_8fps.gif`;
+        this.el.src = `${this.pokemonRoot}_${validFace}_8fps.gif`;
     }
 
     chooseNextState(fromState: States): States {
@@ -277,17 +279,28 @@ export abstract class BasePokemonType implements IPokemonType {
         return possibleNextStates[idx];
     }
 
+    checkWalkFace(face: string): boolean {
+        // Check if the image exists by creating a temporary image element
+        const testImage = new Image();
+        testImage.src = `${this.pokemonRoot}_${face}_8fps.gif`;
+        return testImage.complete && testImage.naturalWidth !== 0;
+    }
+
     nextFrame() {
+        const hasAltFace = this.checkWalkFace('walk_alt');
+
         if (
-            this.currentState.horizontalDirection === HorizontalDirection.left
+            this.currentState.horizontalDirection === HorizontalDirection.left &&
+            !hasAltFace
         ) {
             this.faceLeft();
         } else if (
-            this.currentState.horizontalDirection === HorizontalDirection.right
+            this.currentState.horizontalDirection === HorizontalDirection.right &&
+            !hasAltFace
         ) {
             this.faceRight();
         }
-        this.setAnimation(this.currentState.spriteLabel);
+        this.setAnimation(this.currentState.spriteLabel, hasAltFace);
 
         // What's my buddy doing?
         if (
