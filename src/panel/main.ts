@@ -17,7 +17,7 @@ import {
     availableColors,
     InvalidPokemonException,
 } from './pokemon-collection';
-import { BallState, PokemonElementState, PokemonPanelState } from './states';
+import { PokemonElementState, PokemonPanelState } from './states';
 import { getRandomPokemonConfig } from '../common/pokemon-data';
 
 /* This is how the VS Code API can be invoked from the panel */
@@ -32,20 +32,6 @@ declare global {
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
-
-function calculateBallRadius(size: PokemonSize): number {
-    if (size === PokemonSize.nano) {
-        return 2;
-    } else if (size === PokemonSize.small) {
-        return 3;
-    } else if (size === PokemonSize.medium) {
-        return 4;
-    } else if (size === PokemonSize.large) {
-        return 8;
-    } else {
-        return 1; // Shrug
-    }
-}
 
 function calculateFloor(size: PokemonSize, theme: Theme): number {
     switch (theme) {
@@ -433,7 +419,6 @@ export function pokemonPanelApp(
     originalSpriteSize: number,
     stateApi?: VscodeStateApi,
 ) {
-    const ballRadius: number = calculateBallRadius(pokemonSize);
     var floor = 0;
     if (!stateApi) {
         stateApi = acquireVsCodeApi();

@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonGeneration, PokemonType } from '../common/types';
+import { PokemonColor, PokemonType } from '../common/types';
 
 export interface IPokemonType {
     nextFrame(): void;

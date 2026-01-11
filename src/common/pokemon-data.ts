@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { PokemonColor, PokemonConfig, PokemonGeneration, PokemonType } from "./types";
 
 export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
@@ -2734,8 +2735,8 @@ export function getAllPokemon(): PokemonType[] {
 
 export function getPokemonByGeneration(generation: PokemonGeneration): PokemonType[] {
   return Object.entries(POKEMON_DATA)
-    .filter(([_, config]) => config.generation === generation)
-    .map(([key, _]) => key as PokemonType);
+    .filter(([, config]) => config.generation === generation)
+    .map(([key]) => key as PokemonType);
 }
 
 export function getDefaultPokemon(): PokemonType {
