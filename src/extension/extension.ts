@@ -102,7 +102,7 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
     for (const config of defaultConfig) {
         // Validate that the pokemon type exists
         if (POKEMON_DATA[config.type]) {
-            const name = config.name || randomName(config.type);
+            const name = config.name || randomName();
             result.push(new PokemonSpecification(DEFAULT_COLOR, config.type, size, name));
         } else {
             console.warn(`Invalid pokemon type in defaultPokemon config: ${config.type}`);
@@ -140,7 +140,7 @@ export class PokemonSpecification {
         this.type = type;
         this.size = size;
         if (!name) {
-            this.name = randomName(type);
+            this.name = randomName();
         } else {
             this.name = name;
         }
@@ -692,7 +692,7 @@ export function activate(context: vscode.ExtensionContext) {
                                 const name = await vscode.window.showInputBox({
                                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
                                     prompt: vscode.l10n.t('Name your Pokémon'),
-                                    value: randomName(selectedPokemonType.value),
+                                    value: randomName(),
                                 });
 
                                 const spec = new PokemonSpecification(
@@ -765,7 +765,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
                     prompt: vscode.l10n.t('Name your Pokémon'),
-                    value: randomName(selectedPokemonType.value),
+                    value: randomName(),
                 });
 
                 const spec = new PokemonSpecification(

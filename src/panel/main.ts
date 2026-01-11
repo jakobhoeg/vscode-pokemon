@@ -370,7 +370,7 @@ function recoverState(
                 parseInt(p.elLeft ?? '0'),
                 parseInt(p.elBottom ?? '0'),
                 floor,
-                p.pokemonName ?? randomName(p.pokemonType ?? 'bulbasaur'),
+                p.pokemonName ?? randomName(),
                 stateApi,
                 false
             );
@@ -491,7 +491,7 @@ export function pokemonPanelApp(
                 randomStartPosition(),
                 floor,
                 floor,
-                randomName(pokemonType),
+                randomName(),
                 stateApi,
             ),
         );
@@ -521,7 +521,7 @@ export function pokemonPanelApp(
                         randomStartPosition(),
                         floor,
                         floor,
-                        message.name ?? randomName(message.type),
+                        message.name ?? randomName(),
                         stateApi,
                     ),
                 );
@@ -542,7 +542,7 @@ export function pokemonPanelApp(
                         randomStartPosition(),
                         floor,
                         floor,
-                        randomName(randomPokemonConfig.name),
+                        randomName(),
                         stateApi,
                     ),
                 );
