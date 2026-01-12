@@ -44,6 +44,10 @@ export class Pokemon extends BasePokemonType {
       {
         state: States.walkRight,
         possibleNextStates: [States.sitIdle, States.walkLeft],
+      },
+      {
+        state: States.swipe,
+        possibleNextStates: [States.sitIdle],
       }
     ],
   };
