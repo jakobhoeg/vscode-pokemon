@@ -270,6 +270,7 @@ export abstract class BasePokemonType implements IPokemonType {
             }
         }
         if (!possibleNextStates) {
+            // should fix the issue with swipe, it will just go back to idle
             this.recoverState({
                 currentStateEnum: States.sitIdle,
             });
