@@ -270,6 +270,9 @@ export abstract class BasePokemonType implements IPokemonType {
             }
         }
         if (!possibleNextStates) {
+            this.recoverState({
+                currentStateEnum: States.sitIdle,
+            });
             throw new InvalidStateError(fromState, this.label);
         }
         // randomly choose the next state
