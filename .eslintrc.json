@@ -23,7 +23,10 @@
         "eqeqeq": "warn",
         "no-throw-literal": "warn",
         "semi": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
         "no-unused-vars": "error",
+        "no-var": "off",
+        "no-fallthrough": "warn",
         "unused-imports/no-unused-imports": "error",
         "prefer-const": "error",
         "@typescript-eslint/no-non-null-assertion": "warn",
@@ -34,6 +37,7 @@
         "out",
         "dist",
         "node_modules",
-        ".vscode"
+        ".vscode",
+        "src/test"
     ]
 }
