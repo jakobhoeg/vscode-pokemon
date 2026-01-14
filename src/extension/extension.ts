@@ -695,6 +695,11 @@ export function activate(context: vscode.ExtensionContext) {
                                     value: randomName(selectedPokemonType.value),
                                 });
 
+                                if (name === undefined) {
+                                    console.log('Cancelled Spawning Pokemon - No Name Entered');
+                                    return;
+                                }
+
                                 const spec = new PokemonSpecification(
                                     pokemonColor,
                                     selectedPokemonType.value,
@@ -767,6 +772,11 @@ export function activate(context: vscode.ExtensionContext) {
                     prompt: vscode.l10n.t('Name your Pokémon'),
                     value: randomName(selectedPokemonType.value),
                 });
+
+                if (name === undefined) {
+                    console.log('Cancelled Spawning Pokemon - No Name Entered');
+                    return;
+                }
 
                 const spec = new PokemonSpecification(
                     pokemonColor,
