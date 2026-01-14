@@ -2,6 +2,17 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [3.5.0]
+
+- feat: Added Unown characters in Gen 2 
+- fix: Corphish in pokemon-data.ts 
+- fix: Swipe state bug making everything stand still and not work anymore
+- fix: handle cancellation of Pokemon spawning when no name is entered
+
+## [3.4.0]
+
+- feat: Pokémon spawn animation via Pokéball 
+
 ## [3.3.0]
 
 - feat: add default pokemon configurable through settings.json
