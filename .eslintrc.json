@@ -8,7 +8,13 @@
     },
     "plugins": [
         "@typescript-eslint",
+        "prettier",
         "unused-imports"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
     ],
     "rules": {
         "@typescript-eslint/naming-convention": "warn",
@@ -21,6 +27,13 @@
         "unused-imports/no-unused-imports": "error",
         "prefer-const": "error",
         "@typescript-eslint/no-non-null-assertion": "warn",
-        "@typescript-eslint/no-floating-promises": "warn"
-    }
+        "@typescript-eslint/no-floating-promises": "warn",
+        "prettier/prettier": "error"
+    },
+    "ignorePatterns": [
+        "out",
+        "dist",
+        "node_modules",
+        ".vscode"
+    ]
 }
