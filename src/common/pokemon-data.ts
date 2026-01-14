@@ -1402,6 +1402,202 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Misdreavus!',
     possibleColors: [PokemonColor.default]
   },
+  unown_a: {
+    id: 201,
+    name: 'Unown A',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_b: {
+    id: 201,
+    name: 'Unown B',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_c: {
+    id: 201,
+    name: 'Unown C',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_d: {
+    id: 201,
+    name: 'Unown D',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_e: {
+    id: 201,
+    name: 'Unown E',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_f: {
+    id: 201,
+    name: 'Unown F',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_g: {
+    id: 201,
+    name: 'Unown G',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_h: {
+    id: 201,
+    name: 'Unown H',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_i: {
+    id: 201,
+    name: 'Unown I',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_j: {
+    id: 201,
+    name: 'Unown J',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_k: {
+    id: 201,
+    name: 'Unown K',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_l: {
+    id: 201,
+    name: 'Unown L',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_m: {
+    id: 201,
+    name: 'Unown M',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_n: {
+    id: 201,
+    name: 'Unown N',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_o: {
+    id: 201,
+    name: 'Unown O',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_p: {
+    id: 201,
+    name: 'Unown P',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_q: {
+    id: 201,
+    name: 'Unown Q',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_r: {
+    id: 201,
+    name: 'Unown R',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_s: {
+    id: 201,
+    name: 'Unown S',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_t: {
+    id: 201,
+    name: 'Unown T',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_u: {
+    id: 201,
+    name: 'Unown U',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_v: {
+    id: 201,
+    name: 'Unown V',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_w: {
+    id: 201,
+    name: 'Unown W',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_x: {
+    id: 201,
+    name: 'Unown X',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_y: {
+    id: 201,
+    name: 'Unown Y',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_z: {
+    id: 201,
+    name: 'Unown Z',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_exclamation: {
+    id: 201,
+    name: 'Unown !',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
+  unown_question: {
+    id: 201,
+    name: 'Unown ?',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Unown!',
+    possibleColors: [PokemonColor.default]
+  },
   wobbuffet: {
     id: 202,
     name: 'Wobbuffet',
