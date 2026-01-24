@@ -1,4 +1,4 @@
-import { PokemonColor, PokemonGeneration, PokemonType } from '../common/types';
+import { PokemonColor, PokemonType } from '../common/types';
 
 export interface IPokemonType {
     nextFrame(): void;
@@ -264,7 +264,7 @@ export class WalkRightState implements IState {
 
 export class WalkLeftState implements IState {
     label = States.walkLeft;
-    spriteLabel = 'walk';
+    spriteLabel = 'walk_left';
     horizontalDirection = HorizontalDirection.left;
     pokemon: IPokemonType;
     speedMultiplier = 1;

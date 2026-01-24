@@ -1,4 +1,5 @@
-import { PokemonColor, PokemonGeneration, PokemonSize, PokemonSpeed } from '../common/types';
+import { POKEMON_DATA } from '../common/pokemon-data';
+import { PokemonColor, PokemonExtraSprite, PokemonSize, PokemonSpeed } from '../common/types';
 import { ISequenceTree } from './sequences';
 import {
     States,
@@ -253,11 +254,13 @@ export abstract class BasePokemonType implements IPokemonType {
         this.el.style.transform = 'scaleX(1)';
     }
 
-    setAnimation(face: string) {
-        if (this.el.src.endsWith(`_${face}_8fps.gif`)) {
+    setAnimation(face: string, hasLeftFacingSprite: boolean | undefined) {
+        const validFace = !hasLeftFacingSprite && (face === "walk_left") ? "walk" : face;
+
+        if (this.el.src.endsWith(`_${validFace}_8fps.gif`)) {
             return;
         }
-        this.el.src = `${this.pokemonRoot}_${face}_8fps.gif`;
+        this.el.src = `${this.pokemonRoot}_${validFace}_8fps.gif`;
     }
 
     chooseNextState(fromState: States): States {
@@ -278,16 +281,20 @@ export abstract class BasePokemonType implements IPokemonType {
     }
 
     nextFrame() {
-        if (
-            this.currentState.horizontalDirection === HorizontalDirection.left
-        ) {
-            this.faceLeft();
-        } else if (
-            this.currentState.horizontalDirection === HorizontalDirection.right
-        ) {
+        const hasLeftFacingSprite = POKEMON_DATA[this.label]?.extraSprites?.includes(PokemonExtraSprite.leftFacing);
+        
+        if (!hasLeftFacingSprite) {
+            if (this.currentState.horizontalDirection === HorizontalDirection.left) {
+                this.faceLeft();
+            } else if (
+                this.currentState.horizontalDirection === HorizontalDirection.right
+            ) {
+                this.faceRight();
+            }
+        } else {
             this.faceRight();
         }
-        this.setAnimation(this.currentState.spriteLabel);
+        this.setAnimation(this.currentState.spriteLabel, hasLeftFacingSprite);
 
         // What's my buddy doing?
         if (

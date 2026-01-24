@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.0.0]
+
+- feat: added gen 4 pokemon
+- feat: add missing forms for Pichu, Heracross, and Wobbuffet
+
 ## [3.5.0]
 
 - feat: Added Unown characters in Gen 2 
