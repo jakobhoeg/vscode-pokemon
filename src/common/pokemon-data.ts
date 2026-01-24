@@ -1206,6 +1206,13 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Pichu!',
     possibleColors: [PokemonColor.default]
   },
+  pichu_spiky_eared: {
+    id: 172,
+    name: 'Pichu (Spiky-eared)',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Pichu!',
+    possibleColors: [PokemonColor.default]
+  },
   cleffa: {
     id: 173,
     name: 'Cleffa',
@@ -1598,9 +1605,16 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Unown!',
     possibleColors: [PokemonColor.default]
   },
-  wobbuffet: {
+  wobbuffet_male: {
     id: 202,
-    name: 'Wobbuffet',
+    name: 'Wobbuffet (Male)',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Wobbuffet!',
+    possibleColors: [PokemonColor.default]
+  },
+  wobbuffet_female: {
+    id: 202,
+    name: 'Wobbuffet (Female)',
     generation: PokemonGeneration.Gen2,
     cry: 'Wobbuffet!',
     possibleColors: [PokemonColor.default]
@@ -1683,9 +1697,16 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Shuckle!',
     possibleColors: [PokemonColor.default]
   },
-  heracross: {
+  heracross_male: {
     id: 214,
-    name: 'Heracross',
+    name: 'Heracross (Male)',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Heracross!',
+    possibleColors: [PokemonColor.default]
+  },
+  heracross_female: {
+    id: 214,
+    name: 'Heracross (Female)',
     generation: PokemonGeneration.Gen2,
     cry: 'Heracross!',
     possibleColors: [PokemonColor.default]
