@@ -11,6 +11,7 @@ export enum PokemonGeneration {
   Gen1 = 1,
   Gen2 = 2,
   Gen3 = 3,
+  Gen4 = 4,
 }
 
 export type PokemonTypeString = string & keyof typeof POKEMON_DATA;
@@ -24,6 +25,11 @@ export interface PokemonConfig {
   cry: string;
   possibleColors: PokemonColor[];
   originalSpriteSize?: number;
+  extraSprites?: PokemonExtraSprite[];
+}
+
+export const enum PokemonExtraSprite {
+  leftFacing = 'left_facing',
 }
 
 export const enum PokemonSpeed {

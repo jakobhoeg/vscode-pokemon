@@ -126,9 +126,9 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
-## Upcoming features
+## Features
 
-Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 4 soon!
+Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 5 when possible.
 
 ## Credits
 
