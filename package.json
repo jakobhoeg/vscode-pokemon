@@ -272,5 +272,11 @@
     },
     "dependencies": {
         "@vscode/l10n": "^0.0.10"
-    }
+    },
+	"lint-staged": {
+		"*.ts": [
+			"eslint --fix",
+			"prettier --write"
+		]
+	}
 }
