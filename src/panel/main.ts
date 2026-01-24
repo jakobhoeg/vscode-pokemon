@@ -175,7 +175,7 @@ function addPokemonToPanel(
       pokemonCounter++;
     }
     startAnimations(collisionElement, newPokemon, stateApi);
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Remove elements
     pokemonSpriteElement.remove();
     collisionElement.remove();
@@ -243,7 +243,10 @@ function addPokemonToPanel(
   );
 }
 
-function removePokemonFromPanel(message: any, stateApi?: VscodeStateApi) {
+function removePokemonFromPanel(
+  message: { name: string },
+  stateApi?: VscodeStateApi,
+) {
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }

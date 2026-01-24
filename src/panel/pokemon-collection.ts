@@ -81,7 +81,7 @@ export class PokemonCollection implements IPokemonCollection {
     });
   }
 
-  remove(name: string): any {
+  remove(name: string): void {
     this._pokemonCollection.forEach((pokemon) => {
       if (pokemon.pokemon.name === name) {
         pokemon.remove();

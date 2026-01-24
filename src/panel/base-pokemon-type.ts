@@ -88,7 +88,7 @@ export abstract class BasePokemonType implements IPokemonType {
     this._generation = generation;
 
     // Increment the static count of the Pokemon class that the constructor belongs to
-    (this.constructor as any).count += 1;
+    (this.constructor as typeof BasePokemonType).count += 1;
   }
 
   initSprite(
