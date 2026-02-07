@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.0.1]
+
+- feat: change Pokémon speed depending on size
+
 ## [4.0.0]
 
 - feat: added gen 4 pokemon
