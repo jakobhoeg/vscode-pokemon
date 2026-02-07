@@ -16,6 +16,7 @@ import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 import { getDefaultPokemon as getDefaultPokemonType, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
+import { VSCODE_CONFIGURE_KEYBINDINGS_KEY, VSCODE_DELETE_POKEMON_KEY, VSCODE_EXPORT_POKEMON_LIST_KEY, VSCODE_IMPORT_POKEMON_LIST_KEY, VSCODE_MANAGE_PRESETS_KEY, VSCODE_PRESETS_KEY, VSCODE_REMOVE_ALL_POKEMON_KEY, VSCODE_ROLL_CALL_KEY, VSCODE_SPAWN_POKEMON_KEY, VSCODE_SPAWN_RANDOM_POKEMON_KEY, VSCODE_START_KEY } from '../constants/vscode-keys';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -89,6 +90,20 @@ function getThrowWithMouseConfiguration(): boolean {
 interface IDefaultPokemonConfig {
     type: PokemonType;
     name?: string;
+}
+
+interface IPresetPokemon {
+    color: PokemonColor;
+    type: PokemonType;
+    size: PokemonSize;
+    name: string;
+    generation?: string;
+    originalSpriteSize?: number;
+}
+
+interface IPreset {
+    name: string;
+    pokemon: IPresetPokemon[];
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -220,6 +235,14 @@ export async function storeCollectionAsMemento(
     ]);
 }
 
+function loadPresets(context: vscode.ExtensionContext): IPreset[] {
+    return context.globalState.get<IPreset[]>(VSCODE_PRESETS_KEY, []);
+}
+
+async function storePresets(context: vscode.ExtensionContext, presets: IPreset[]) {
+    await context.globalState.update(VSCODE_PRESETS_KEY, presets);
+}
+
 let spawnPokemonStatusBar: vscode.StatusBarItem;
 
 interface IPokemonInfo {
@@ -317,7 +340,78 @@ function getWebview(): vscode.Webview | undefined {
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.start', async () => {
+        vscode.commands.registerCommand(VSCODE_MANAGE_PRESETS_KEY, async () => {
+            const presets = loadPresets(context);
+            const items: vscode.QuickPickItem[] = [
+                ...presets.map((p) => ({ label: p.name, description: `${p.pokemon.length} Pokémon` })),
+                { label: '$(plus) Create preset from current collection', description: 'Create a named preset from your saved collection' },
+                { label: '$(trash) Delete a preset', description: 'Remove an existing preset' },
+            ];
+
+            const pick = await vscode.window.showQuickPick(items, { placeHolder: 'Select a preset to spawn or an action' });
+            if (!pick) { return; }
+
+            if (pick.label === '$(plus) Create preset from current collection') {
+                const collection = PokemonSpecification.collectionFromMemento(context, getConfiguredSize());
+                if (collection.length === 0) {
+                    await vscode.window.showInformationMessage(vscode.l10n.t('No Pokémon in saved collection to create a preset.'));
+                    return;
+                }
+                const name = await vscode.window.showInputBox({ prompt: 'Preset name' });
+                if (!name) { return; }
+                const preset: IPreset = {
+                    name,
+                    pokemon: collection.map((spec) => ({
+                        color: spec.color,
+                        type: spec.type,
+                        size: spec.size,
+                        name: spec.name,
+                        generation: spec.generation,
+                        originalSpriteSize: spec.originalSpriteSize,
+                    })),
+                };
+                presets.push(preset);
+                await storePresets(context, presets);
+                await vscode.window.showInformationMessage(vscode.l10n.t('Preset saved.'));
+                return;
+            }
+
+            if (pick.label === '$(trash) Delete a preset') {
+                if (presets.length === 0) {
+                    await vscode.window.showInformationMessage(vscode.l10n.t('No presets to delete.'));
+                    return;
+                }
+                const toDelete = await vscode.window.showQuickPick(presets.map(p => p.name), { placeHolder: 'Select preset to delete' });
+                if (!toDelete) { return; }
+                const updated = presets.filter(p => p.name !== toDelete);
+                await storePresets(context, updated);
+                await vscode.window.showInformationMessage(vscode.l10n.t('Preset deleted.'));
+                return;
+            }
+
+            const preset = presets.find(p => p.name === pick.label);
+            if (!preset) { return; }
+
+            const panel = getPokemonPanel();
+            if (!panel) {
+                await createPokemonPlayground(context);
+            }
+
+            const spawnSpecs: PokemonSpecification[] = [];
+            for (const p of preset.pokemon) {
+                const spec = new PokemonSpecification(p.color, p.type, p.size, p.name, p.generation);
+                spec.originalSpriteSize = p.originalSpriteSize ?? spec.originalSpriteSize;
+                spawnSpecs.push(spec);
+                getPokemonPanel()?.spawnPokemon(spec);
+            }
+
+            // Merge into saved collection and persist
+            const existing = PokemonSpecification.collectionFromMemento(context, getConfiguredSize());
+            for (const s of spawnSpecs) { existing.push(s); }
+            await storeCollectionAsMemento(context, existing);
+        }),
+
+        vscode.commands.registerCommand(VSCODE_START_KEY, async () => {
             if (
                 getConfigurationPosition() === ExtPosition.explorer &&
                 webviewViewProvider
@@ -363,7 +457,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.StatusBarAlignment.Right,
         100,
     );
-    spawnPokemonStatusBar.command = 'vscode-pokemon.spawn-pokemon';
+    spawnPokemonStatusBar.command = VSCODE_SPAWN_POKEMON_KEY;
     context.subscriptions.push(spawnPokemonStatusBar);
 
     context.subscriptions.push(
@@ -404,7 +498,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.delete-pokemon', async () => {
+        vscode.commands.registerCommand(VSCODE_DELETE_POKEMON_KEY, async () => {
             const panel = getPokemonPanel();
             if (panel !== undefined) {
                 panel.listPokemon();
@@ -419,7 +513,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.roll-call', async () => {
+        vscode.commands.registerCommand(VSCODE_ROLL_CALL_KEY, async () => {
             const panel = getPokemonPanel();
             if (panel !== undefined) {
                 panel.rollCall();
@@ -430,27 +524,27 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.configure-keybindings', async () => {
+        vscode.commands.registerCommand(VSCODE_CONFIGURE_KEYBINDINGS_KEY, async () => {
             const items: Array<vscode.QuickPickItem & { commandId: string }> = [
                 {
                     label: vscode.l10n.t('Spawn additional pokemon'),
-                    description: 'vscode-pokemon.spawn-pokemon',
-                    commandId: 'vscode-pokemon.spawn-pokemon',
+                    description: VSCODE_SPAWN_POKEMON_KEY,
+                    commandId: VSCODE_SPAWN_POKEMON_KEY,
                 },
                 {
                     label: vscode.l10n.t('Spawn random pokemon'),
-                    description: 'vscode-pokemon.spawn-random-pokemon',
-                    commandId: 'vscode-pokemon.spawn-random-pokemon',
+                    description: VSCODE_SPAWN_RANDOM_POKEMON_KEY,
+                    commandId: VSCODE_SPAWN_RANDOM_POKEMON_KEY,
                 },
                 {
                     label: vscode.l10n.t('Remove pokemon'),
-                    description: 'vscode-pokemon.delete-pokemon',
-                    commandId: 'vscode-pokemon.delete-pokemon',
+                    description: VSCODE_DELETE_POKEMON_KEY,
+                    commandId: VSCODE_DELETE_POKEMON_KEY,
                 },
                 {
                     label: vscode.l10n.t('Remove all pokemon'),
-                    description: 'vscode-pokemon.remove-all-pokemon',
-                    commandId: 'vscode-pokemon.remove-all-pokemon',
+                    description: VSCODE_REMOVE_ALL_POKEMON_KEY,
+                    commandId: VSCODE_REMOVE_ALL_POKEMON_KEY,
                 },
             ];
 
@@ -470,7 +564,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pokemon.export-pokemon-list',
+            VSCODE_EXPORT_POKEMON_LIST_KEY,
             async () => {
                 const pokemonCollection = PokemonSpecification.collectionFromMemento(
                     context,
@@ -514,7 +608,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pokemon.import-pokemon-list',
+            VSCODE_IMPORT_POKEMON_LIST_KEY,
             async () => {
                 const options: vscode.OpenDialogOptions = {
                     canSelectMany: false,
@@ -573,7 +667,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.spawn-pokemon', async () => {
+        vscode.commands.registerCommand(VSCODE_SPAWN_POKEMON_KEY, async () => {
             const panel = getPokemonPanel();
             if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
                 await vscode.commands.executeCommand('pokemonView.focus');
@@ -804,7 +898,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.spawn-random-pokemon', async () => {
+        vscode.commands.registerCommand(VSCODE_SPAWN_RANDOM_POKEMON_KEY, async () => {
             const panel = getPokemonPanel();
             if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
                 await vscode.commands.executeCommand('pokemonView.focus');
@@ -838,7 +932,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand(
-            'vscode-pokemon.remove-all-pokemon',
+            VSCODE_REMOVE_ALL_POKEMON_KEY,
             async () => {
                 const panel = getPokemonPanel();
                 if (panel !== undefined) {
