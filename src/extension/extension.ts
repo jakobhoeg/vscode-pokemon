@@ -1212,8 +1212,8 @@ class PokemonWebviewContainer implements IPokemonPanel {
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
           webview.cspSource
         } 'nonce-${nonce}'; img-src ${
-      webview.cspSource
-    } https:; script-src 'nonce-${nonce}';
+          webview.cspSource
+        } https:; script-src 'nonce-${nonce}';
                 font-src ${webview.cspSource};">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${stylesResetUri}" rel="stylesheet" nonce="${nonce}">
