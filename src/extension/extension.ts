@@ -31,6 +31,7 @@ const DEFAULT_COLOR = PokemonColor.default;
 const DEFAULT_POKEMON_TYPE = getDefaultPokemonType();
 const DEFAULT_POSITION = ExtPosition.panel;
 const DEFAULT_THEME = Theme.none;
+const DEFAULT_SHINY_CHANCE_PERCENT = 0.024;
 
 class PokemonQuickPickItem implements vscode.QuickPickItem {
   constructor(
@@ -91,6 +92,31 @@ function getThrowWithMouseConfiguration(): boolean {
     .get<boolean>('throwBallWithMouse', true);
 }
 
+function getConfiguredShinyChancePercent(): number {
+  const chance = vscode.workspace
+    .getConfiguration('vscode-pokemon')
+    .get<number>('shinyChancePercent', DEFAULT_SHINY_CHANCE_PERCENT);
+
+  if (typeof chance !== 'number' || isNaN(chance)) {
+    return DEFAULT_SHINY_CHANCE_PERCENT;
+  }
+  return Math.max(0, Math.min(100, chance));
+}
+
+function applyShinyChance(pokemonColor: PokemonColor): PokemonColor {
+  if (pokemonColor !== PokemonColor.default) {
+    return pokemonColor;
+  }
+
+  const shinyChancePercent = getConfiguredShinyChancePercent();
+  if (shinyChancePercent <= 0) {
+    return pokemonColor;
+  }
+
+  const roll = Math.random() * 100;
+  return roll < shinyChancePercent ? PokemonColor.shiny : pokemonColor;
+}
+
 interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
@@ -108,9 +134,8 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
     // Validate that the pokemon type exists
     if (POKEMON_DATA[config.type]) {
       const name = config.name || randomName();
-      result.push(
-        new PokemonSpecification(DEFAULT_COLOR, config.type, size, name),
-      );
+      const color = applyShinyChance(DEFAULT_COLOR);
+      result.push(new PokemonSpecification(color, config.type, size, name));
     } else {
       console.warn(
         `Invalid pokemon type in defaultPokemon config: ${config.type}`,
@@ -340,6 +365,7 @@ export function activate(context: vscode.ExtensionContext) {
         await vscode.commands.executeCommand('pokemonView.focus');
       } else {
         const spec = PokemonSpecification.fromConfiguration();
+        spec.color = applyShinyChance(spec.color);
         PokemonPanel.createOrShow(
           context.extensionUri,
           spec.color,
@@ -393,6 +419,7 @@ export function activate(context: vscode.ExtensionContext) {
   updateStatusBar();
 
   const spec = PokemonSpecification.fromConfiguration();
+  spec.color = applyShinyChance(spec.color);
   webviewViewProvider = new PokemonWebviewViewProvider(
     context,
     context.extensionUri,
@@ -738,6 +765,7 @@ export function activate(context: vscode.ExtensionContext) {
                   } else {
                     pokemonColor = possibleColors[0];
                   }
+                  pokemonColor = applyShinyChance(pokemonColor);
 
                   const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
@@ -816,6 +844,7 @@ export function activate(context: vscode.ExtensionContext) {
           } else {
             pokemonColor = possibleColors[0];
           }
+          pokemonColor = applyShinyChance(pokemonColor);
 
           const name = await vscode.window.showInputBox({
             placeHolder: vscode.l10n.t('Leave blank for a random name'),
@@ -868,8 +897,11 @@ export function activate(context: vscode.ExtensionContext) {
         if (panel) {
           var [randomPokemonType, randomPokemonConfig] =
             getRandomPokemonConfig();
-          const spec = new PokemonSpecification(
+          const pokemonColor = applyShinyChance(
             randomPokemonConfig.possibleColors[0],
+          );
+          const spec = new PokemonSpecification(
+            pokemonColor,
             randomPokemonType,
             getConfiguredSize(),
             randomPokemonConfig.name,

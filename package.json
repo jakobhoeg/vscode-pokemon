@@ -197,6 +197,13 @@
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
                     },
+                    "vscode-pokemon.shinyChancePercent": {
+                        "type": "number",
+                        "default": 0.024,
+                        "minimum": 0,
+                        "maximum": 100,
+                        "description": "Percentage chance (0-100) that a newly spawned Pokemon will be shiny"
+                    },
                     "vscode-pokemon.defaultPokemon": {
                         "type": "array",
                         "items": {

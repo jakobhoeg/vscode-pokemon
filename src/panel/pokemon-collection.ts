@@ -189,6 +189,9 @@ export function normalizeColor(
   pokemonColor: PokemonColor,
   pokemonType: PokemonType,
 ): PokemonColor {
+  if (pokemonColor === PokemonColor.shiny) {
+    return PokemonColor.shiny;
+  }
   const colors = availableColors(pokemonType);
   return colors.includes(pokemonColor) ? pokemonColor : colors[0];
 }

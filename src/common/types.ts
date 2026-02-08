@@ -76,7 +76,7 @@ export class WebviewMessage {
   }
 }
 
-export const ALL_COLORS = [PokemonColor.default];
+export const ALL_COLORS = [PokemonColor.default, PokemonColor.shiny];
 export const ALL_SCALES = [
   PokemonSize.nano,
   PokemonSize.small,

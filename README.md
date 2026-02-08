@@ -92,6 +92,18 @@ Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In t
 
 Set the size and position of the extension.
 
+### Shiny chance
+
+You can control the chance that a newly spawned Pokemon appears as shiny.
+
+```json
+{
+  "vscode-pokemon.shinyChancePercent": 0.024
+}
+```
+
+The value is a percentage (0-100). The default of `0.024` is roughly 1 in 4096.
+
 ### Default Pokémon
 
 You can configure specific Pokémon to automatically appear when you first start using the extension. This is useful for setting up your preferred team without having to manually spawn them when you open new windows.

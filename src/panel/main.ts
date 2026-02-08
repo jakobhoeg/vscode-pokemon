@@ -125,7 +125,8 @@ function addPokemonToPanel(
   incrementCounter: boolean = true,
 ): PokemonElement {
   var pokemonSpriteElement: HTMLImageElement = document.createElement('img');
-  pokemonSpriteElement.className = 'pokemon';
+  const isShiny = pokemonColor === PokemonColor.shiny;
+  pokemonSpriteElement.className = isShiny ? 'pokemon shiny' : 'pokemon';
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
     pokemonSpriteElement,
   );
@@ -143,7 +144,8 @@ function addPokemonToPanel(
     speechBubbleElement,
   );
 
-  const root = `${basePokemonUri}/${gen}/${pokemonType}/${pokemonColor}`;
+  const rootColor = isShiny ? PokemonColor.default : pokemonColor;
+  const root = `${basePokemonUri}/${gen}/${pokemonType}/${rootColor}`;
   console.log(
     'Creating new pokemon : ',
     pokemonType,
@@ -154,7 +156,7 @@ function addPokemonToPanel(
     originalSpriteSize,
   );
   try {
-    if (!availableColors(pokemonType).includes(pokemonColor)) {
+    if (!isShiny && !availableColors(pokemonType).includes(pokemonColor)) {
       throw new InvalidPokemonException('Invalid color for pokemon type');
     }
     var newPokemon = createPokemon(

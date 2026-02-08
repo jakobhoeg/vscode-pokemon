@@ -129,6 +129,12 @@ img.pokemon {
 	z-index: 2;
 }
 
+img.pokemon.shiny {
+	filter: hue-rotate(120deg) saturate(1.4) brightness(1.1)
+		drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+	animation: shiny-glint 4s ease-in-out infinite;
+}
+
 .collision {
 	position: absolute;
 	left: 0px;
@@ -155,6 +161,19 @@ img.pokemon {
 	100% {
 		opacity: 1;
 		transform: translateX(50%) translateY(0);
+	}
+}
+
+@keyframes shiny-glint {
+	0%,
+	100% {
+		filter: hue-rotate(120deg) saturate(1.4) brightness(1.1)
+			drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+	}
+
+	50% {
+		filter: hue-rotate(140deg) saturate(1.7) brightness(1.2)
+			drop-shadow(0 0 10px rgba(255, 230, 150, 0.8));
 	}
 }
 
