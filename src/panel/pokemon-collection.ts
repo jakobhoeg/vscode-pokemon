@@ -81,15 +81,15 @@ export class PokemonCollection implements IPokemonCollection {
     });
   }
 
-  remove(name: string): void {
-    this._pokemonCollection.forEach((pokemon) => {
-      if (pokemon.pokemon.name === name) {
-        pokemon.remove();
-      }
-    });
-    this._pokemonCollection = this._pokemonCollection.filter((pokemon) => {
-      return pokemon.pokemon.name !== name;
-    });
+  remove(name: string): any {
+    const idx = this._pokemonCollection.findIndex(
+      (pokemon) => pokemon.pokemon.name === name,
+    );
+    if (idx === -1) {
+      return;
+    }
+    this._pokemonCollection[idx].remove();
+    this._pokemonCollection.splice(idx, 1);
   }
 
   seekNewFriends(): string[] {

@@ -2,7 +2,12 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.1.1]
+
+- fix: optimize remove Pokemon method
+
 ## [4.1.0]
+
 - feat: added code-quality GitHub Action
 - chore: formatted the whole codebase with Prettier
 - chore: enforced ESlint rules on commit

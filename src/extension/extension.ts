@@ -613,9 +613,9 @@ export function activate(context: vscode.ExtensionContext) {
           > = Object.entries(POKEMON_DATA).map(([type, config]) => ({
             label: config.name,
             value: type as PokemonType,
-            description: `#${config.id
-              .toString()
-              .padStart(4, '0')} - Gen ${config.generation}`,
+            description: `#${config.id.toString().padStart(4, '0')} - Gen ${
+              config.generation
+            }`,
             isGeneration: false as const,
           }));
 
