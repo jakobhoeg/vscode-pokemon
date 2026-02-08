@@ -1626,7 +1626,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     name: 'Wobbuffet (Female)',
     generation: PokemonGeneration.Gen2,
     cry: 'Wobbuffet!',
-    possibleColors: [PokemonColor.default],
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
   },
   girafarig: {
     id: 203,
@@ -1718,7 +1718,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     name: 'Heracross (Female)',
     generation: PokemonGeneration.Gen2,
     cry: 'Heracross!',
-    possibleColors: [PokemonColor.default],
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
   },
   sneasel: {
     id: 215,
