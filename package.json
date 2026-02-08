@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "4.0.1",
+    "version": "4.1.0",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -232,12 +232,15 @@
         "watch": "webpack && tsc -watch -p ./tsconfig.extension.json",
         "watch:web": "webpack --watch",
         "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src --ext ts && prettier --check src",
-        "lint:fix": "eslint src --ext ts --fix && prettier --write src",
+        "lint": "eslint src --ext ts",
+        "lint:fix": "eslint src --ext ts --fix",
+        "format:check": "prettier --check src",
+        "format": "prettier --write src",
         "test": "node ./out/test/runTest.js",
         "test:coverage": "COVERAGE=1 node ./out/test/runTest.js",
         "test:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
-        "test:gifs": "node ./out/test/gifs.js"
+        "test:gifs": "node ./out/test/gifs.js",
+        "prepare": "husky"
     },
     "devDependencies": {
         "@rbarilani/remove-source-map-url-webpack-plugin": "^1.1.0",
@@ -251,15 +254,18 @@
         "@vscode/l10n-dev": "^0.0.29",
         "@vscode/test-web": "^0.0.50",
         "eslint": "^8.18.0",
+        "eslint-config-prettier": "^9.1.2",
+        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-unused-imports": "^2.0.0",
         "glob": "^8.0.3",
         "gulp": "^5.0.0",
+        "husky": "^9.1.7",
         "jsdom": "^20.0.0",
         "jsdom-global": "^3.0.2",
         "mocha": "^10.0.0",
         "nyc": "^15.1.0",
         "path-browserify": "^1.0.1",
-        "prettier": "^2.7.1",
+        "prettier": "^3.3.3",
         "process": "^0.11.10",
         "ts-loader": "^9.3.0",
         "typescript": "^4.7.4",
@@ -270,5 +276,11 @@
     },
     "dependencies": {
         "@vscode/l10n": "^0.0.10"
+    },
+    "lint-staged": {
+        "*.ts": [
+            "eslint --fix",
+            "prettier --write"
+        ]
     }
 }

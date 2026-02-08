@@ -1219,7 +1219,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     name: 'Pichu (Spiky-eared)',
     generation: PokemonGeneration.Gen2,
     cry: 'Pichu!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   cleffa: {
     id: 173,
@@ -1422,203 +1422,203 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     name: 'Unown A',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_b: {
     id: 201,
     name: 'Unown B',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_c: {
     id: 201,
     name: 'Unown C',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_d: {
     id: 201,
     name: 'Unown D',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_e: {
     id: 201,
     name: 'Unown E',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_f: {
     id: 201,
     name: 'Unown F',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_g: {
     id: 201,
     name: 'Unown G',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_h: {
     id: 201,
     name: 'Unown H',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_i: {
     id: 201,
     name: 'Unown I',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_j: {
     id: 201,
     name: 'Unown J',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_k: {
     id: 201,
     name: 'Unown K',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_l: {
     id: 201,
     name: 'Unown L',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_m: {
     id: 201,
     name: 'Unown M',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_n: {
     id: 201,
     name: 'Unown N',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_o: {
     id: 201,
     name: 'Unown O',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_p: {
     id: 201,
     name: 'Unown P',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_q: {
     id: 201,
     name: 'Unown Q',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_r: {
     id: 201,
     name: 'Unown R',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_s: {
     id: 201,
     name: 'Unown S',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_t: {
     id: 201,
     name: 'Unown T',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_u: {
     id: 201,
     name: 'Unown U',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_v: {
     id: 201,
     name: 'Unown V',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_w: {
     id: 201,
     name: 'Unown W',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_x: {
     id: 201,
     name: 'Unown X',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_y: {
     id: 201,
     name: 'Unown Y',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_z: {
     id: 201,
     name: 'Unown Z',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_exclamation: {
     id: 201,
     name: 'Unown !',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   unown_question: {
     id: 201,
     name: 'Unown ?',
     generation: PokemonGeneration.Gen2,
     cry: 'Unown!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   wobbuffet_male: {
     id: 202,
     name: 'Wobbuffet (Male)',
     generation: PokemonGeneration.Gen2,
     cry: 'Wobbuffet!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   wobbuffet_female: {
     id: 202,
@@ -1710,7 +1710,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     name: 'Heracross (Male)',
     generation: PokemonGeneration.Gen2,
     cry: 'Heracross!',
-    possibleColors: [PokemonColor.default]
+    possibleColors: [PokemonColor.default],
   },
   heracross_female: {
     id: 214,
@@ -2971,7 +2971,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Torterra!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   chimchar: {
     id: 390,
@@ -3056,7 +3056,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Kricketot!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   kricketune: {
     id: 402,
@@ -3064,7 +3064,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Kricketune!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   shinx: {
     id: 403,
@@ -3100,7 +3100,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Roserade!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   cranidos: {
     id: 408,
@@ -3269,7 +3269,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Ambipom!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   drifloon: {
     id: 425,
@@ -3291,7 +3291,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Buneary!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   lopunny: {
     id: 428,
@@ -3404,7 +3404,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Gible!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   gabite: {
     id: 444,
@@ -3419,7 +3419,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Garchomp!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   munchlax: {
     id: 446,
@@ -3434,7 +3434,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Riolu!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   lucario: {
     id: 448,
@@ -3596,7 +3596,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Togekiss!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   yanmega: {
     id: 469,
@@ -3688,7 +3688,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Rotom!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   rotom_frost: {
     id: 479,
@@ -3820,7 +3820,7 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     generation: PokemonGeneration.Gen4,
     cry: 'Shaymin!',
     possibleColors: [PokemonColor.default],
-    extraSprites: [PokemonExtraSprite.leftFacing]
+    extraSprites: [PokemonExtraSprite.leftFacing],
   },
   arceus: {
     id: 493,
@@ -3967,8 +3967,8 @@ export function getPokemonByGeneration(
   generation: PokemonGeneration,
 ): PokemonType[] {
   return Object.entries(POKEMON_DATA)
-    .filter(([_, config]) => config.generation === generation)
-    .map(([key, _]) => key as PokemonType);
+    .filter(([, config]) => config.generation === generation)
+    .map(([key]) => key as PokemonType);
 }
 
 export function getDefaultPokemon(): PokemonType {
@@ -3976,7 +3976,7 @@ export function getDefaultPokemon(): PokemonType {
 }
 
 export function getRandomPokemonConfig(): [PokemonType, PokemonConfig] {
-  var keys = Object.keys(POKEMON_DATA);
-  var randomKey = keys[Math.floor(Math.random() * keys.length)];
+  const keys = Object.keys(POKEMON_DATA);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
   return [randomKey as PokemonType, POKEMON_DATA[randomKey]];
 }

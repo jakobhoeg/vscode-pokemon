@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.1.0]
+- feat: added code-quality GitHub Action
+- chore: formatted the whole codebase with Prettier
+- chore: enforced ESlint rules on commit
+
 ## [4.0.1]
 
 - feat: change Pokémon speed depending on size

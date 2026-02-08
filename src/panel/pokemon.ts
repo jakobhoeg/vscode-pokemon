@@ -1,8 +1,12 @@
 import { POKEMON_DATA } from '../common/pokemon-data';
-import { PokemonColor, PokemonConfig, PokemonGeneration, PokemonSize } from '../common/types';
+import {
+  PokemonColor,
+  PokemonConfig,
+  PokemonGeneration,
+  PokemonSize,
+} from '../common/types';
 import { BasePokemonType } from './base-pokemon-type';
 import { States } from './states';
-
 
 export class Pokemon extends BasePokemonType {
   private config: PokemonConfig;
@@ -22,7 +26,20 @@ export class Pokemon extends BasePokemonType {
     generation: string,
     originalSpriteSize: number,
   ) {
-    super(spriteElement, collisionElement, speechElement, size, left, bottom, pokemonRoot, floor, name, speed, generation, originalSpriteSize);
+    super(
+      spriteElement,
+      collisionElement,
+      speechElement,
+      size,
+      left,
+      bottom,
+      pokemonRoot,
+      floor,
+      name,
+      speed,
+      generation,
+      originalSpriteSize,
+    );
 
     this.config = POKEMON_DATA[pokemonType] || POKEMON_DATA.bulbasaur;
     this.label = pokemonType;
@@ -48,7 +65,7 @@ export class Pokemon extends BasePokemonType {
       {
         state: States.swipe,
         possibleNextStates: [States.sitIdle],
-      }
+      },
     ],
   };
 
@@ -59,7 +76,6 @@ export class Pokemon extends BasePokemonType {
   get pokedexNumber(): number {
     return this.config.id;
   }
-
 
   showSpeechBubble(duration: number = 3000, friend: boolean) {
     super.showSpeechBubble(duration, friend);
