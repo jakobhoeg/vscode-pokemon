@@ -13,7 +13,6 @@ import {
   PokemonGeneration,
 } from '../common/types';
 import { randomName } from '../common/names';
-import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 import {
   getDefaultPokemon as getDefaultPokemonType,
@@ -89,6 +88,22 @@ function getThrowWithMouseConfiguration(): boolean {
   return vscode.workspace
     .getConfiguration('vscode-pokemon')
     .get<boolean>('throwBallWithMouse', true);
+}
+
+function getConfiguredShinyOdds(): number {
+  return vscode.workspace
+    .getConfiguration('vscode-pokemon')
+    .get<number>('shinyOdds', 8192);
+}
+
+function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
+  if (possibleColors.includes(PokemonColor.shiny)) {
+    const shinyOdds = getConfiguredShinyOdds();
+    if (Math.floor(Math.random() * shinyOdds) === 0) {
+      return PokemonColor.shiny;
+    }
+  }
+  return possibleColors[0];
 }
 
 interface IDefaultPokemonConfig {
@@ -714,30 +729,9 @@ export function activate(context: vscode.ExtensionContext) {
                   selectedPokemonType = picked;
 
                   // Handle the rest of the flow
-                  var pokemonColor: PokemonColor = DEFAULT_COLOR;
                   const possibleColors = availableColors(
                     selectedPokemonType.value,
                   );
-
-                  if (possibleColors.length > 1) {
-                    var selectedColor = await vscode.window.showQuickPick(
-                      localize.stringListAsQuickPickItemList<PokemonColor>(
-                        possibleColors,
-                      ),
-                      {
-                        placeHolder: vscode.l10n.t('Select a color'),
-                      },
-                    );
-                    if (!selectedColor) {
-                      console.log(
-                        'Cancelled Spawning Pokemon - No Color Selected',
-                      );
-                      return;
-                    }
-                    pokemonColor = selectedColor.value;
-                  } else {
-                    pokemonColor = possibleColors[0];
-                  }
 
                   const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
@@ -751,7 +745,7 @@ export function activate(context: vscode.ExtensionContext) {
                   }
 
                   const spec = new PokemonSpecification(
-                    pokemonColor,
+                    maybeMakeShiny(possibleColors),
                     selectedPokemonType.value,
                     getConfiguredSize(),
                     name,
@@ -796,26 +790,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           // Rest of the existing code
-          var pokemonColor: PokemonColor = DEFAULT_COLOR;
           const possibleColors = availableColors(selectedPokemonType.value);
-
-          if (possibleColors.length > 1) {
-            var selectedColor = await vscode.window.showQuickPick(
-              localize.stringListAsQuickPickItemList<PokemonColor>(
-                possibleColors,
-              ),
-              {
-                placeHolder: vscode.l10n.t('Select a color'),
-              },
-            );
-            if (!selectedColor) {
-              console.log('Cancelled Spawning Pokemon - No Color Selected');
-              return;
-            }
-            pokemonColor = selectedColor.value;
-          } else {
-            pokemonColor = possibleColors[0];
-          }
 
           const name = await vscode.window.showInputBox({
             placeHolder: vscode.l10n.t('Leave blank for a random name'),
@@ -829,7 +804,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           const spec = new PokemonSpecification(
-            pokemonColor,
+            maybeMakeShiny(possibleColors),
             selectedPokemonType.value,
             getConfiguredSize(),
             name,
@@ -869,7 +844,7 @@ export function activate(context: vscode.ExtensionContext) {
           var [randomPokemonType, randomPokemonConfig] =
             getRandomPokemonConfig();
           const spec = new PokemonSpecification(
-            randomPokemonConfig.possibleColors[0],
+            maybeMakeShiny(randomPokemonConfig.possibleColors),
             randomPokemonType,
             getConfiguredSize(),
             randomPokemonConfig.name,
