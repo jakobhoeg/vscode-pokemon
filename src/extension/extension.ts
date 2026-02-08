@@ -613,9 +613,9 @@ export function activate(context: vscode.ExtensionContext) {
           > = Object.entries(POKEMON_DATA).map(([type, config]) => ({
             label: config.name,
             value: type as PokemonType,
-            description: `#${config.id
-              .toString()
-              .padStart(4, '0')} - Gen ${config.generation}`,
+            description: `#${config.id.toString().padStart(4, '0')} - Gen ${
+              config.generation
+            }`,
             isGeneration: false as const,
           }));
 
@@ -1212,8 +1212,8 @@ class PokemonWebviewContainer implements IPokemonPanel {
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
           webview.cspSource
         } 'nonce-${nonce}'; img-src ${
-          webview.cspSource
-        } https:; script-src 'nonce-${nonce}';
+      webview.cspSource
+    } https:; script-src 'nonce-${nonce}';
                 font-src ${webview.cspSource};">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${stylesResetUri}" rel="stylesheet" nonce="${nonce}">
