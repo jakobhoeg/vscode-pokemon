@@ -31,6 +31,13 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Venusaur!',
     possibleColors: [PokemonColor.default, PokemonColor.shiny],
   },
+  venusaur_female: {
+    id: 3,
+    name: 'Venusaur (Female)',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Venusaur!',
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
+  },
   charmander: {
     id: 4,
     name: 'Charmander',
@@ -181,6 +188,13 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
   pikachu: {
     id: 25,
     name: 'Pikachu',
+    generation: PokemonGeneration.Gen1,
+    cry: 'Pikachu!',
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
+  },
+  pikachu_female: {
+    id: 25,
+    name: 'Pikachu (Female)',
     generation: PokemonGeneration.Gen1,
     cry: 'Pikachu!',
     possibleColors: [PokemonColor.default, PokemonColor.shiny],
@@ -1089,6 +1103,13 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     cry: 'Meganium!',
     possibleColors: [PokemonColor.default, PokemonColor.shiny],
   },
+  meganium_female: {
+    id: 154,
+    name: 'Meganium (Female)',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Meganium!',
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
+  },
   cyndaquil: {
     id: 155,
     name: 'Cyndaquil',
@@ -1666,6 +1687,14 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
   steelix: {
     id: 208,
     name: 'Steelix',
+    generation: PokemonGeneration.Gen2,
+    cry: 'Steelix!',
+    possibleColors: [PokemonColor.default, PokemonColor.shiny],
+    originalSpriteSize: 64,
+  },
+  steelix_female: {
+    id: 208,
+    name: 'Steelix (Female)',
     generation: PokemonGeneration.Gen2,
     cry: 'Steelix!',
     possibleColors: [PokemonColor.default, PokemonColor.shiny],
