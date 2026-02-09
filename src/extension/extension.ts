@@ -845,6 +845,7 @@ export function activate(context: vscode.ExtensionContext) {
               }
             }
             await storeCollectionAsMemento(context, collection);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (e: any) {
             await vscode.window.showErrorMessage(
               vscode.l10n.t('Failed to import pokemon: {0}', e?.message),
@@ -952,6 +953,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         disposables.push(
           qp.onDidAccept(async () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const sel = qp.selectedItems[0] as any;
             if (!sel) {
               qp.hide();
@@ -1012,6 +1014,7 @@ export function activate(context: vscode.ExtensionContext) {
                 await storeCollectionAsMemento(context, collection);
               }
             } else {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               selectedPokemonType = sel as any;
               qp.hide();
             }
