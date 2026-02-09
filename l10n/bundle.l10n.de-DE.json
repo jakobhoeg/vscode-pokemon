@@ -1,8 +1,10 @@
 {
 	"Spawn Pokemon": "Pokémon erscheinen lassen",
 	"Pokemon Panel": "Pokémon-Panel",
+	"Pokemon language changed to {0}. The change will persist after restart.": "Pokémon-Sprache wurde auf {0} geändert. Die Änderung bleibt nach dem Neustart erhalten.",
 	"Select a Pokemon": "Wähle ein Pokémon",
 	"Select a color": "Wähle eine Farbe",
+	"Select language for Pokemon names": "Sprache für Pokémon-Namen auswählen",
 	"Select the Pokemon to remove.": "Wähle das Pokémon zum Entfernen.",
 	"Leave blank for a random name": "Leer lassen für einen zufälligen Namen",
 	"Name your Pokemon": "Benenne dein Pokémon",

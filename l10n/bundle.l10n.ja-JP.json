@@ -1,8 +1,10 @@
 {
 	"Spawn Pokemon": "ポケモンを出現させる",
 	"Pokemon Panel": "ポケモンパネル",
+	"Pokemon language changed to {0}. The change will persist after restart.": "ポケモンの言語が{0}に変更されました。この変更は再起動後も保持されます。",
 	"Select a Pokemon": "ポケモンを選択",
 	"Select a color": "色を選択",
+	"Select language for Pokemon names": "ポケモン名の言語を選択",
 	"Select the Pokemon to remove.": "削除するポケモンを選択してください。",
 	"Leave blank for a random name": "ランダムな名前の場合は空白のまま",
 	"Name your Pokemon": "ポケモンに名前を付ける",

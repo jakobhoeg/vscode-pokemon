@@ -1,8 +1,10 @@
 {
 	"Spawn Pokemon": "Spawn Pokemon",
 	"Pokemon Panel": "Pokemon Panel",
+	"Pokemon language changed to {0}. The change will persist after restart.": "Pokemon language changed to {0}. The change will persist after restart.",
 	"Select a Pokemon": "Select a Pokemon",
-	"Select a color": "Select a colour",
+	"Select a color": "Select a color",
+	"Select language for Pokemon names": "Select language for Pokemon names",
 	"Select the Pokemon to remove.": "Select the Pokemon to remove.",
 	"Leave blank for a random name": "Leave blank for a random name",
 	"Name your Pokemon": "Name your Pokemon",
