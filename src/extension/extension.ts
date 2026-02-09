@@ -2,18 +2,23 @@ import * as vscode from 'vscode';
 import { ColorThemeKind } from 'vscode';
 import * as localize from '../common/localize';
 import { randomName } from '../common/names';
-import { getDefaultPokemon as getDefaultPokemonType, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
 import {
-    ALL_COLORS,
-    ALL_SCALES,
-    ALL_THEMES,
-    ExtPosition,
-    PokemonColor,
-    PokemonGeneration,
-    PokemonSize,
-    PokemonType,
-    Theme,
-    WebviewMessage,
+  getDefaultPokemon as getDefaultPokemonType,
+  getPokemonByGeneration,
+  getRandomPokemonConfig,
+  POKEMON_DATA,
+} from '../common/pokemon-data';
+import {
+  ALL_COLORS,
+  ALL_SCALES,
+  ALL_THEMES,
+  ExtPosition,
+  PokemonColor,
+  PokemonGeneration,
+  PokemonSize,
+  PokemonType,
+  Theme,
+  WebviewMessage,
 } from '../common/types';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 
@@ -342,29 +347,29 @@ function getWebview(): vscode.Webview | undefined {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    // Reset the Pokemon translations cache at startup to load the correct language
-    localize.resetPokemonTranslationsCache();
-    
-    context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.start', async () => {
-            if (
-                getConfigurationPosition() === ExtPosition.explorer &&
-                webviewViewProvider
-            ) {
-                await vscode.commands.executeCommand('pokemonView.focus');
-            } else {
-                const spec = PokemonSpecification.fromConfiguration();
-                PokemonPanel.createOrShow(
-                    context.extensionUri,
-                    spec.color,
-                    spec.type,
-                    spec.size,
-                    spec.generation,
-                    spec.originalSpriteSize,
-                    getConfiguredTheme(),
-                    getConfiguredThemeKind(),
-                    getThrowWithMouseConfiguration(),
-                );
+  // Reset the Pokemon translations cache at startup to load the correct language
+  localize.resetPokemonTranslationsCache();
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('vscode-pokemon.start', async () => {
+      if (
+        getConfigurationPosition() === ExtPosition.explorer &&
+        webviewViewProvider
+      ) {
+        await vscode.commands.executeCommand('pokemonView.focus');
+      } else {
+        const spec = PokemonSpecification.fromConfiguration();
+        PokemonPanel.createOrShow(
+          context.extensionUri,
+          spec.color,
+          spec.type,
+          spec.size,
+          spec.generation,
+          spec.originalSpriteSize,
+          getConfiguredTheme(),
+          getConfiguredThemeKind(),
+          getThrowWithMouseConfiguration(),
+        );
 
         if (PokemonPanel.currentPanel) {
           // First, check if there are saved pokemon from previous session
@@ -503,167 +508,139 @@ export function activate(context: vscode.ExtensionContext) {
     ),
   );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.change-pokemon-language', async () => {
-            const config = vscode.workspace.getConfiguration('vscode-pokemon');
-            const currentLanguage = config.get<string>('pokemonLanguage', 'auto');
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.change-pokemon-language',
+      async () => {
+        const config = vscode.workspace.getConfiguration('vscode-pokemon');
+        const currentLanguage = config.get<string>('pokemonLanguage', 'auto');
 
-            // Language display names and flags (official Pokemon languages only)
-            const languageLabels: { [key: string]: { label: string; description: string } } = {
-                'auto': { label: '$(globe) Auto', description: 'Use VS Code language' },
-                'en-US': { label: '🇺🇸 English (US)', description: 'English names' },
-                'fr-FR': { label: '🇫🇷 Français (FR)', description: 'Noms français' },
-                'de-DE': { label: '🇩🇪 Deutsch (DE)', description: 'Deutsche Namen' },
-                'ja-JP': { label: '🇯🇵 日本語 (JP)', description: '日本語名' },
-            } as { [key: string]: { label: string; description: string } };
+        // Language display names and flags (official Pokemon languages only)
+        /* eslint-disable @typescript-eslint/naming-convention */
+        const languageLabels: {
+          [key: string]: { label: string; description: string };
+        } = {
+          auto: { label: '$(globe) Auto', description: 'Use VS Code language' },
+          'en-US': { label: '🇺🇸 English (US)', description: 'English names' },
+          'fr-FR': { label: '🇫🇷 Français (FR)', description: 'Noms français' },
+          'de-DE': { label: '🇩🇪 Deutsch (DE)', description: 'Deutsche Namen' },
+          'ja-JP': { label: '🇯🇵 日本語 (JP)', description: '日本語名' },
+        } as { [key: string]: { label: string; description: string } };
+        /* eslint-enable @typescript-eslint/naming-convention */
 
-            const languageOptions: Array<vscode.QuickPickItem & { value: string }> = [
-                {
-                    label: languageLabels['auto'].label,
-                    description: languageLabels['auto'].description,
-                    detail: currentLanguage === 'auto' ? 'Current' : undefined,
-                    value: 'auto',
-                },
-                ...localize.SUPPORTED_LOCALES.map((locale) => ({
-                    label: languageLabels[locale]?.label || locale,
-                    description: languageLabels[locale]?.description || locale,
-                    detail: currentLanguage === locale ? 'Current' : undefined,
-                    value: locale,
-                })),
-            ];
+        const languageOptions: Array<vscode.QuickPickItem & { value: string }> =
+          [
+            {
+              label: languageLabels['auto'].label,
+              description: languageLabels['auto'].description,
+              detail: currentLanguage === 'auto' ? 'Current' : undefined,
+              value: 'auto',
+            },
+            ...localize.SUPPORTED_LOCALES.map((locale) => ({
+              label: languageLabels[locale]?.label || locale,
+              description: languageLabels[locale]?.description || locale,
+              detail: currentLanguage === locale ? 'Current' : undefined,
+              value: locale,
+            })),
+          ];
 
-            const picked = await vscode.window.showQuickPick(languageOptions, {
-                placeHolder: vscode.l10n.t('Select language for Pokemon names'),
+        const picked = await vscode.window.showQuickPick(languageOptions, {
+          placeHolder: vscode.l10n.t('Select language for Pokemon names'),
+        });
+
+        if (!picked) {
+          return;
+        }
+
+        // Update configuration persistently
+        await config.update(
+          'pokemonLanguage',
+          picked.value,
+          vscode.ConfigurationTarget.Global,
+        );
+
+        // Reset translation cache to force reload
+        localize.resetPokemonTranslationsCache();
+
+        // Preload translations with the new language
+        // This ensures the cache is immediately available
+        const testPokemon: PokemonType = 'bulbasaur';
+        localize.getLocalizedPokemonName(testPokemon);
+
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t(
+            'Pokemon language changed to {0}. The change will persist after restart.',
+            picked.label,
+          ),
+        );
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.export-pokemon-list',
+      async () => {
+        const pokemonCollection = PokemonSpecification.collectionFromMemento(
+          context,
+          getConfiguredSize(),
+        );
+        const pokemonJson = JSON.stringify(pokemonCollection, null, 2);
+        const fileName = `pokemonCollection-${Date.now()}.json`;
+        if (!vscode.workspace.workspaceFolders) {
+          await vscode.window.showErrorMessage(
+            vscode.l10n.t(
+              'You must have a folder or workspace open to export pokemonCollection.',
+            ),
+          );
+          return;
+        }
+        const filePath = vscode.Uri.joinPath(
+          vscode.workspace.workspaceFolders[0].uri,
+          fileName,
+        );
+        const newUri = vscode.Uri.file(fileName).with({
+          scheme: 'untitled',
+          path: filePath.fsPath,
+        });
+        await vscode.workspace.openTextDocument(newUri).then(async (doc) => {
+          await vscode.window.showTextDocument(doc).then(async (editor) => {
+            await editor.edit((edit) => {
+              edit.insert(new vscode.Position(0, 0), pokemonJson);
             });
+          });
+        });
+      },
+    ),
+  );
 
-            if (!picked) {
-                return;
-            }
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.import-pokemon-list',
+      async () => {
+        const options: vscode.OpenDialogOptions = {
+          canSelectMany: false,
+          openLabel: 'Open pokemonCollection.json',
+          filters: {
+            json: ['json'],
+          },
+        };
+        const fileUri = await vscode.window.showOpenDialog(options);
 
-            // Update configuration persistently
-            await config.update('pokemonLanguage', picked.value, vscode.ConfigurationTarget.Global);
-            
-            // Reset translation cache to force reload
-            localize.resetPokemonTranslationsCache();
-            
-            // Preload translations with the new language
-            // This ensures the cache is immediately available
-            const testPokemon: PokemonType = 'bulbasaur';
-            localize.getLocalizedPokemonName(testPokemon);
-            
-            await vscode.window.showInformationMessage(
-                vscode.l10n.t('Pokemon language changed to {0}. The change will persist after restart.', picked.label),
+        if (fileUri && fileUri[0]) {
+          console.log('Selected file: ' + fileUri[0].fsPath);
+          try {
+            const fileContents = await vscode.workspace.fs.readFile(fileUri[0]);
+            const pokemonToLoad = JSON.parse(
+              String.fromCharCode.apply(null, Array.from(fileContents)),
             );
-        }),
-    );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'vscode-pokemon.export-pokemon-list',
-            async () => {
-                const pokemonCollection = PokemonSpecification.collectionFromMemento(
-                    context,
-                    getConfiguredSize(),
-                );
-                const pokemonJson = JSON.stringify(pokemonCollection, null, 2);
-                const fileName = `pokemonCollection-${Date.now()}.json`;
-                if (!vscode.workspace.workspaceFolders) {
-                    await vscode.window.showErrorMessage(
-                        vscode.l10n.t(
-                            'You must have a folder or workspace open to export pokemonCollection.',
-                        ),
-                    );
-                    return;
-                }
-                const filePath = vscode.Uri.joinPath(
-                    vscode.workspace.workspaceFolders[0].uri,
-                    fileName,
-                );
-                const newUri = vscode.Uri.file(fileName).with({
-                    scheme: 'untitled',
-                    path: filePath.fsPath,
-                });
-                await vscode.workspace
-                    .openTextDocument(newUri)
-                    .then(async (doc) => {
-                        await vscode.window
-                            .showTextDocument(doc)
-                            .then(async (editor) => {
-                                await editor.edit((edit) => {
-                                    edit.insert(
-                                        new vscode.Position(0, 0),
-                                        pokemonJson,
-                                    );
-                                });
-                            });
-                    });
-            },
-        ),
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'vscode-pokemon.import-pokemon-list',
-            async () => {
-                const options: vscode.OpenDialogOptions = {
-                    canSelectMany: false,
-                    openLabel: 'Open pokemonCollection.json',
-                    filters: {
-                        json: ['json'],
-                    },
-                };
-                const fileUri = await vscode.window.showOpenDialog(options);
-
-                if (fileUri && fileUri[0]) {
-                    console.log('Selected file: ' + fileUri[0].fsPath);
-                    try {
-                        const fileContents = await vscode.workspace.fs.readFile(
-                            fileUri[0],
-                        );
-                        const pokemonToLoad = JSON.parse(
-                            String.fromCharCode.apply(
-                                null,
-                                Array.from(fileContents),
-                            ),
-                        );
-
-                        // load the pokemon into the collection
-                        var collection = PokemonSpecification.collectionFromMemento(
-                            context,
-                            getConfiguredSize(),
-                        );
-                        // fetch just the pokemon types
-                        const panel = getPokemonPanel();
-                        for (let i = 0; i < pokemonToLoad.length; i++) {
-                            const pokemon = pokemonToLoad[i];
-                            const pokemonSpec = new PokemonSpecification(
-                                normalizeColor(pokemon.color, pokemon.type),
-                                pokemon.type,
-                                pokemon.size,
-                                pokemon.name,
-                            );
-                            collection.push(pokemonSpec);
-                            if (panel !== undefined) {
-                                panel.spawnPokemon(pokemonSpec);
-                            }
-                        }
-                        await storeCollectionAsMemento(context, collection);
-                    } catch (e: any) {
-                        await vscode.window.showErrorMessage(
-                            vscode.l10n.t(
-                                'Failed to import pokemon: {0}',
-                                e?.message,
-                            ),
-                        );
-                    }
-                }
-            },
-        ),
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.spawn-pokemon', async () => {
->>>>>>> aa50f9d (feat: add support for official languages in Pokemon names and introduce language selection command)
+            // load the pokemon into the collection
+            var collection = PokemonSpecification.collectionFromMemento(
+              context,
+              getConfiguredSize(),
+            );
+            // fetch just the pokemon types
             const panel = getPokemonPanel();
             for (let i = 0; i < pokemonToLoad.length; i++) {
               const pokemon = pokemonToLoad[i];
@@ -689,32 +666,41 @@ export function activate(context: vscode.ExtensionContext) {
     ),
   );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-pokemon.spawn-pokemon', async () => {
-            const panel = getPokemonPanel();
-            if (getConfigurationPosition() === ExtPosition.explorer && webviewViewProvider) {
-                await vscode.commands.executeCommand('pokemonView.focus');
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.spawn-pokemon',
+      async () => {
+        const panel = getPokemonPanel();
+        if (
+          getConfigurationPosition() === ExtPosition.explorer &&
+          webviewViewProvider
+        ) {
+          await vscode.commands.executeCommand('pokemonView.focus');
+        }
+        if (panel) {
+          // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
+          const generationItems: Array<
+            vscode.QuickPickItem & {
+              isGeneration: true;
+              gen: PokemonGeneration;
             }
-            if (panel) {
-                // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
-                const generationItems: Array<vscode.QuickPickItem & { isGeneration: true; gen: PokemonGeneration }> = Object
-                    .values(PokemonGeneration)
-                    .filter((gen) => typeof gen === 'number')
-                    .map((gen) => ({
-                        label: `$(folder) Generation ${gen}`,
-                        description: `Browse Gen ${gen} Pokémon`,
-                        isGeneration: true as const,
-                        gen: gen as PokemonGeneration,
-                    }));
+          > = Object.values(PokemonGeneration)
+            .filter((gen) => typeof gen === 'number')
+            .map((gen) => ({
+              label: `$(folder) Generation ${gen}`,
+              description: `Browse Gen ${gen} Pokémon`,
+              isGeneration: true as const,
+              gen: gen as PokemonGeneration,
+            }));
 
-                const allPokemonOptions: Array<vscode.QuickPickItem & { value: PokemonType; isGeneration: false }> = Object
-                    .entries(POKEMON_DATA)
-                    .map(([type, config]) => ({
-                        label: localize.getLocalizedPokemonName(type as PokemonType),
-                        value: type as PokemonType,
-                        description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
-                        isGeneration: false as const,
-                    }));
+          const allPokemonOptions: Array<
+            vscode.QuickPickItem & { value: PokemonType; isGeneration: false }
+          > = Object.entries(POKEMON_DATA).map(([type, config]) => ({
+            label: localize.getLocalizedPokemonName(type as PokemonType),
+            value: type as PokemonType,
+            description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
+            isGeneration: false as const,
+          }));
 
           const qp = vscode.window.createQuickPick<
             vscode.QuickPickItem & {
