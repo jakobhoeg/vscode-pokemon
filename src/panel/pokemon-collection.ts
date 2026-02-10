@@ -81,7 +81,7 @@ export class PokemonCollection implements IPokemonCollection {
     });
   }
 
-  remove(name: string): any {
+  remove(name: string): void {
     const idx = this._pokemonCollection.findIndex(
       (pokemon) => pokemon.pokemon.name === name,
     );
