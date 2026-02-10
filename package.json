@@ -222,7 +222,7 @@
                         "type": "number",
                         "default": 8192,
                         "minimum": 1,
-                        "description": "Odds (1 in N) for a Pokémon to be shiny. Lower = more shinies."
+                        "description": "Odds (1 in N) for a Pokémon to be shiny. Lower = more shinies. Default is 8192."
                     }
                 }
             }
