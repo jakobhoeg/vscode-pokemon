@@ -254,6 +254,36 @@ img.pokemon {
   }
 }
 
+.shiny-overlay {
+  position: absolute;
+  image-rendering: pixelated;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  margin-bottom: -5px;
+  animation: shiny-sparkle 1s ease-out forwards;
+}
+
+@keyframes shiny-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  30% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .pokemon.fade-out {
   animation: pokemon-fade-out 220ms ease-out;
 }

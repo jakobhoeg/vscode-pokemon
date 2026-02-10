@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "4.1.1",
+    "version": "4.2.0",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -217,6 +217,12 @@
                         },
                         "default": [],
                         "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"charizard\"}]"
+                    },
+                    "vscode-pokemon.shinyOdds": {
+                        "type": "number",
+                        "default": 8192,
+                        "minimum": 1,
+                        "description": "Odds (1 in N) for a Pokémon to be shiny. Lower = more shinies. Default is 8192."
                     }
                 }
             }

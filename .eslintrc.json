@@ -31,7 +31,12 @@
         "prefer-const": "error",
         "@typescript-eslint/no-non-null-assertion": "warn",
         "@typescript-eslint/no-floating-promises": "warn",
-        "prettier/prettier": "error"
+        "prettier/prettier": [
+            "error",
+            {
+                "endOfLine": "auto"
+            }
+        ]
     },
     "ignorePatterns": [
         "out",

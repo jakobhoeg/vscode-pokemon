@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.2.0]
+
+- feat: add shiny sprites & spawn rate for gen 1-4
+
 ## [4.1.1]
 
 - fix: optimize remove Pokemon method
