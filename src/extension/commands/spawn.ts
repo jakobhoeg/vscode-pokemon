@@ -56,6 +56,7 @@ export function registerSpawnCommands(deps: CommandDependencies): void {
     getPokemonPanel,
     createPokemonPlayground,
     storeCollectionAsMemento,
+    maybeMakeShiny,
     pokemonSpecification,
   } = deps;
 
@@ -258,26 +259,7 @@ export function registerSpawnCommands(deps: CommandDependencies): void {
           return;
         }
 
-        var pokemonColor: PokemonColor = DEFAULT_COLOR;
         const possibleColors = availableColors(selectedPokemonType.value);
-
-        if (possibleColors.length > 1) {
-          var selectedColor = await vscode.window.showQuickPick(
-            localize.stringListAsQuickPickItemList<PokemonColor>(
-              possibleColors,
-            ),
-            {
-              placeHolder: vscode.l10n.t('Select a color'),
-            },
-          );
-          if (!selectedColor) {
-            console.log('Cancelled Spawning Pokemon - No Color Selected');
-            return;
-          }
-          pokemonColor = selectedColor.value;
-        } else {
-          pokemonColor = possibleColors[0];
-        }
 
         const name = await vscode.window.showInputBox({
           placeHolder: vscode.l10n.t('Leave blank for a random name'),
@@ -291,7 +273,7 @@ export function registerSpawnCommands(deps: CommandDependencies): void {
         }
 
         const spec = new pokemonSpecification(
-          pokemonColor,
+          maybeMakeShiny(possibleColors),
           selectedPokemonType.value,
           getConfiguredSize(),
           name,
@@ -330,7 +312,7 @@ export function registerSpawnCommands(deps: CommandDependencies): void {
           var [randomPokemonType, randomPokemonConfig] =
             getRandomPokemonConfig();
           const spec = new pokemonSpecification(
-            randomPokemonConfig.possibleColors[0],
+            maybeMakeShiny(randomPokemonConfig.possibleColors),
             randomPokemonType,
             getConfiguredSize(),
             randomPokemonConfig.name,

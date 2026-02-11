@@ -30,7 +30,7 @@
         "unused-imports/no-unused-imports": "error",
         "prefer-const": "error",
         "@typescript-eslint/no-non-null-assertion": "warn",
-        "@typescript-eslint/no-floating-promises": "warn",        
+        "@typescript-eslint/no-floating-promises": "warn",
         "prettier/prettier": [
             "error",
             {

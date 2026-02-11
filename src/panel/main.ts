@@ -217,6 +217,23 @@ function addPokemonToPanel(
     spawned = true;
     pokemonSpriteElement.classList.add('spawn-pop');
     pokemonSpriteElement.style.opacity = '1';
+
+    if (pokemonColor === PokemonColor.shiny) {
+      const shinyOverlay = document.createElement('img');
+      shinyOverlay.src = `${basePokemonUri}/shiny-anim.gif?t=${Date.now()}`;
+      shinyOverlay.className = 'shiny-overlay';
+      shinyOverlay.style.left = pokemonSpriteElement.style.left;
+      shinyOverlay.style.bottom = pokemonSpriteElement.style.bottom;
+      shinyOverlay.style.width = pokemonSpriteElement.style.width;
+      shinyOverlay.style.height = pokemonSpriteElement.style.height;
+      (
+        document.getElementById('pokemonContainer') as HTMLDivElement
+      ).appendChild(shinyOverlay);
+      const removeOverlay = () => shinyOverlay.remove();
+      shinyOverlay.addEventListener('animationend', removeOverlay);
+      setTimeout(removeOverlay, 1500);
+    }
+
     saveState(stateApi);
   };
 

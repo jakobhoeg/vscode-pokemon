@@ -75,6 +75,22 @@ function getThrowWithMouseConfiguration(): boolean {
     .get<boolean>('throwBallWithMouse', true);
 }
 
+function getConfiguredShinyOdds(): number {
+  return vscode.workspace
+    .getConfiguration('vscode-pokemon')
+    .get<number>('shinyOdds', 8192);
+}
+
+export function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
+  if (possibleColors.includes(PokemonColor.shiny)) {
+    const shinyOdds = getConfiguredShinyOdds();
+    if (Math.floor(Math.random() * shinyOdds) === 0) {
+      return PokemonColor.shiny;
+    }
+  }
+  return possibleColors[0];
+}
+
 interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
@@ -317,8 +333,8 @@ export function activate(context: vscode.ExtensionContext) {
     createPokemonPlayground,
     storeCollectionAsMemento,
     pokemonSpecification: PokemonSpecification,
+    maybeMakeShiny: maybeMakeShiny,
   };
-
   registerStartCommand(commandDependencies);
   registerSpawnCommands(commandDependencies);
   registerCollectionCommands(commandDependencies);

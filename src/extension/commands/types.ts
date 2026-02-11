@@ -63,5 +63,6 @@ export interface CommandDependencies {
     context: vscode.ExtensionContext,
     collection: PokemonSpecificationLike[],
   ): Promise<void>;
+  maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor;
   pokemonSpecification: PokemonSpecificationClass;
 }
