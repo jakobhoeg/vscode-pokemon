@@ -55,6 +55,7 @@ export abstract class BasePokemonType implements IPokemonType {
   private _size: PokemonSize;
   private _generation: string;
   private _originalSpriteSize: number;
+  private appearanceAnimationTimeout: number | undefined;
 
   constructor(
     spriteElement: HTMLImageElement,
@@ -294,6 +295,17 @@ export abstract class BasePokemonType implements IPokemonType {
   setAppearance(label: string, pokemonRoot: string): void {
     this.label = label;
     this.pokemonRoot = pokemonRoot;
+    if (this.appearanceAnimationTimeout !== undefined) {
+      window.clearTimeout(this.appearanceAnimationTimeout);
+    }
+    this.el.classList.remove('ditto-transforming');
+    // Force reflow so rapid consecutive transforms retrigger animation.
+    void this.el.offsetWidth;
+    this.el.classList.add('ditto-transforming');
+    this.appearanceAnimationTimeout = window.setTimeout(() => {
+      this.el.classList.remove('ditto-transforming');
+      this.appearanceAnimationTimeout = undefined;
+    }, 650);
     // Clear source so the next animation update always applies the new root.
     this.el.src = '';
   }
