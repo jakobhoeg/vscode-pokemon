@@ -2,6 +2,7 @@ import { PokemonColor, PokemonType } from '../common/types';
 
 export interface IPokemonType {
   nextFrame(): void;
+  setAppearance(label: string, pokemonRoot: string): void;
 
   // Special methods for actions
   canSwipe: boolean;

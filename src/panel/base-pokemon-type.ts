@@ -291,6 +291,13 @@ export abstract class BasePokemonType implements IPokemonType {
     this.el.src = `${this.pokemonRoot}_${validFace}_8fps.gif`;
   }
 
+  setAppearance(label: string, pokemonRoot: string): void {
+    this.label = label;
+    this.pokemonRoot = pokemonRoot;
+    // Clear source so the next animation update always applies the new root.
+    this.el.src = '';
+  }
+
   chooseNextState(fromState: States): States {
     // Work out next state
     var possibleNextStates: States[] | undefined = undefined;
