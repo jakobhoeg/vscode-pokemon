@@ -33,9 +33,8 @@ declare global {
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
 const DITTO_TYPE = 'ditto' as PokemonType;
-const DITTO_INITIAL_WAIT_MS = 60_000;
-const DITTO_TRANSFORM_DURATION_MS = 120_000;
-const DITTO_WAIT_BETWEEN_TRANSFORMS_MS = 60_000;
+const DITTO_INTERVAL_MIN_MS = 60_000;
+const DITTO_INTERVAL_MAX_MS = 120_000;
 
 type DittoTransformSchedule = {
   nextActionAt: number;
@@ -46,6 +45,10 @@ const dittoTransformSchedules = new WeakMap<
   IPokemonType,
   DittoTransformSchedule
 >();
+
+function getRandomDelayMs(minMs: number, maxMs: number): number {
+  return Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+}
 
 function getDittoRoot(
   basePokemonUri: string,
@@ -86,7 +89,8 @@ function maybeTransformDitto(
 
   if (schedule === undefined) {
     dittoTransformSchedules.set(pokemon, {
-      nextActionAt: now + DITTO_INITIAL_WAIT_MS,
+      nextActionAt:
+        now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS),
       transformed: false,
     });
     return;
@@ -115,14 +119,16 @@ function maybeTransformDitto(
       );
     }
     schedule.transformed = true;
-    schedule.nextActionAt = now + DITTO_TRANSFORM_DURATION_MS;
+    schedule.nextActionAt =
+      now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS);
   } else {
     pokemon.setAppearance(
       DITTO_TYPE,
       getDittoRoot(basePokemonUri, generation, DITTO_TYPE, pokemonColor),
     );
     schedule.transformed = false;
-    schedule.nextActionAt = now + DITTO_WAIT_BETWEEN_TRANSFORMS_MS;
+    schedule.nextActionAt =
+      now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS);
   }
 }
 
