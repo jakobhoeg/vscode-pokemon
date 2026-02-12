@@ -137,6 +137,48 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
   return result;
 }
 
+function getSessionPokemonCollection(
+  context: vscode.ExtensionContext,
+): PokemonSpecification[] {
+  const savedCollection = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  );
+
+  if (savedCollection.length > 0) {
+    return savedCollection;
+  }
+
+  return getConfiguredDefaultPokemon();
+}
+
+function getDefaultPokemonForFreshSession(
+  context: vscode.ExtensionContext,
+): PokemonSpecification[] {
+  const savedCollection = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  );
+
+  if (savedCollection.length > 0) {
+    return [];
+  }
+
+  return getConfiguredDefaultPokemon();
+}
+
+async function spawnAndPersistCollection(
+  context: vscode.ExtensionContext,
+  panel: IPokemonPanel,
+  collection: PokemonSpecification[],
+): Promise<void> {
+  collection.forEach((item) => {
+    panel.spawnPokemon(item);
+  });
+
+  await storeCollectionAsMemento(context, collection);
+}
+
 function updatePanelThrowWithMouse(): void {
   const panel = getPokemonPanel();
   if (panel !== undefined) {
@@ -372,22 +414,12 @@ export function activate(context: vscode.ExtensionContext) {
         );
 
         if (PokemonPanel.currentPanel) {
-          // First, check if there are saved pokemon from previous session
-          let collection = PokemonSpecification.collectionFromMemento(
+          const collection = getSessionPokemonCollection(context);
+          await spawnAndPersistCollection(
             context,
-            getConfiguredSize(),
+            PokemonPanel.currentPanel,
+            collection,
           );
-
-          if (collection.length === 0) {
-            // Fall back to configured default pokemon if no saved session
-            collection = getConfiguredDefaultPokemon();
-          }
-
-          collection.forEach((item) => {
-            PokemonPanel.currentPanel?.spawnPokemon(item);
-          });
-          // Store the collection in the memento, incase any of the null values (e.g. name) have been set
-          await storeCollectionAsMemento(context, collection);
         }
       }
     }),
@@ -1040,6 +1072,15 @@ export function activate(context: vscode.ExtensionContext) {
           getConfiguredThemeKind(),
           getThrowWithMouseConfiguration(),
         );
+
+        if (PokemonPanel.currentPanel) {
+          const collection = getDefaultPokemonForFreshSession(context);
+          await spawnAndPersistCollection(
+            context,
+            PokemonPanel.currentPanel,
+            collection,
+          );
+        }
       },
     });
   }
@@ -1565,30 +1606,8 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
       this._disposables,
     );
 
-    // Load pokemon after the webview is ready
-    // First check if there are saved pokemon from previous session
-    let collection = PokemonSpecification.collectionFromMemento(
-      this._context,
-      getConfiguredSize(),
-    );
-
-    if (collection.length === 0) {
-      // Fall back to configured default pokemon if no saved session
-      collection = getConfiguredDefaultPokemon();
-    }
-
-    // Small delay to ensure webview is fully loaded
-    // setTimeout(() => {
-    //     // Reset any existing pokemon before spawning new ones
-    //     this.resetPokemon();
-
-    //     collection.forEach((item) => {
-    //         this.spawnPokemon(item);
-    //     });
-    // }, 100);
-
-    // Store the collection in the memento
-    await storeCollectionAsMemento(this._context, collection);
+    const collection = getDefaultPokemonForFreshSession(this._context);
+    await spawnAndPersistCollection(this._context, this, collection);
   }
 
   update() {
