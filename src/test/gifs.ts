@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 import {
   PokemonColor,
@@ -6,7 +7,6 @@ import {
   PokemonGeneration,
 } from '../common/types';
 import { getAllPokemon, POKEMON_DATA } from '../common/pokemon-data';
-import * as path from 'path';
 
 type MissingGif = {
   generation: number;
@@ -15,13 +15,15 @@ type MissingGif = {
 };
 
 const mediaFolder = './media';
-const DELAY_MS = 10;
+const DELAY_MS = 5;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function runGifCheck(folder: string): Promise<MissingGif[]> {
+  console.log(`Checking GIFs in folder: ${folder}`);
+
   // Group pokemon by generation
   const genMap: Record<number, string[]> = {};
   getAllPokemon().forEach((pokemon) => {
@@ -37,7 +39,7 @@ async function runGifCheck(folder: string): Promise<MissingGif[]> {
     generation <= PokemonGeneration.Gen4;
     generation++
   ) {
-    console.log(`Checking generation ${generation}...`);
+    console.log(`\nChecking generation ${generation}...`);
     const pokes = genMap[generation] || [];
     // Order by POKEMON_DATA id when available
     pokes.sort(
