@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 
 import {
   PokemonColor,
@@ -7,6 +6,7 @@ import {
   PokemonGeneration,
 } from '../common/types';
 import { getAllPokemon, POKEMON_DATA } from '../common/pokemon-data';
+import * as path from 'path';
 
 type MissingGif = {
   generation: number;
@@ -15,8 +15,13 @@ type MissingGif = {
 };
 
 const mediaFolder = './media';
+const DELAY_MS = 10;
 
-function runGifCheck(folder: string): MissingGif[] {
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runGifCheck(folder: string): Promise<MissingGif[]> {
   // Group pokemon by generation
   const genMap: Record<number, string[]> = {};
   getAllPokemon().forEach((pokemon) => {
@@ -65,25 +70,8 @@ function runGifCheck(folder: string): MissingGif[] {
             pokemon,
             filename,
           );
-
-          const exists =
-            fs.existsSync(filePath) ||
-            (() => {
-              // Fallback: case-insensitive look-up inside the pokemon directory
-              try {
-                const dir = path.join(folder, `gen${generation}`, pokemon);
-                if (!fs.existsSync(dir)) return false;
-                const files = fs.readdirSync(dir);
-                const target = filename.toLowerCase();
-                return files.some((f) => f.toLowerCase() === target);
-              } catch (e) {
-                return false;
-              }
-            })();
-
-          if (!exists) {
+          if (!fs.existsSync(filePath)) {
             missing.push(`${color}_${state}`);
-            console.log(`      checked path: ${filePath}`);
           }
         }
       }
@@ -92,24 +80,29 @@ function runGifCheck(folder: string): MissingGif[] {
         console.error(`    \x1b[31mmissing ${missing.join(', ')}\x1b[0m`);
         missingPokemon.push({ generation, pokemon, states: missing });
       }
+
+      // Wait a short time between pokemon checks to reduce CI flakiness
+      await sleep(DELAY_MS);
     }
   }
 
   return missingPokemon;
 }
 
-const missing = runGifCheck(mediaFolder);
-if (missing.length > 0) {
-  setTimeout(() => {
-    console.error(`\nMissing GIFs:`);
-    missing.forEach(({ generation, pokemon, states }) => {
-      console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
-    });
+(async () => {
+  const missing = await runGifCheck(mediaFolder);
+  if (missing.length > 0) {
+    setTimeout(() => {
+      console.error(`\nMissing GIFs:`);
+      missing.forEach(({ generation, pokemon, states }) => {
+        console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
+      });
 
-    // Non-zero exit to fail CI when there are missing GIFs
-    process.exit(1);
-  }, 1000);
-} else {
-  console.log('All GIFs are present!');
-  process.exit(0);
-}
+      // Non-zero exit to fail CI when there are missing GIFs
+      process.exit(1);
+    }, 1000);
+  } else {
+    console.log('All GIFs are present!');
+    process.exit(0);
+  }
+})();
