@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 import {
   PokemonColor,
@@ -58,9 +59,31 @@ function runGifCheck(folder: string): MissingGif[] {
       for (const color of colors) {
         for (const state of states) {
           const filename = `${color}_${state}_8fps.gif`;
-          const filePath = `${folder}/gen${generation}/${pokemon}/${filename}`;
-          if (!fs.existsSync(filePath)) {
+          const filePath = path.join(
+            folder,
+            `gen${generation}`,
+            pokemon,
+            filename,
+          );
+
+          const exists =
+            fs.existsSync(filePath) ||
+            (() => {
+              // Fallback: case-insensitive look-up inside the pokemon directory
+              try {
+                const dir = path.join(folder, `gen${generation}`, pokemon);
+                if (!fs.existsSync(dir)) return false;
+                const files = fs.readdirSync(dir);
+                const target = filename.toLowerCase();
+                return files.some((f) => f.toLowerCase() === target);
+              } catch (e) {
+                return false;
+              }
+            })();
+
+          if (!exists) {
             missing.push(`${color}_${state}`);
+            console.log(`      checked path: ${filePath}`);
           }
         }
       }
