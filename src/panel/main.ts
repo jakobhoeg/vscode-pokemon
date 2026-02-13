@@ -327,7 +327,7 @@ function removePokemonFromPanel(
 
       pokeballEl.remove();
 
-      // 🔥 now only modify the state
+      // 🔥 only now we change the state
       allPokemon.remove(message.name);
       pokemonCounter = normalizePokemonCounter(pokemonCounter - 1);
       saveState(stateApi);
