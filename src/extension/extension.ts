@@ -520,11 +520,26 @@ export function activate(context: vscode.ExtensionContext) {
         const languageLabels: {
           [key: string]: { label: string; description: string };
         } = {
-          auto: { label: '$(globe) Auto', description: 'Use VS Code language' },
-          'en-US': { label: '🇺🇸 English (US)', description: 'English names' },
-          'fr-FR': { label: '🇫🇷 Français (FR)', description: 'Noms français' },
-          'de-DE': { label: '🇩🇪 Deutsch (DE)', description: 'Deutsche Namen' },
-          'ja-JP': { label: '🇯🇵 日本語 (JP)', description: '日本語名' },
+          auto: {
+            label: '$(globe) Auto',
+            description: vscode.l10n.t('Use VS Code language'),
+          },
+          'en-US': {
+            label: '🇺🇸 English (US)',
+            description: vscode.l10n.t('English names'),
+          },
+          'fr-FR': {
+            label: '🇫🇷 Français (FR)',
+            description: vscode.l10n.t('French names'),
+          },
+          'de-DE': {
+            label: '🇩🇪 Deutsch (DE)',
+            description: vscode.l10n.t('German names'),
+          },
+          'ja-JP': {
+            label: '🇯🇵 日本語 (JP)',
+            description: vscode.l10n.t('Japanese names'),
+          },
         } as { [key: string]: { label: string; description: string } };
         /* eslint-enable @typescript-eslint/naming-convention */
 
@@ -533,13 +548,19 @@ export function activate(context: vscode.ExtensionContext) {
             {
               label: languageLabels['auto'].label,
               description: languageLabels['auto'].description,
-              detail: currentLanguage === 'auto' ? 'Current' : undefined,
+              detail:
+                currentLanguage === 'auto'
+                  ? vscode.l10n.t('Current')
+                  : undefined,
               value: 'auto',
             },
             ...localize.SUPPORTED_LOCALES.map((locale) => ({
               label: languageLabels[locale]?.label || locale,
               description: languageLabels[locale]?.description || locale,
-              detail: currentLanguage === locale ? 'Current' : undefined,
+              detail:
+                currentLanguage === locale
+                  ? vscode.l10n.t('Current')
+                  : undefined,
               value: locale,
             })),
           ];
@@ -687,8 +708,8 @@ export function activate(context: vscode.ExtensionContext) {
           > = Object.values(PokemonGeneration)
             .filter((gen) => typeof gen === 'number')
             .map((gen) => ({
-              label: `$(folder) Generation ${gen}`,
-              description: `Browse Gen ${gen} Pokémon`,
+              label: `$(folder) ${vscode.l10n.t('Generation {0}', gen)}`,
+              description: vscode.l10n.t('Browse Gen {0} Pokemon', gen),
               isGeneration: true as const,
               gen: gen as PokemonGeneration,
             }));
@@ -710,14 +731,14 @@ export function activate(context: vscode.ExtensionContext) {
             }
           >();
           qp.placeholder = vscode.l10n.t(
-            'Select a generation or start typing to search for a Pokémon...',
+            'Select a generation or start typing to search for a Pokemon...',
           );
           qp.matchOnDescription = true;
 
           const setGenerationOnlyItems = () => {
             qp.items = [
               {
-                label: 'Generations',
+                label: vscode.l10n.t('Generations'),
                 kind: vscode.QuickPickItemKind.Separator,
               },
               ...generationItems,
@@ -733,12 +754,12 @@ export function activate(context: vscode.ExtensionContext) {
             );
             qp.items = [
               {
-                label: 'Generations',
+                label: vscode.l10n.t('Generations'),
                 kind: vscode.QuickPickItemKind.Separator,
               },
               ...generationItems,
               {
-                label: 'Results',
+                label: vscode.l10n.t('Results'),
                 kind: vscode.QuickPickItemKind.Separator,
               },
               ...results,
@@ -790,7 +811,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const picked = await vscode.window.showQuickPick(
                   pokemonOptions,
                   {
-                    placeHolder: vscode.l10n.t('Select a Pokémon'),
+                    placeHolder: vscode.l10n.t('Select a Pokemon'),
                   },
                 );
                 if (picked) {
@@ -803,7 +824,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                   const name = await vscode.window.showInputBox({
                     placeHolder: vscode.l10n.t('Leave blank for a random name'),
-                    prompt: vscode.l10n.t('Name your Pokémon'),
+                    prompt: vscode.l10n.t('Name your Pokemon'),
                     value: randomName(),
                   });
 
@@ -853,7 +874,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           if (!selectedPokemonType) {
-            console.log('Cancelled Spawning Pokemon - No Pokémon Selected');
+            console.log('Cancelled Spawning Pokemon - No Pokemon Selected');
             return;
           }
 
@@ -862,7 +883,7 @@ export function activate(context: vscode.ExtensionContext) {
 
           const name = await vscode.window.showInputBox({
             placeHolder: vscode.l10n.t('Leave blank for a random name'),
-            prompt: vscode.l10n.t('Name your Pokémon'),
+            prompt: vscode.l10n.t('Name your Pokemon'),
             value: randomName(),
           });
 
@@ -970,6 +991,11 @@ export function activate(context: vscode.ExtensionContext) {
         if (e.affectsConfiguration('vscode-pokemon.pokemonLanguage')) {
           // Reset the Pokemon translations cache when the language changes
           localize.resetPokemonTranslationsCache();
+          // Update the panel to reflect the new language
+          const panel = getPokemonPanel();
+          if (panel) {
+            panel.update();
+          }
         }
       },
     ),
