@@ -1,48 +1,93 @@
 import * as fs from 'fs';
 
-import { PokemonColor } from '../common/types';
+import {
+  PokemonColor,
+  PokemonExtraSprite,
+  PokemonGeneration,
+} from '../common/types';
 import { getAllPokemon, POKEMON_DATA } from '../common/pokemon-data';
 
-const defaultPokemonConfig = {
-  colors: [PokemonColor.default],
-  states: ['idle', 'walk'],
+type MissingGif = {
+  generation: number;
+  pokemon: string;
+  states: string[];
 };
 
-const allPokemon = getAllPokemon().reduce(
-  (acc, pokemon) => ({
-    ...acc,
-    [pokemon]: defaultPokemonConfig,
-  }),
-  {} as { [key: string]: { colors: string[]; states: string[] } },
-);
-function checkGifFilenames(folder: string) {
-  for (const pokemon in allPokemon) {
-    const allowedColors = allPokemon[pokemon].colors;
-    const allowedStates = allPokemon[pokemon].states;
-    if (!allowedColors) {
-      console.error(`No colors found for pokemon "${pokemon}"`);
-      return;
-    }
+const mediaFolder = './media';
 
-    // Get the generation number from POKEMON_DATA
+function runGifCheck(folder: string): number {
+  // Group pokemon by generation
+  const genMap: Record<number, string[]> = {};
+  getAllPokemon().forEach((pokemon) => {
     const generation = POKEMON_DATA[pokemon]?.generation || 1;
-    const genFolder = `gen${generation}`;
+    if (!genMap[generation]) genMap[generation] = [];
+    genMap[generation].push(pokemon);
+  });
 
-    allowedColors.forEach((color) => {
-      allowedStates.forEach((state) => {
-        const filename = `${color}_${state}_8fps.gif`;
-        const filePath = `${folder}/${genFolder}/${pokemon}/${filename}`;
-        if (!fs.existsSync(filePath)) {
-          // \x1b[31m is the ANSI escape code for red, and \x1b[0m resets the color back to the terminal's default.
-          console.error(`\x1b[31mFile "${filePath}" does not exist.\x1b[0m`);
-          return false;
-        } else {
-          console.log(`File "${filePath}" exists.`);
+  const missingPokemon: MissingGif[] = [];
+  // Iterate generations starting at 1
+  for (
+    let generation = PokemonGeneration.Gen1;
+    generation <= PokemonGeneration.Gen4;
+    generation++
+  ) {
+    console.log(`Checking generation ${generation}...`);
+    const pokes = genMap[generation] || [];
+    // Order by POKEMON_DATA id when available
+    pokes.sort(
+      (a, b) => (POKEMON_DATA[a]?.id || 0) - (POKEMON_DATA[b]?.id || 0),
+    );
+
+    for (const pokemon of pokes) {
+      const cfg = POKEMON_DATA[pokemon];
+      console.log(`  Checking ${pokemon}...`);
+      const colors =
+        cfg?.possibleColors && cfg.possibleColors.length > 0
+          ? cfg.possibleColors
+          : [PokemonColor.default];
+      const states = ['idle', 'walk'];
+      if (
+        cfg?.extraSprites &&
+        cfg.extraSprites.includes(PokemonExtraSprite.leftFacing)
+      ) {
+        states.push('walk_left');
+      }
+
+      const missing: string[] = [];
+
+      for (const color of colors) {
+        for (const state of states) {
+          const filename = `${color}_${state}_8fps.gif`;
+          const filePath = `${folder}/gen${generation}/${pokemon}/${filename}`;
+          if (!fs.existsSync(filePath)) {
+            missing.push(`${color}_${state}`);
+          }
         }
-      });
+      }
+
+      if (missing.length > 0) {
+        console.error(
+          `    \x1b[31m${pokemon}: missing ${missing.join(', ')}\x1b[0m`,
+        );
+        missingPokemon.push({ generation, pokemon, states: missing });
+      }
+    }
+  }
+
+  if (missingPokemon.length === 0) {
+    console.log('All GIFs are present!');
+  } else {
+    console.error(`\nMissing GIFs:`);
+    missingPokemon.forEach(({ generation, pokemon, states }) => {
+      console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
     });
   }
+  return missingPokemon.length;
 }
 
-const mediaFolder = './media';
-checkGifFilenames(mediaFolder);
+const missing = runGifCheck(mediaFolder);
+if (missing > 0) {
+  // Non-zero exit to fail CI when there are missing GIFs
+  process.exit(1);
+}
+process.exit(0);
