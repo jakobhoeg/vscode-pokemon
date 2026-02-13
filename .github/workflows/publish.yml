@@ -1,0 +1,58 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run compile
+
+      - name: Package extension
+        run: |
+          npm install -g @vscode/vsce
+          vsce package
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-pokemon-${{ github.ref_name }}.vsix
+          path: "*.vsix"
+          retention-days: 30
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: vsce publish --pat $VSCE_PAT
+
+      - name: Publish to Open VSX Registry
+        continue-on-error: true
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -n "$OVSX_PAT" ]; then
+            npm install -g ovsx
+            ovsx publish -p $OVSX_PAT
+          else
+            echo "OVSX_PAT not set, skipping Open VSX publication"
+          fi
