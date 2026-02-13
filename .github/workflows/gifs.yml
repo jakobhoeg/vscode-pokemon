@@ -5,23 +5,23 @@ on:
         branches: [main]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-                uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Set up Node.js
-                uses: actions/setup-node@v4
-                with:
-                node-version: 20
-                cache: npm
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-            - name: Install dependencies
-                run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Compile tests
-                run: npm run compile:test
+      - name: Compile tests
+        run: npm run compile:test
 
-            - name: Verify Sprites
-                run: npm run test:gifs
+      - name: Verify Sprites
+        run: npm run test:gifs
