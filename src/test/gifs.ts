@@ -15,7 +15,7 @@ type MissingGif = {
 
 const mediaFolder = './media';
 
-function runGifCheck(folder: string): number {
+function runGifCheck(folder: string): MissingGif[] {
   // Group pokemon by generation
   const genMap: Record<number, string[]> = {};
   getAllPokemon().forEach((pokemon) => {
@@ -66,28 +66,27 @@ function runGifCheck(folder: string): number {
       }
 
       if (missing.length > 0) {
-        console.error(
-          `    \x1b[31m${pokemon}: missing ${missing.join(', ')}\x1b[0m`,
-        );
+        console.error(`    \x1b[31mmissing ${missing.join(', ')}\x1b[0m`);
         missingPokemon.push({ generation, pokemon, states: missing });
       }
     }
   }
 
-  if (missingPokemon.length === 0) {
-    console.log('All GIFs are present!');
-  } else {
-    console.error(`\nMissing GIFs:`);
-    missingPokemon.forEach(({ generation, pokemon, states }) => {
-      console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
-    });
-  }
-  return missingPokemon.length;
+  return missingPokemon;
 }
 
 const missing = runGifCheck(mediaFolder);
-if (missing > 0) {
-  // Non-zero exit to fail CI when there are missing GIFs
-  process.exit(1);
+if (missing.length > 0) {
+  setTimeout(() => {
+    console.error(`\nMissing GIFs:`);
+    missing.forEach(({ generation, pokemon, states }) => {
+      console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
+    });
+
+    // Non-zero exit to fail CI when there are missing GIFs
+    process.exit(1);
+  }, 1000);
+} else {
+  console.log('All GIFs are present!');
+  process.exit(0);
 }
-process.exit(0);
