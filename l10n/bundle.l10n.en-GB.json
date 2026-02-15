@@ -30,6 +30,17 @@
   "There are no pokemon to remove.": "There are no pokemon to remove.",
   "You must have a folder or workspace open to export pokemonCollection.": "You must have a folder or workspace open to export pokemonCollection.",
   "Failed to import pokemon: {0}": "Failed to import pokemon: {0}",
+  "No Pokémon in saved collection to create a preset.": "No Pokemon in saved collection to create a preset.",
+  "Preset saved.": "Preset saved.",
+  "No presets to delete.": "No presets to delete.",
+  "Preset deleted.": "Preset deleted.",
+  "Create preset from current collection": "Create preset from current collection",
+  "Create a named preset from your saved collection": "Create a named preset from your saved collection",
+  "Delete a preset": "Delete a preset",
+  "Remove an existing preset": "Remove an existing preset",
+  "Select a preset to spawn or an action": "Select a preset to spawn or an action",
+  "Preset name": "Preset name",
+  "Select preset to delete": "Select preset to delete",
   "default": "Default",
   "shiny": "Shiny"
 }
