@@ -20,7 +20,6 @@ import {
   Theme,
   WebviewMessage,
 } from '../common/types';
-import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 import {
   VSCODE_CHANGE_POKEMON_LANGUAGE_KEY,
   VSCODE_CONFIGURE_KEYBINDINGS_KEY,
@@ -35,6 +34,7 @@ import {
   VSCODE_SPAWN_RANDOM_POKEMON_KEY,
   VSCODE_START_KEY,
 } from '../constants/vscode-keys';
+import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -392,29 +392,36 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(VSCODE_MANAGE_PRESETS_KEY, async () => {
       const presets = loadPresets(context);
-      const items: vscode.QuickPickItem[] = [
+      const CREATE_ACTION = '__create__';
+      const DELETE_ACTION = '__delete__';
+
+      const items: Array<vscode.QuickPickItem & { action?: string }> = [
         ...presets.map((p) => ({
           label: p.name,
           description: `${p.pokemon.length} Pokémon`,
         })),
         {
-          label: '$(plus) Create preset from current collection',
-          description: 'Create a named preset from your saved collection',
+          label: `$(plus) ${vscode.l10n.t('Create preset from current collection')}`,
+          description: vscode.l10n.t(
+            'Create a named preset from your saved collection',
+          ),
+          action: CREATE_ACTION,
         },
         {
-          label: '$(trash) Delete a preset',
-          description: 'Remove an existing preset',
+          label: `$(trash) ${vscode.l10n.t('Delete a preset')}`,
+          description: vscode.l10n.t('Remove an existing preset'),
+          action: DELETE_ACTION,
         },
       ];
 
       const pick = await vscode.window.showQuickPick(items, {
-        placeHolder: 'Select a preset to spawn or an action',
+        placeHolder: vscode.l10n.t('Select a preset to spawn or an action'),
       });
       if (!pick) {
         return;
       }
 
-      if (pick.label === '$(plus) Create preset from current collection') {
+      if (pick.action === CREATE_ACTION) {
         const collection = PokemonSpecification.collectionFromMemento(
           context,
           getConfiguredSize(),
@@ -426,7 +433,7 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
         const name = await vscode.window.showInputBox({
-          prompt: 'Preset name',
+          prompt: vscode.l10n.t('Preset name'),
         });
         if (!name) {
           return;
@@ -450,7 +457,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      if (pick.label === '$(trash) Delete a preset') {
+      if (pick.action === DELETE_ACTION) {
         if (presets.length === 0) {
           await vscode.window.showInformationMessage(
             vscode.l10n.t('No presets to delete.'),
@@ -459,7 +466,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         const toDelete = await vscode.window.showQuickPick(
           presets.map((p) => p.name),
-          { placeHolder: 'Select preset to delete' },
+          { placeHolder: vscode.l10n.t('Select preset to delete') },
         );
         if (!toDelete) {
           return;

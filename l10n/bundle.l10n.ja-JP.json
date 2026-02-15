@@ -30,6 +30,17 @@
   "There are no pokemon to remove.": "削除するポケモンがありません。",
   "You must have a folder or workspace open to export pokemonCollection.": "ポケモンコレクションをエクスポートするには、フォルダーまたはワークスペースを開いている必要があります。",
   "Failed to import pokemon: {0}": "ポケモンのインポートに失敗しました：{0}",
+  "No Pokémon in saved collection to create a preset.": "チームを作成するための保存されたコレクションにポケモンがありません。",
+  "Preset saved.": "チームが保存されました。",
+  "No presets to delete.": "削除するチームがありません。",
+  "Preset deleted.": "チームが削除されました。",
+  "Create preset from current collection": "現在のコレクションからチームを作成",
+  "Create a named preset from your saved collection": "保存されたコレクションから名前付きチームを作成",
+  "Delete a preset": "チームを削除",
+  "Remove an existing preset": "既存のチームを削除",
+  "Select a preset to spawn or an action": "読み込むチームまたはアクションを選択",
+  "Preset name": "チーム名",
+  "Select preset to delete": "削除するチームを選択",
   "default": "デフォルト",
   "shiny": "色違い"
 }
