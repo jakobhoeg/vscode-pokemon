@@ -20,6 +20,20 @@ import {
   Theme,
   WebviewMessage,
 } from '../common/types';
+import {
+  VSCODE_CHANGE_POKEMON_LANGUAGE_KEY,
+  VSCODE_CONFIGURE_KEYBINDINGS_KEY,
+  VSCODE_DELETE_POKEMON_KEY,
+  VSCODE_EXPORT_POKEMON_LIST_KEY,
+  VSCODE_IMPORT_POKEMON_LIST_KEY,
+  VSCODE_MANAGE_PRESETS_KEY,
+  VSCODE_PRESETS_KEY,
+  VSCODE_REMOVE_ALL_POKEMON_KEY,
+  VSCODE_ROLL_CALL_KEY,
+  VSCODE_SPAWN_POKEMON_KEY,
+  VSCODE_SPAWN_RANDOM_POKEMON_KEY,
+  VSCODE_START_KEY,
+} from '../constants/vscode-keys';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
@@ -110,6 +124,20 @@ function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
 interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
+}
+
+interface IPresetPokemon {
+  color: PokemonColor;
+  type: PokemonType;
+  size: PokemonSize;
+  name: string;
+  generation?: string;
+  originalSpriteSize?: number;
+}
+
+interface IPreset {
+  name: string;
+  pokemon: IPresetPokemon[];
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -251,6 +279,17 @@ export async function storeCollectionAsMemento(
   ]);
 }
 
+function loadPresets(context: vscode.ExtensionContext): IPreset[] {
+  return context.globalState.get<IPreset[]>(VSCODE_PRESETS_KEY, []);
+}
+
+async function storePresets(
+  context: vscode.ExtensionContext,
+  presets: IPreset[],
+) {
+  await context.globalState.update(VSCODE_PRESETS_KEY, presets);
+}
+
 let spawnPokemonStatusBar: vscode.StatusBarItem;
 
 interface IPokemonInfo {
@@ -351,7 +390,132 @@ export function activate(context: vscode.ExtensionContext) {
   localize.resetPokemonTranslationsCache();
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('vscode-pokemon.start', async () => {
+    vscode.commands.registerCommand(VSCODE_MANAGE_PRESETS_KEY, async () => {
+      const presets = loadPresets(context);
+      const CREATE_ACTION = '__create__';
+      const DELETE_ACTION = '__delete__';
+
+      const items: Array<vscode.QuickPickItem & { action?: string }> = [
+        ...presets.map((p) => ({
+          label: p.name,
+          description: `${p.pokemon.length} Pokémon`,
+        })),
+        {
+          label: `$(plus) ${vscode.l10n.t('Create preset from current collection')}`,
+          description: vscode.l10n.t(
+            'Create a named preset from your saved collection',
+          ),
+          action: CREATE_ACTION,
+        },
+        {
+          label: `$(trash) ${vscode.l10n.t('Delete a preset')}`,
+          description: vscode.l10n.t('Remove an existing preset'),
+          action: DELETE_ACTION,
+        },
+      ];
+
+      const pick = await vscode.window.showQuickPick(items, {
+        placeHolder: vscode.l10n.t('Select a preset to spawn or an action'),
+      });
+      if (!pick) {
+        return;
+      }
+
+      if (pick.action === CREATE_ACTION) {
+        const collection = PokemonSpecification.collectionFromMemento(
+          context,
+          getConfiguredSize(),
+        );
+        if (collection.length === 0) {
+          await vscode.window.showInformationMessage(
+            vscode.l10n.t('No Pokémon in saved collection to create a preset.'),
+          );
+          return;
+        }
+        const name = await vscode.window.showInputBox({
+          prompt: vscode.l10n.t('Preset name'),
+        });
+        if (!name) {
+          return;
+        }
+        const preset: IPreset = {
+          name,
+          pokemon: collection.map((spec) => ({
+            color: spec.color,
+            type: spec.type,
+            size: spec.size,
+            name: spec.name,
+            generation: spec.generation,
+            originalSpriteSize: spec.originalSpriteSize,
+          })),
+        };
+        presets.push(preset);
+        await storePresets(context, presets);
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t('Preset saved.'),
+        );
+        return;
+      }
+
+      if (pick.action === DELETE_ACTION) {
+        if (presets.length === 0) {
+          await vscode.window.showInformationMessage(
+            vscode.l10n.t('No presets to delete.'),
+          );
+          return;
+        }
+        const toDelete = await vscode.window.showQuickPick(
+          presets.map((p) => p.name),
+          { placeHolder: vscode.l10n.t('Select preset to delete') },
+        );
+        if (!toDelete) {
+          return;
+        }
+        const updated = presets.filter((p) => p.name !== toDelete);
+        await storePresets(context, updated);
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t('Preset deleted.'),
+        );
+        return;
+      }
+
+      const preset = presets.find((p) => p.name === pick.label);
+      if (!preset) {
+        return;
+      }
+
+      const panel = getPokemonPanel();
+      if (!panel) {
+        await createPokemonPlayground(context);
+      }
+
+      const spawnSpecs: PokemonSpecification[] = [];
+      for (const p of preset.pokemon) {
+        const spec = new PokemonSpecification(
+          p.color,
+          p.type,
+          p.size,
+          p.name,
+          p.generation,
+        );
+        spec.originalSpriteSize =
+          p.originalSpriteSize ?? spec.originalSpriteSize;
+        spawnSpecs.push(spec);
+        getPokemonPanel()?.spawnPokemon(spec);
+      }
+
+      // Merge into saved collection and persist
+      const existing = PokemonSpecification.collectionFromMemento(
+        context,
+        getConfiguredSize(),
+      );
+      for (const s of spawnSpecs) {
+        existing.push(s);
+      }
+      await storeCollectionAsMemento(context, existing);
+    }),
+
+    vscode.commands.registerCommand(VSCODE_START_KEY, async () => {
       if (
         getConfigurationPosition() === ExtPosition.explorer &&
         webviewViewProvider
@@ -397,7 +561,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.StatusBarAlignment.Right,
     100,
   );
-  spawnPokemonStatusBar.command = 'vscode-pokemon.spawn-pokemon';
+  spawnPokemonStatusBar.command = VSCODE_SPAWN_POKEMON_KEY;
   context.subscriptions.push(spawnPokemonStatusBar);
 
   context.subscriptions.push(
@@ -436,45 +600,36 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'vscode-pokemon.delete-pokemon',
-      async () => {
-        const panel = getPokemonPanel();
-        if (panel !== undefined) {
-          panel.listPokemon();
-          getWebview()?.onDidReceiveMessage(
-            handleRemovePokemonMessage,
-            context,
-          );
-        } else {
-          await createPokemonPlayground(context);
-        }
-      },
-    ),
+    vscode.commands.registerCommand(VSCODE_DELETE_POKEMON_KEY, async () => {
+      const panel = getPokemonPanel();
+      if (panel !== undefined) {
+        panel.listPokemon();
+        getWebview()?.onDidReceiveMessage(handleRemovePokemonMessage, context);
+      } else {
+        await createPokemonPlayground(context);
+      }
+    }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'vscode-pokemon.remove-all-pokemon',
-      async () => {
-        const panel = getPokemonPanel();
-        if (panel !== undefined) {
-          panel.resetPokemon();
-          await storeCollectionAsMemento(context, []);
-        } else {
-          await createPokemonPlayground(context);
-          await vscode.window.showInformationMessage(
-            vscode.l10n.t(
-              "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
-            ),
-          );
-        }
-      },
-    ),
+    vscode.commands.registerCommand(VSCODE_REMOVE_ALL_POKEMON_KEY, async () => {
+      const panel = getPokemonPanel();
+      if (panel !== undefined) {
+        panel.resetPokemon();
+        await storeCollectionAsMemento(context, []);
+      } else {
+        await createPokemonPlayground(context);
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t(
+            "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
+          ),
+        );
+      }
+    }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('vscode-pokemon.roll-call', async () => {
+    vscode.commands.registerCommand(VSCODE_ROLL_CALL_KEY, async () => {
       const panel = getPokemonPanel();
       if (panel !== undefined) {
         panel.rollCall();
@@ -486,28 +641,28 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'vscode-pokemon.configure-keybindings',
+      VSCODE_CONFIGURE_KEYBINDINGS_KEY,
       async () => {
         const items: Array<vscode.QuickPickItem & { commandId: string }> = [
           {
             label: vscode.l10n.t('Spawn additional pokemon'),
-            description: 'vscode-pokemon.spawn-pokemon',
-            commandId: 'vscode-pokemon.spawn-pokemon',
+            description: VSCODE_SPAWN_POKEMON_KEY,
+            commandId: VSCODE_SPAWN_POKEMON_KEY,
           },
           {
             label: vscode.l10n.t('Spawn random pokemon'),
-            description: 'vscode-pokemon.spawn-random-pokemon',
-            commandId: 'vscode-pokemon.spawn-random-pokemon',
+            description: VSCODE_SPAWN_RANDOM_POKEMON_KEY,
+            commandId: VSCODE_SPAWN_RANDOM_POKEMON_KEY,
           },
           {
             label: vscode.l10n.t('Remove pokemon'),
-            description: 'vscode-pokemon.delete-pokemon',
-            commandId: 'vscode-pokemon.delete-pokemon',
+            description: VSCODE_DELETE_POKEMON_KEY,
+            commandId: VSCODE_DELETE_POKEMON_KEY,
           },
           {
             label: vscode.l10n.t('Remove all pokemon'),
-            description: 'vscode-pokemon.remove-all-pokemon',
-            commandId: 'vscode-pokemon.remove-all-pokemon',
+            description: VSCODE_REMOVE_ALL_POKEMON_KEY,
+            commandId: VSCODE_REMOVE_ALL_POKEMON_KEY,
           },
         ];
 
@@ -530,7 +685,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'vscode-pokemon.change-pokemon-language',
+      VSCODE_CHANGE_POKEMON_LANGUAGE_KEY,
       async () => {
         const config = vscode.workspace.getConfiguration('vscode-pokemon');
         const currentLanguage = config.get<string>('pokemonLanguage', 'auto');
@@ -620,7 +775,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'vscode-pokemon.export-pokemon-list',
+      VSCODE_EXPORT_POKEMON_LIST_KEY,
       async () => {
         const pokemonCollection = PokemonSpecification.collectionFromMemento(
           context,
@@ -657,7 +812,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'vscode-pokemon.import-pokemon-list',
+      VSCODE_IMPORT_POKEMON_LIST_KEY,
       async () => {
         const options: vscode.OpenDialogOptions = {
           canSelectMany: false,
@@ -697,6 +852,7 @@ export function activate(context: vscode.ExtensionContext) {
               }
             }
             await storeCollectionAsMemento(context, collection);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (e: any) {
             await vscode.window.showErrorMessage(
               vscode.l10n.t('Failed to import pokemon: {0}', e?.message),
@@ -708,239 +864,235 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'vscode-pokemon.spawn-pokemon',
-      async () => {
-        const panel = getPokemonPanel();
-        if (
-          getConfigurationPosition() === ExtPosition.explorer &&
-          webviewViewProvider
-        ) {
-          await vscode.commands.executeCommand('pokemonView.focus');
-        }
-        if (panel) {
-          // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
-          const generationItems: Array<
-            vscode.QuickPickItem & {
-              isGeneration: true;
-              gen: PokemonGeneration;
-            }
-          > = Object.values(PokemonGeneration)
-            .filter((gen) => typeof gen === 'number')
-            .map((gen) => ({
-              label: `$(folder) ${vscode.l10n.t('Generation {0}', gen)}`,
-              description: vscode.l10n.t('Browse Gen {0} Pokemon', gen),
-              isGeneration: true as const,
-              gen: gen as PokemonGeneration,
-            }));
-
-          const allPokemonOptions: Array<
-            vscode.QuickPickItem & { value: PokemonType; isGeneration: false }
-          > = Object.entries(POKEMON_DATA).map(([type, config]) => ({
-            label: localize.getLocalizedPokemonName(type as PokemonType),
-            value: type as PokemonType,
-            description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
-            isGeneration: false as const,
+    vscode.commands.registerCommand(VSCODE_SPAWN_POKEMON_KEY, async () => {
+      const panel = getPokemonPanel();
+      if (
+        getConfigurationPosition() === ExtPosition.explorer &&
+        webviewViewProvider
+      ) {
+        await vscode.commands.executeCommand('pokemonView.focus');
+      }
+      if (panel) {
+        // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
+        const generationItems: Array<
+          vscode.QuickPickItem & {
+            isGeneration: true;
+            gen: PokemonGeneration;
+          }
+        > = Object.values(PokemonGeneration)
+          .filter((gen) => typeof gen === 'number')
+          .map((gen) => ({
+            label: `$(folder) ${vscode.l10n.t('Generation {0}', gen)}`,
+            description: vscode.l10n.t('Browse Gen {0} Pokemon', gen),
+            isGeneration: true as const,
+            gen: gen as PokemonGeneration,
           }));
 
-          const qp = vscode.window.createQuickPick<
-            vscode.QuickPickItem & {
-              isGeneration?: boolean;
-              gen?: PokemonGeneration;
-              value?: PokemonType;
+        const allPokemonOptions: Array<
+          vscode.QuickPickItem & { value: PokemonType; isGeneration: false }
+        > = Object.entries(POKEMON_DATA).map(([type, config]) => ({
+          label: localize.getLocalizedPokemonName(type as PokemonType),
+          value: type as PokemonType,
+          description: `#${config.id.toString().padStart(4, '0')} - Gen ${config.generation}`,
+          isGeneration: false as const,
+        }));
+
+        const qp = vscode.window.createQuickPick<
+          vscode.QuickPickItem & {
+            isGeneration?: boolean;
+            gen?: PokemonGeneration;
+            value?: PokemonType;
+          }
+        >();
+        qp.placeholder = vscode.l10n.t(
+          'Select a generation or start typing to search for a Pokemon...',
+        );
+        qp.matchOnDescription = true;
+
+        const setGenerationOnlyItems = () => {
+          qp.items = [
+            {
+              label: vscode.l10n.t('Generations'),
+              kind: vscode.QuickPickItemKind.Separator,
+            },
+            ...generationItems,
+          ];
+        };
+
+        const setWithSearchResults = (query: string) => {
+          const q = query.toLowerCase().trim();
+          const results = allPokemonOptions.filter(
+            (opt) =>
+              opt.label.toLowerCase().includes(q) ||
+              (opt.description?.toLowerCase().includes(q) ?? false),
+          );
+          qp.items = [
+            {
+              label: vscode.l10n.t('Generations'),
+              kind: vscode.QuickPickItemKind.Separator,
+            },
+            ...generationItems,
+            {
+              label: vscode.l10n.t('Results'),
+              kind: vscode.QuickPickItemKind.Separator,
+            },
+            ...results,
+          ];
+        };
+
+        setGenerationOnlyItems();
+
+        let selectedPokemonType:
+          | { label: string; value: PokemonType }
+          | undefined;
+
+        const disposables: vscode.Disposable[] = [];
+
+        disposables.push(
+          qp.onDidChangeValue((val) => {
+            if (val && val.trim().length > 0) {
+              setWithSearchResults(val);
+            } else {
+              setGenerationOnlyItems();
             }
-          >();
-          qp.placeholder = vscode.l10n.t(
-            'Select a generation or start typing to search for a Pokemon...',
-          );
-          qp.matchOnDescription = true;
+          }),
+        );
 
-          const setGenerationOnlyItems = () => {
-            qp.items = [
-              {
-                label: vscode.l10n.t('Generations'),
-                kind: vscode.QuickPickItemKind.Separator,
-              },
-              ...generationItems,
-            ];
-          };
+        disposables.push(
+          qp.onDidAccept(async () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const sel = qp.selectedItems[0] as any;
+            if (!sel) {
+              qp.hide();
+              return;
+            }
+            if (sel.isGeneration) {
+              // Don't hide the first quick pick yet - dispose it manually
+              const pokemonInGeneration = getPokemonByGeneration(
+                sel.gen as PokemonGeneration,
+              );
+              const pokemonOptions = pokemonInGeneration.map((type) => ({
+                label: localize.getLocalizedPokemonName(type),
+                value: type,
+                description: `#${POKEMON_DATA[type].id
+                  .toString()
+                  .padStart(4, '0')}`,
+              }));
 
-          const setWithSearchResults = (query: string) => {
-            const q = query.toLowerCase().trim();
-            const results = allPokemonOptions.filter(
-              (opt) =>
-                opt.label.toLowerCase().includes(q) ||
-                (opt.description?.toLowerCase().includes(q) ?? false),
-            );
-            qp.items = [
-              {
-                label: vscode.l10n.t('Generations'),
-                kind: vscode.QuickPickItemKind.Separator,
-              },
-              ...generationItems,
-              {
-                label: vscode.l10n.t('Results'),
-                kind: vscode.QuickPickItemKind.Separator,
-              },
-              ...results,
-            ];
-          };
+              // Manually dispose the first quick pick to prevent race condition
+              disposables.forEach((d) => d.dispose());
+              qp.dispose();
 
-          setGenerationOnlyItems();
+              const picked = await vscode.window.showQuickPick(pokemonOptions, {
+                placeHolder: vscode.l10n.t('Select a Pokemon'),
+              });
+              if (picked) {
+                selectedPokemonType = picked;
 
-          let selectedPokemonType:
-            | { label: string; value: PokemonType }
-            | undefined;
-
-          const disposables: vscode.Disposable[] = [];
-
-          disposables.push(
-            qp.onDidChangeValue((val) => {
-              if (val && val.trim().length > 0) {
-                setWithSearchResults(val);
-              } else {
-                setGenerationOnlyItems();
-              }
-            }),
-          );
-
-          disposables.push(
-            qp.onDidAccept(async () => {
-              const sel = qp.selectedItems[0] as any;
-              if (!sel) {
-                qp.hide();
-                return;
-              }
-              if (sel.isGeneration) {
-                // Don't hide the first quick pick yet - dispose it manually
-                const pokemonInGeneration = getPokemonByGeneration(
-                  sel.gen as PokemonGeneration,
+                // Handle the rest of the flow
+                const possibleColors = availableColors(
+                  selectedPokemonType.value,
                 );
-                const pokemonOptions = pokemonInGeneration.map((type) => ({
-                  label: localize.getLocalizedPokemonName(type),
-                  value: type,
-                  description: `#${POKEMON_DATA[type].id
-                    .toString()
-                    .padStart(4, '0')}`,
-                }));
 
-                // Manually dispose the first quick pick to prevent race condition
-                disposables.forEach((d) => d.dispose());
-                qp.dispose();
+                const name = await vscode.window.showInputBox({
+                  placeHolder: vscode.l10n.t('Leave blank for a random name'),
+                  prompt: vscode.l10n.t('Name your Pokemon'),
+                  value: randomName(),
+                });
 
-                const picked = await vscode.window.showQuickPick(
-                  pokemonOptions,
-                  {
-                    placeHolder: vscode.l10n.t('Select a Pokemon'),
-                  },
-                );
-                if (picked) {
-                  selectedPokemonType = picked;
-
-                  // Handle the rest of the flow
-                  const possibleColors = availableColors(
-                    selectedPokemonType.value,
-                  );
-
-                  const name = await vscode.window.showInputBox({
-                    placeHolder: vscode.l10n.t('Leave blank for a random name'),
-                    prompt: vscode.l10n.t('Name your Pokemon'),
-                    value: randomName(),
-                  });
-
-                  if (name === undefined) {
-                    console.log('Cancelled Spawning Pokemon - No Name Entered');
-                    return;
-                  }
-
-                  const spec = new PokemonSpecification(
-                    maybeMakeShiny(possibleColors),
-                    selectedPokemonType.value,
-                    getConfiguredSize(),
-                    name,
-                  );
-
-                  panel.spawnPokemon(spec);
-                  var collection = PokemonSpecification.collectionFromMemento(
-                    context,
-                    getConfiguredSize(),
-                  );
-                  collection.push(spec);
-                  await storeCollectionAsMemento(context, collection);
+                if (name === undefined) {
+                  console.log('Cancelled Spawning Pokemon - No Name Entered');
+                  return;
                 }
-              } else {
-                selectedPokemonType = sel as any;
-                qp.hide();
+
+                const spec = new PokemonSpecification(
+                  maybeMakeShiny(possibleColors),
+                  selectedPokemonType.value,
+                  getConfiguredSize(),
+                  name,
+                );
+
+                panel.spawnPokemon(spec);
+                var collection = PokemonSpecification.collectionFromMemento(
+                  context,
+                  getConfiguredSize(),
+                );
+                collection.push(spec);
+                await storeCollectionAsMemento(context, collection);
               }
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              selectedPokemonType = sel as any;
+              qp.hide();
+            }
+          }),
+        );
+
+        const closed = new Promise<void>((resolve) => {
+          disposables.push(
+            qp.onDidHide(() => {
+              disposables.forEach((d) => d.dispose());
+              qp.dispose();
+              resolve();
             }),
           );
+        });
 
-          const closed = new Promise<void>((resolve) => {
-            disposables.push(
-              qp.onDidHide(() => {
-                disposables.forEach((d) => d.dispose());
-                qp.dispose();
-                resolve();
-              }),
-            );
-          });
+        qp.show();
+        await closed;
 
-          qp.show();
-          await closed;
-
-          if (!selectedPokemonType) {
-            console.log('Cancelled Spawning Pokemon - No Selection');
-            return;
-          }
-
-          if (!selectedPokemonType) {
-            console.log('Cancelled Spawning Pokemon - No Pokemon Selected');
-            return;
-          }
-
-          // Rest of the existing code
-          const possibleColors = availableColors(selectedPokemonType.value);
-
-          const name = await vscode.window.showInputBox({
-            placeHolder: vscode.l10n.t('Leave blank for a random name'),
-            prompt: vscode.l10n.t('Name your Pokemon'),
-            value: randomName(),
-          });
-
-          if (name === undefined) {
-            console.log('Cancelled Spawning Pokemon - No Name Entered');
-            return;
-          }
-
-          const spec = new PokemonSpecification(
-            maybeMakeShiny(possibleColors),
-            selectedPokemonType.value,
-            getConfiguredSize(),
-            name,
-          );
-
-          panel.spawnPokemon(spec);
-          var collection = PokemonSpecification.collectionFromMemento(
-            context,
-            getConfiguredSize(),
-          );
-          collection.push(spec);
-          await storeCollectionAsMemento(context, collection);
-        } else {
-          await createPokemonPlayground(context);
-          await vscode.window.showInformationMessage(
-            vscode.l10n.t(
-              "A Pokemon Playground has been created. You can now use the 'Spawn Additional Pokemon' Command to add more Pokemon.",
-            ),
-          );
+        if (!selectedPokemonType) {
+          console.log('Cancelled Spawning Pokemon - No Selection');
+          return;
         }
-      },
-    ),
+
+        if (!selectedPokemonType) {
+          console.log('Cancelled Spawning Pokemon - No Pokemon Selected');
+          return;
+        }
+
+        // Rest of the existing code
+        const possibleColors = availableColors(selectedPokemonType.value);
+
+        const name = await vscode.window.showInputBox({
+          placeHolder: vscode.l10n.t('Leave blank for a random name'),
+          prompt: vscode.l10n.t('Name your Pokemon'),
+          value: randomName(),
+        });
+
+        if (name === undefined) {
+          console.log('Cancelled Spawning Pokemon - No Name Entered');
+          return;
+        }
+
+        const spec = new PokemonSpecification(
+          maybeMakeShiny(possibleColors),
+          selectedPokemonType.value,
+          getConfiguredSize(),
+          name,
+        );
+
+        panel.spawnPokemon(spec);
+        var collection = PokemonSpecification.collectionFromMemento(
+          context,
+          getConfiguredSize(),
+        );
+        collection.push(spec);
+        await storeCollectionAsMemento(context, collection);
+      } else {
+        await createPokemonPlayground(context);
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t(
+            "A Pokemon Playground has been created. You can now use the 'Spawn Additional Pokemon' Command to add more Pokemon.",
+          ),
+        );
+      }
+    }),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'vscode-pokemon.spawn-random-pokemon',
+      VSCODE_SPAWN_RANDOM_POKEMON_KEY,
       async () => {
         const panel = getPokemonPanel();
         if (
