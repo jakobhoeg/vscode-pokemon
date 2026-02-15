@@ -2,9 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
-## [4.3.0]
+## [4.3.1]
 
 - feat: add multi-language support
+- fix: add missing Nidoqueen & Rotom sprites
 
 ## [4.2.0]
 
