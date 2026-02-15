@@ -33,6 +33,14 @@ declare global {
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
 
+function normalizePokemonCounter(counter: number | undefined): number {
+  if (counter === undefined || Number.isNaN(counter)) {
+    return 0;
+  }
+
+  return Math.max(0, counter);
+}
+
 function calculateFloor(size: PokemonSize, theme: Theme): number {
   switch (theme) {
     case Theme.forest:
@@ -319,10 +327,10 @@ function removePokemonFromPanel(
 
       pokeballEl.remove();
 
-      // 🔥 maintenant seulement on modifie l'état
+      // 🔥 only now we change the state
       allPokemon.remove(message.name);
+      pokemonCounter = normalizePokemonCounter(pokemonCounter - 1);
       saveState(stateApi);
-      pokemonCounter--;
 
       stateApi?.postMessage({
         command: 'info',
@@ -353,7 +361,7 @@ export function saveState(stateApi?: VscodeStateApi) {
       elBottom: pokemonItem.el.style.bottom,
     });
   });
-  state.pokemonCounter = pokemonCounter;
+  state.pokemonCounter = normalizePokemonCounter(pokemonCounter);
   stateApi?.setState(state);
 }
 
@@ -369,13 +377,9 @@ function recoverState(
   }
   var state = stateApi?.getState();
   if (!state) {
-    pokemonCounter = 1;
+    pokemonCounter = 0;
   } else {
-    if (state.pokemonCounter === undefined || isNaN(state.pokemonCounter)) {
-      pokemonCounter = 1;
-    } else {
-      pokemonCounter = state.pokemonCounter ?? 1;
-    }
+    pokemonCounter = normalizePokemonCounter(state.pokemonCounter);
   }
 
   var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
@@ -502,29 +506,19 @@ export function pokemonPanelApp(
 
   // New session
   var state = stateApi?.getState();
-  if (!state) {
-    console.log('No state, starting a new session.');
-    pokemonCounter = 1;
-    console.log('adding pokemon to panel for new session');
-    allPokemon.push(
-      addPokemonToPanel(
-        pokemonType,
-        basePokemonUri,
-        gen,
-        originalSpriteSize,
-        pokemonColor,
-        pokemonSize,
-        randomStartPosition(),
-        floor,
-        floor,
-        randomName(),
-        stateApi,
-      ),
-    );
-    saveState(stateApi);
-  } else {
+
+  const hasRecoverableState =
+    state !== undefined &&
+    Array.isArray(state.pokemonStates) &&
+    state.pokemonStates.length > 0;
+
+  if (hasRecoverableState) {
     console.log('Recovering state - ', state);
     recoverState(basePokemonUri, gen, pokemonSize, floor, stateApi);
+  } else {
+    console.log('No recoverable pokemon state, starting an empty session.');
+    pokemonCounter = normalizePokemonCounter(state?.pokemonCounter);
+    saveState(stateApi);
   }
 
   initCanvas();
