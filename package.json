@@ -38,6 +38,7 @@
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
+        "onCommand:vscode-pokemon.set-random-theme",
         "onCommand:vscode-pokemon.configure-keybindings",
         "onCommand:vscode-pokemon.change-pokemon-language",
         "onWebviewPanel:pokemonCoding",
@@ -133,6 +134,11 @@
             {
                 "command": "vscode-pokemon.roll-call",
                 "title": "Roll-call",
+                "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.set-random-theme",
+                "title": "Set random theme",
                 "category": "Pokemon Coding"
             },
             {

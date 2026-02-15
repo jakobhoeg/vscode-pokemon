@@ -486,6 +486,29 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
+      'vscode-pokemon.set-random-theme',
+      async () => {
+        // Get available themes (excluding 'none')
+        const availableThemes = [Theme.forest, Theme.castle, Theme.beach];
+        // Select random theme
+        const randomTheme =
+          availableThemes[Math.floor(Math.random() * availableThemes.length)];
+
+        // Update the configuration
+        await vscode.workspace
+          .getConfiguration('vscode-pokemon')
+          .update('theme', randomTheme, vscode.ConfigurationTarget.Global);
+
+        // Show notification
+        await vscode.window.showInformationMessage(
+          vscode.l10n.t('Theme changed to: {0}', randomTheme),
+        );
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
       'vscode-pokemon.configure-keybindings',
       async () => {
         const items: Array<vscode.QuickPickItem & { commandId: string }> = [
