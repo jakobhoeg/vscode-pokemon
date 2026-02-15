@@ -32,6 +32,105 @@ declare global {
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
+const DITTO_TYPE = 'ditto' as PokemonType;
+const DITTO_INTERVAL_MIN_MS = 60_000;
+const DITTO_INTERVAL_MAX_MS = 120_000;
+
+type DittoTransformSchedule = {
+  nextActionAt: number;
+  transformed: boolean;
+};
+
+const dittoTransformSchedules = new WeakMap<
+  IPokemonType,
+  DittoTransformSchedule
+>();
+
+function getRandomDelayMs(minMs: number, maxMs: number): number {
+  return Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+}
+
+function getDittoRoot(
+  basePokemonUri: string,
+  generation: string,
+  type: PokemonType,
+  color: PokemonColor,
+): string {
+  return `${basePokemonUri}/${generation}/${type}/${color}`;
+}
+
+function chooseRandomTransformTarget(
+  selfName: string,
+): PokemonElement | undefined {
+  const transformCandidates = allPokemon.pokemonCollection.filter(
+    (candidate) =>
+      candidate.type !== DITTO_TYPE && candidate.pokemon.name !== selfName,
+  );
+  if (transformCandidates.length === 0) {
+    return undefined;
+  }
+  const randomIndex = Math.floor(Math.random() * transformCandidates.length);
+  return transformCandidates[randomIndex];
+}
+
+function maybeTransformDitto(
+  pokemon: IPokemonType,
+  pokemonType: PokemonType,
+  generation: string,
+  pokemonColor: PokemonColor,
+  basePokemonUri: string,
+) {
+  if (pokemonType !== DITTO_TYPE) {
+    return;
+  }
+
+  const now = Date.now();
+  const schedule = dittoTransformSchedules.get(pokemon);
+
+  if (schedule === undefined) {
+    dittoTransformSchedules.set(pokemon, {
+      nextActionAt:
+        now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS),
+      transformed: false,
+    });
+    return;
+  }
+
+  if (now < schedule.nextActionAt) {
+    return;
+  }
+
+  if (!schedule.transformed) {
+    const randomTarget = chooseRandomTransformTarget(pokemon.name);
+    if (randomTarget) {
+      pokemon.setAppearance(
+        randomTarget.type,
+        getDittoRoot(
+          basePokemonUri,
+          randomTarget.generation,
+          randomTarget.type,
+          randomTarget.color,
+        ),
+      );
+    } else {
+      pokemon.setAppearance(
+        DITTO_TYPE,
+        getDittoRoot(basePokemonUri, generation, DITTO_TYPE, pokemonColor),
+      );
+    }
+    schedule.transformed = true;
+    schedule.nextActionAt =
+      now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS);
+  } else {
+    pokemon.setAppearance(
+      DITTO_TYPE,
+      getDittoRoot(basePokemonUri, generation, DITTO_TYPE, pokemonColor),
+    );
+    schedule.transformed = false;
+    schedule.nextActionAt =
+      now + getRandomDelayMs(DITTO_INTERVAL_MIN_MS, DITTO_INTERVAL_MAX_MS);
+  }
+}
 
 function calculateFloor(size: PokemonSize, theme: Theme): number {
   switch (theme) {
@@ -90,6 +189,10 @@ function handleMouseOver(e: MouseEvent) {
 function startAnimations(
   collision: HTMLDivElement,
   pokemon: IPokemonType,
+  pokemonType: PokemonType,
+  generation: string,
+  pokemonColor: PokemonColor,
+  basePokemonUri: string,
   stateApi?: VscodeStateApi,
 ) {
   if (!stateApi) {
@@ -105,6 +208,13 @@ function startAnimations(
         command: 'info',
       });
     });
+    maybeTransformDitto(
+      pokemon,
+      pokemonType,
+      generation,
+      pokemonColor,
+      basePokemonUri,
+    );
     pokemon.nextFrame();
     saveState(stateApi);
   }, 100);
@@ -174,7 +284,15 @@ function addPokemonToPanel(
     if (incrementCounter) {
       pokemonCounter++;
     }
-    startAnimations(collisionElement, newPokemon, stateApi);
+    startAnimations(
+      collisionElement,
+      newPokemon,
+      pokemonType,
+      gen,
+      pokemonColor,
+      basePokemonUri,
+      stateApi,
+    );
   } catch (e: unknown) {
     // Remove elements
     pokemonSpriteElement.remove();
