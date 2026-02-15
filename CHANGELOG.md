@@ -2,12 +2,9 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
-## [Unreleased]
+## [4.3.0]
 
-- feat: add multi-language support for Pokemon names (#63)
-- feat: add French, German, and Japanese translations for all Pokemon (Gen 1-4)
-- feat: add command to change Pokemon language preference
-- feat: add auto-detection of VS Code language for Pokemon names
+- feat: add multi-language support
 
 ## [4.2.0]
 
