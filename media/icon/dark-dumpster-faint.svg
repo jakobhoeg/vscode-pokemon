@@ -1,0 +1,16 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#c5c5c5" opacity="0.7">
+  <!-- Dumpster body -->
+  <rect x="2" y="4" width="12" height="8" rx="1" fill="#a3a3a3"/>
+  <!-- Dumpster lid -->
+  <rect x="1.2" y="2.6" width="13.6" height="1.4" rx="0.7" fill="#bdbdbd"/>
+  <!-- Wheels -->
+  <circle cx="5" cy="13.2" r="0.6" fill="#6f6f6f"/>
+  <circle cx="11" cy="13.2" r="0.6" fill="#6f6f6f"/>
+  <!-- Front lines -->
+  <path d="M4 6v6" stroke="#8d8d8d" stroke-width="0.6" stroke-linecap="round"/>
+  <path d="M8 6v6" stroke="#8d8d8d" stroke-width="0.6" stroke-linecap="round"/>
+  <path d="M12 6v6" stroke="#8d8d8d" stroke-width="0.6" stroke-linecap="round"/>
+  <!-- Overflowing trash: box and bottle -->
+  <rect x="3.4" y="1.6" width="2" height="1.4" rx="0.2" fill="#d1d1d1" transform="rotate(-10 4.4 2.3)"/>
+  <path d="M9.8 1.6c.2-.3.6-.3.8 0 .2.3.1.6-.1.8l-.6.9c-.2.3-.5.3-.7 0-.2-.3-.1-.7.1-.9l.5-.8z" fill="#ffe082"/>
+</svg>
