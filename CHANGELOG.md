@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.3.2]
+
+- fix: add back accidentally removed "remove-all" command
+
 ## [4.3.1]
 
 - feat: add multi-language support

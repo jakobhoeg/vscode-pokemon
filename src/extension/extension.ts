@@ -454,6 +454,26 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.remove-all-pokemon',
+      async () => {
+        const panel = getPokemonPanel();
+        if (panel !== undefined) {
+          panel.resetPokemon();
+          await storeCollectionAsMemento(context, []);
+        } else {
+          await createPokemonPlayground(context);
+          await vscode.window.showInformationMessage(
+            vscode.l10n.t(
+              "A Pokemon Playground has been created. You can now use the 'Remove All Pokemon' Command to remove all Pokemon.",
+            ),
+          );
+        }
+      },
+    ),
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('vscode-pokemon.roll-call', async () => {
       const panel = getPokemonPanel();
       if (panel !== undefined) {
