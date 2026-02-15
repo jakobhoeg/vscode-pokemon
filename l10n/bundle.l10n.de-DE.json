@@ -30,6 +30,17 @@
   "There are no pokemon to remove.": "Es gibt keine Pokemon zum Entfernen.",
   "You must have a folder or workspace open to export pokemonCollection.": "Du musst einen Ordner oder Arbeitsbereich geöffnet haben, um die Pokemon-Sammlung zu exportieren.",
   "Failed to import pokemon: {0}": "Fehler beim Importieren von Pokemon: {0}",
+  "No Pokémon in saved collection to create a preset.": "Keine Pokemon in der gespeicherten Sammlung, um ein Team zu erstellen.",
+  "Preset saved.": "Team gespeichert.",
+  "No presets to delete.": "Keine Teams zum Löschen.",
+  "Preset deleted.": "Team gelöscht.",
+  "Create preset from current collection": "Team aus aktueller Sammlung erstellen",
+  "Create a named preset from your saved collection": "Ein benanntes Team aus Ihrer gespeicherten Sammlung erstellen",
+  "Delete a preset": "Ein Team löschen",
+  "Remove an existing preset": "Ein vorhandenes Team entfernen",
+  "Select a preset to spawn or an action": "Wähle ein Team zum Laden oder eine Aktion",
+  "Preset name": "Team-Name",
+  "Select preset to delete": "Team zum Löschen auswählen",
   "default": "Standard",
   "shiny": "Schillernd"
 }
