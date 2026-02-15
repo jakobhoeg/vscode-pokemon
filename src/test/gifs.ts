@@ -1,48 +1,110 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
-import { PokemonColor } from '../common/types';
+import {
+  PokemonColor,
+  PokemonExtraSprite,
+  PokemonGeneration,
+} from '../common/types';
 import { getAllPokemon, POKEMON_DATA } from '../common/pokemon-data';
 
-const defaultPokemonConfig = {
-  colors: [PokemonColor.default],
-  states: ['idle', 'walk'],
+type MissingGif = {
+  generation: number;
+  pokemon: string;
+  states: string[];
 };
 
-const allPokemon = getAllPokemon().reduce(
-  (acc, pokemon) => ({
-    ...acc,
-    [pokemon]: defaultPokemonConfig,
-  }),
-  {} as { [key: string]: { colors: string[]; states: string[] } },
-);
-function checkGifFilenames(folder: string) {
-  for (const pokemon in allPokemon) {
-    const allowedColors = allPokemon[pokemon].colors;
-    const allowedStates = allPokemon[pokemon].states;
-    if (!allowedColors) {
-      console.error(`No colors found for pokemon "${pokemon}"`);
-      return;
-    }
+const mediaFolder = './media';
+const DELAY_MS = 5;
 
-    // Get the generation number from POKEMON_DATA
-    const generation = POKEMON_DATA[pokemon]?.generation || 1;
-    const genFolder = `gen${generation}`;
-
-    allowedColors.forEach((color) => {
-      allowedStates.forEach((state) => {
-        const filename = `${color}_${state}_8fps.gif`;
-        const filePath = `${folder}/${genFolder}/${pokemon}/${filename}`;
-        if (!fs.existsSync(filePath)) {
-          // \x1b[31m is the ANSI escape code for red, and \x1b[0m resets the color back to the terminal's default.
-          console.error(`\x1b[31mFile "${filePath}" does not exist.\x1b[0m`);
-          return false;
-        } else {
-          console.log(`File "${filePath}" exists.`);
-        }
-      });
-    });
-  }
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const mediaFolder = './media';
-checkGifFilenames(mediaFolder);
+async function runGifCheck(folder: string): Promise<MissingGif[]> {
+  console.log(`Checking GIFs in folder: ${folder}`);
+
+  // Group pokemon by generation
+  const genMap: Record<number, string[]> = {};
+  getAllPokemon().forEach((pokemon) => {
+    const generation = POKEMON_DATA[pokemon]?.generation || 1;
+    if (!genMap[generation]) genMap[generation] = [];
+    genMap[generation].push(pokemon);
+  });
+
+  const missingPokemon: MissingGif[] = [];
+  // Iterate generations starting at 1
+  for (
+    let generation = PokemonGeneration.Gen1;
+    generation <= PokemonGeneration.Gen4;
+    generation++
+  ) {
+    console.log(`\nChecking generation ${generation}...`);
+    const pokes = genMap[generation] || [];
+    // Order by POKEMON_DATA id when available
+    pokes.sort(
+      (a, b) => (POKEMON_DATA[a]?.id || 0) - (POKEMON_DATA[b]?.id || 0),
+    );
+
+    for (const pokemon of pokes) {
+      const cfg = POKEMON_DATA[pokemon];
+      console.log(`  Checking ${pokemon}...`);
+      const colors =
+        cfg?.possibleColors && cfg.possibleColors.length > 0
+          ? cfg.possibleColors
+          : [PokemonColor.default];
+      const states = ['idle', 'walk'];
+      if (
+        cfg?.extraSprites &&
+        cfg.extraSprites.includes(PokemonExtraSprite.leftFacing)
+      ) {
+        states.push('walk_left');
+      }
+
+      const missing: string[] = [];
+
+      for (const color of colors) {
+        for (const state of states) {
+          const filename = `${color}_${state}_8fps.gif`;
+          const filePath = path.join(
+            folder,
+            `gen${generation}`,
+            pokemon,
+            filename,
+          );
+          if (!fs.existsSync(filePath)) {
+            missing.push(`${color}_${state}`);
+          }
+        }
+      }
+
+      if (missing.length > 0) {
+        console.error(`    \x1b[31mmissing ${missing.join(', ')}\x1b[0m`);
+        missingPokemon.push({ generation, pokemon, states: missing });
+      }
+
+      // Wait a short time between pokemon checks to reduce CI flakiness
+      await sleep(DELAY_MS);
+    }
+  }
+
+  return missingPokemon;
+}
+
+(async () => {
+  const missing = await runGifCheck(mediaFolder);
+  if (missing.length > 0) {
+    setTimeout(() => {
+      console.error(`\nMissing GIFs:`);
+      missing.forEach(({ generation, pokemon, states }) => {
+        console.error(`  Gen ${generation} - ${pokemon}: ${states.join(', ')}`);
+      });
+
+      // Non-zero exit to fail CI when there are missing GIFs
+      process.exit(1);
+    }, 1000);
+  } else {
+    console.log('All GIFs are present!');
+    process.exit(0);
+  }
+})();
