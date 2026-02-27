@@ -592,6 +592,10 @@ export function activate(context: vscode.ExtensionContext) {
             label: '🇯🇵 日本語 (JP)',
             description: vscode.l10n.t('Japanese names'),
           },
+          'ko-KR': {
+            label: '🇰🇷 한국어 (KR)',
+            description: vscode.l10n.t('Korean names'),
+          },
         } as { [key: string]: { label: string; description: string } };
         /* eslint-enable @typescript-eslint/naming-convention */
 
