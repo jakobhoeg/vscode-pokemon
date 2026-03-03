@@ -110,6 +110,7 @@ function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
 interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
+  shiny?: boolean;
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -124,9 +125,18 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
     // Validate that the pokemon type exists
     if (POKEMON_DATA[config.type]) {
       const name = config.name || randomName();
-      result.push(
-        new PokemonSpecification(DEFAULT_COLOR, config.type, size, name),
-      );
+
+      // If shiny is not specified, default to color to maybeShiny with the pokemon's available colors. If shiny is true, force shiny color. If shiny is false, force default color.
+      let color: PokemonColor;
+      if (config.shiny === undefined) {
+        color = maybeMakeShiny(availableColors(config.type));
+      } else if (config.shiny) {
+        color = PokemonColor.shiny;
+      } else {
+        color = DEFAULT_COLOR;
+      }
+
+      result.push(new PokemonSpecification(color, config.type, size, name));
     } else {
       console.warn(
         `Invalid pokemon type in defaultPokemon config: ${config.type}`,
