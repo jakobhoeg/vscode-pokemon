@@ -15,7 +15,13 @@ let pokemonTranslationsCache: { [locale: string]: { [key: string]: string } } =
  * Supported Pokemon translation locales
  * These correspond to the folders in l10n/pokemon/
  */
-export const SUPPORTED_LOCALES = ['en-US', 'fr-FR', 'de-DE', 'ja-JP'] as const;
+export const SUPPORTED_LOCALES = [
+  'en-US',
+  'fr-FR',
+  'de-DE',
+  'ja-JP',
+  'zh-CN',
+] as const;
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
