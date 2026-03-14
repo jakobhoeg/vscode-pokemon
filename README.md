@@ -24,9 +24,9 @@
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon.gif">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon-light.gif">
-  <img alt="Shows gif in dark or light mode" src="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon-light.gif">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon.gif">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon-light.gif">
+  <img alt="Shows gif in dark or light mode" src="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon-light.gif">
 </picture>
 </div>
 
@@ -48,7 +48,7 @@ Your sponsorship helps me dedicate more energy to improve and expand the project
 
 Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon) or the [Open VSX Registry](https://open-vsx.org/extension/jakobhoeg/vscode-pokemon).
 
-![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/install.png)
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/install.png)
 
 OR
 
@@ -66,7 +66,7 @@ After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux 
 
 Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a Bulbasaur in VS Code:
 
-![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/usage.png)
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/usage.png)
 
 Enjoy interacting with your favourite Pokémon!
 
@@ -74,7 +74,7 @@ Enjoy interacting with your favourite Pokémon!
 
 VS Code Pokémon comes with default keyboard shortcuts to make managing your Pokémon quick and easy:
 
-![Keybindings](https://github.com/jakobhoeg/vscode-pokemon/raw/main/keybindings.png)
+![Keybindings](https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/keybindings.png)
 
 ### Configuring Keyboard Shortcuts
 

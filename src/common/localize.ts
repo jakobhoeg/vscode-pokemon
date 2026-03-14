@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { POKEMON_DATA } from './pokemon-data';
 import { PokemonType } from './types';
+import { POKEMON_DATA } from './dex/index';
 
 /**
  * Cache for loaded Pokemon translations

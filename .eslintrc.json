@@ -44,5 +44,13 @@
         "node_modules",
         ".vscode",
         "src/test"
+    ],
+    "overrides": [
+        {
+            "files": ["src/common/dex/*"],
+            "rules": {
+                "@typescript-eslint/naming-convention": "off"
+            }
+        }
     ]
 }

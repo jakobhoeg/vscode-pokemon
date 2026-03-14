@@ -200,7 +200,7 @@ img.pokemon {
   width: var(--frame-size);
   height: var(--frame-size);
 
-  background-image: url('pokeball_sprite_sheet.png');
+  background-image: url('animations/pokeball_sprite_sheet.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: var(--frame-size)
