@@ -157,6 +157,16 @@ Available options:
 
 **Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, and 4.
 
+### Extension UI language
+
+The extension interface (commands, messages, panel labels) is localized. When VS Code’s display language is set to one of the supported locales, the extension UI will follow it:
+
+- **en-US** (English – US), **en-GB** (English – UK)
+- **fr-FR** (French), **de-DE** (German), **ja-JP** (Japanese), **zh-CN** (Chinese)
+- **pt-PT** (Portuguese), **es-ES** (Spanish), **it-IT** (Italian), **da-DK** (Danish)
+
+To use a translated UI, set your VS Code display language via the Command Palette: **Configure Display Language**, then choose the desired language and restart if prompted.
+
 ## Features
 
 Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 5 when possible.
