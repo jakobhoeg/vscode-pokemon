@@ -118,6 +118,7 @@ To configure default Pokémon, add the following to your `settings.json`:
 
 - **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
 - **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
+- **`shiny`** (optional): Determines if the Pokémon is shiny, if not set will use `vscode-pokemon.shinyOdds` setting.
 
 **Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
 - You start the extension for the first time
