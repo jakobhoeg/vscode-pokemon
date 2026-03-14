@@ -288,6 +288,39 @@ img.pokemon {
   animation: pokemon-fade-out 220ms ease-out;
 }
 
+.pokemon.ditto-transforming {
+  animation: ditto-morph 620ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: filter, clip-path, opacity;
+}
+
+@keyframes ditto-morph {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+  18% {
+    clip-path: inset(22% 8% 4% 8% round 40% 40% 18% 18%);
+    filter: saturate(2.1) brightness(1.55) contrast(1.15)
+      drop-shadow(0 0 6px rgba(255, 171, 255, 0.65));
+  }
+  42% {
+    clip-path: inset(38% 18% 10% 18% round 48%);
+    filter: saturate(0.15) brightness(1.95) contrast(0.95) blur(0.7px)
+      drop-shadow(0 0 10px rgba(255, 171, 255, 0.85));
+  }
+  68% {
+    clip-path: inset(10% 5% 28% 5% round 20% 20% 50% 50%);
+    filter: saturate(2.2) brightness(1.3) contrast(1.08)
+      drop-shadow(0 0 6px rgba(255, 171, 255, 0.65));
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
 @keyframes pokemon-fade-out {
   0% {
 	opacity: 1;
