@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.3.4]
+
+- feat: add shiny configuration option to default Pokemon settings
+- fix: prevent spawning empty Pokémon collection on session start
+
 ## [4.3.3]
 
 - fix: improve session handling and normalize pokemon counter
