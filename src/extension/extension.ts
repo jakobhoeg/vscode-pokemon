@@ -167,6 +167,12 @@ function getDefaultPokemonForFreshSession(
   return getConfiguredDefaultPokemon();
 }
 
+export function shouldSpawnInitialCollection(
+  collection: PokemonSpecification[],
+): boolean {
+  return collection.length > 0;
+}
+
 async function spawnAndPersistCollection(
   context: vscode.ExtensionContext,
   panel: IPokemonPanel,
@@ -1075,11 +1081,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (PokemonPanel.currentPanel) {
           const collection = getDefaultPokemonForFreshSession(context);
-          await spawnAndPersistCollection(
-            context,
-            PokemonPanel.currentPanel,
-            collection,
-          );
+          if (shouldSpawnInitialCollection(collection)) {
+            await spawnAndPersistCollection(
+              context,
+              PokemonPanel.currentPanel,
+              collection,
+            );
+          }
         }
       },
     });
@@ -1607,7 +1615,9 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
     );
 
     const collection = getDefaultPokemonForFreshSession(this._context);
-    await spawnAndPersistCollection(this._context, this, collection);
+    if (shouldSpawnInitialCollection(collection)) {
+      await spawnAndPersistCollection(this._context, this, collection);
+    }
   }
 
   update() {
