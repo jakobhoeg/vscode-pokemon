@@ -608,6 +608,10 @@ export function activate(context: vscode.ExtensionContext) {
             label: '🇯🇵 日本語 (JP)',
             description: vscode.l10n.t('Japanese names'),
           },
+          'zh-CN': {
+            label: '🇨🇳 简体中文 (CN)',
+            description: vscode.l10n.t('Chinese names'),
+          },
         } as { [key: string]: { label: string; description: string } };
         /* eslint-enable @typescript-eslint/naming-convention */
 

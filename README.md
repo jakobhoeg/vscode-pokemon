@@ -129,7 +129,7 @@ To reset to your default Pokémon, use the "Remove all pokemon" command and rest
 
 ### Pokémon Language
 
-You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese.
+You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese, Chinese and Korean.
 
 #### Using the Command
 
@@ -153,8 +153,20 @@ Available options:
 - **`fr-FR`**: French names (e.g., "Bulbizarre", "Salamèche", "Dracaufeu")
 - **`de-DE`**: German names (e.g., "Bisasam", "Glumanda", "Glurak")
 - **`ja-JP`**: Japanese names (e.g., "フシギダネ", "ヒトカゲ", "リザードン")
+- **`ko-KR`**: Korean names (e.g., "피카츄", "라이츄", "리자몽")
+- **`zh-CN`**: Chinese names (e.g., "妙蛙种子", "小火龙", "喷火龙")
 
 **Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, and 4.
+
+### Extension UI language
+
+The extension interface (commands, messages, panel labels) is localized. When VS Code’s display language is set to one of the supported locales, the extension UI will follow it:
+
+- **en-US** (English – US), **en-GB** (English – UK)
+- **fr-FR** (French), **de-DE** (German), **ja-JP** (Japanese), **zh-CN** (Chinese)
+- **pt-PT** (Portuguese), **es-ES** (Spanish), **it-IT** (Italian), **da-DK** (Danish)
+
+To use a translated UI, set your VS Code display language via the Command Palette: **Configure Display Language**, then choose the desired language and restart if prompted.
 
 ## Features
 
