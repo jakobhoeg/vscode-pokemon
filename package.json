@@ -38,6 +38,7 @@
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
+        "onCommand:vscode-pokemon.manage-presets",
         "onCommand:vscode-pokemon.configure-keybindings",
         "onCommand:vscode-pokemon.change-pokemon-language",
         "onWebviewPanel:pokemonCoding",
@@ -92,6 +93,11 @@
             {
                 "command": "vscode-pokemon.import-pokemon-list",
                 "title": "Import pokemon list",
+                "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.manage-presets",
+                "title": "Manage presets",
                 "category": "Pokemon Coding"
             },
             {
