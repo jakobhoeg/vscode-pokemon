@@ -1,6 +1,12 @@
 // This script will be run within the webview itself
 import { randomName } from '../common/names';
 import {
+  DEFAULT_POKEBALL,
+  getPokeballSpriteSheet,
+  normalizePokeball,
+  Pokeball,
+} from '../common/pokeball-data';
+import {
   PokemonSize,
   PokemonColor,
   PokemonType,
@@ -32,6 +38,29 @@ declare global {
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
+let currentPokeball: Pokeball = DEFAULT_POKEBALL;
+const POKEBALL_FRAME_SIZE = 64;
+
+function getCenteredPokeballLeft(left: number, spriteWidth: number): number {
+  return left + spriteWidth / 2 - POKEBALL_FRAME_SIZE / 2;
+}
+
+function createPokeballElement(
+  left: number,
+  bottom: number,
+  basePokemonUri: string,
+): HTMLDivElement {
+  const pokeballEl = document.createElement('div');
+  pokeballEl.classList.add('pokeball-sprite');
+  pokeballEl.style.left = `${left}px`;
+  pokeballEl.style.bottom = `${bottom}px`;
+  pokeballEl.style.setProperty(
+    '--pokeball-image',
+    `url('${basePokemonUri}/pokeballs/${getPokeballSpriteSheet(currentPokeball)}')`,
+  );
+
+  return pokeballEl;
+}
 
 function normalizePokemonCounter(counter: number | undefined): number {
   if (counter === undefined || Number.isNaN(counter)) {
@@ -192,13 +221,11 @@ function addPokemonToPanel(
   }
 
   pokemonSpriteElement.style.opacity = '0';
-
-  const pokeballEl = document.createElement('div');
-  pokeballEl.classList.add('pokeball-sprite');
-
-  // Position pokeball at pokemon location + pokemon center offset
-  pokeballEl.style.left = `${left}px`;
-  pokeballEl.style.bottom = `${bottom}px`;
+  const pokeballEl = createPokeballElement(
+    getCenteredPokeballLeft(left, newPokemon.width),
+    bottom,
+    basePokemonUri,
+  );
 
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
     pokeballEl,
@@ -270,6 +297,7 @@ function addPokemonToPanel(
 
 function removePokemonFromPanel(
   message: { name: string },
+  basePokemonUri: string,
   stateApi?: VscodeStateApi,
 ) {
   if (!stateApi) {
@@ -292,12 +320,11 @@ function removePokemonFromPanel(
 
   // pokemon fade out
   pokemonSpriteElement.classList.add('fade-out');
-
-  const pokeballEl = document.createElement('div');
-  pokeballEl.classList.add('pokeball-sprite');
-
-  pokeballEl.style.left = `${pokemon.pokemon.left}px`;
-  pokeballEl.style.bottom = `${pokemon.pokemon.bottom}px`;
+  const pokeballEl = createPokeballElement(
+    getCenteredPokeballLeft(pokemon.pokemon.left, pokemon.pokemon.width),
+    pokemon.pokemon.bottom,
+    basePokemonUri,
+  );
 
   const container = document.getElementById(
     'pokemonContainer',
@@ -459,6 +486,7 @@ export function pokemonPanelApp(
   pokemonColor: PokemonColor,
   pokemonSize: PokemonSize,
   pokemonType: PokemonType,
+  pokeball: string,
   throwBallWithMouse: boolean,
   gen: string,
   originalSpriteSize: number,
@@ -468,6 +496,7 @@ export function pokemonPanelApp(
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }
+  currentPokeball = normalizePokeball(pokeball);
   // Apply Theme backgrounds
   const foregroundEl = document.getElementById('foreground');
   if (theme !== Theme.none) {
@@ -593,13 +622,21 @@ export function pokemonPanelApp(
           });
         });
         break;
+      case 'update-pokeball':
+        currentPokeball = normalizePokeball(message.pokeball);
+        saveState(stateApi);
+        break;
       case 'delete-pokemon':
-        removePokemonFromPanel(message, stateApi);
+        removePokemonFromPanel(message, basePokemonUri, stateApi);
         break;
       case 'reset-pokemon':
         var pokemonToRemove = [...allPokemon.pokemonCollection];
         pokemonToRemove.forEach((pokemon) => {
-          removePokemonFromPanel({ name: pokemon.pokemon.name }, stateApi);
+          removePokemonFromPanel(
+            { name: pokemon.pokemon.name },
+            basePokemonUri,
+            stateApi,
+          );
         });
         // Wait for animations to complete before resetting
         setTimeout(() => {
