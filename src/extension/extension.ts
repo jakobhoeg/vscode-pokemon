@@ -141,6 +141,20 @@ interface IPreset {
   pokemon: IPresetPokemon[];
 }
 
+interface IPresetPokemon {
+  color: PokemonColor;
+  type: PokemonType;
+  size: PokemonSize;
+  name: string;
+  generation?: string;
+  originalSpriteSize?: number;
+}
+
+interface IPreset {
+  name: string;
+  pokemon: IPresetPokemon[];
+}
+
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
   const defaultConfig = vscode.workspace
     .getConfiguration('vscode-pokemon')
