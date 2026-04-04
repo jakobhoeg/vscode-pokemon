@@ -14,7 +14,7 @@ import {
   Theme,
   WebviewMessage,
 } from '../common/types';
-import { normalizeColor } from '../panel/pokemon-collection';
+import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 import { POKEMON_DATA } from '../common/dex/index';
 import {
   VSCODE_POKEMON_PANEL_VIEW_TYPE,
