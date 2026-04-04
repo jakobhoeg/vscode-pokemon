@@ -200,7 +200,7 @@ img.pokemon {
   width: var(--frame-size);
   height: var(--frame-size);
 
-  background-image: url('animations/pokeball_sprite_sheet.png');
+  background-image: url('pokeballs/pokeball_sprite_sheet.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: var(--frame-size)
@@ -209,9 +209,11 @@ img.pokemon {
   image-rendering: pixelated;
   z-index: 0;
 }
+
 .pokeball-sprite.pokeball-open {
   animation: pokeball-open 0.45s steps(var(--frames)) forwards;
 }
+
 @keyframes pokeball-open {
   to {
     background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));
