@@ -658,17 +658,20 @@ class PokemonWebviewContainer implements IPokemonPanel {
     const styleResetPath = vscode.Uri.joinPath(
       this._extensionUri,
       'media',
+      'styles',
       'reset.css',
     );
     const stylesPathMainPath = vscode.Uri.joinPath(
       this._extensionUri,
       'media',
+      'styles',
       'pokemon.css',
     );
     const silkScreenFontPath = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
         'media',
+        'styles',
         'Silkscreen-Regular.ttf',
       ),
     );
