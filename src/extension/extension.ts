@@ -93,6 +93,7 @@ function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
 interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
+  shiny?: boolean;
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -107,9 +108,18 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
     // Validate that the pokemon type exists
     if (POKEMON_DATA[config.type]) {
       const name = config.name || randomName();
-      result.push(
-        new PokemonSpecification(DEFAULT_COLOR, config.type, size, name),
-      );
+
+      // If shiny is not specified, default to color to maybeShiny with the pokemon's available colors. If shiny is true, force shiny color. If shiny is false, force default color.
+      let color: PokemonColor;
+      if (config.shiny === undefined) {
+        color = maybeMakeShiny(availableColors(config.type));
+      } else if (config.shiny) {
+        color = PokemonColor.shiny;
+      } else {
+        color = DEFAULT_COLOR;
+      }
+
+      result.push(new PokemonSpecification(color, config.type, size, name));
     } else {
       console.warn(
         `Invalid pokemon type in defaultPokemon config: ${config.type}`,
@@ -148,6 +158,12 @@ function getDefaultPokemonForFreshSession(
   }
 
   return getConfiguredDefaultPokemon();
+}
+
+export function shouldSpawnInitialCollection(
+  collection: PokemonSpecification[],
+): boolean {
+  return collection.length > 0;
 }
 
 async function spawnAndPersistCollection(
@@ -444,11 +460,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (PokemonPanel.currentPanel) {
           const collection = getDefaultPokemonForFreshSession(context);
-          await spawnAndPersistCollection(
-            context,
-            PokemonPanel.currentPanel,
-            collection,
-          );
+          if (shouldSpawnInitialCollection(collection)) {
+            await spawnAndPersistCollection(
+              context,
+              PokemonPanel.currentPanel,
+              collection,
+            );
+          }
         }
       },
     });
@@ -979,7 +997,9 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
     );
 
     const collection = getDefaultPokemonForFreshSession(this._context);
-    await spawnAndPersistCollection(this._context, this, collection);
+    if (shouldSpawnInitialCollection(collection)) {
+      await spawnAndPersistCollection(this._context, this, collection);
+    }
   }
 
   update() {
