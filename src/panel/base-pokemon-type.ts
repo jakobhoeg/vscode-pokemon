@@ -239,7 +239,7 @@ export abstract class BasePokemonType implements IPokemonType {
   showSpeechBubble(duration: number = 3000, friend: boolean = false) {
     // Extract the media folder
     const segments = this.pokemonRoot.split('/');
-    const basePath = segments.slice(0, segments.length - 3).join('/');
+    const basePath = segments.slice(0, segments.length - 4).join('/');
 
     if (friend) {
       this.speech.src = `${basePath}/emotions/heart.png`;

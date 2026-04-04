@@ -151,7 +151,7 @@ function addPokemonToPanel(
     speechBubbleElement,
   );
 
-  const root = `${basePokemonUri}/${gen}/${pokemonType}/${pokemonColor}`;
+  const root = `${basePokemonUri}/dex/${gen}/${pokemonType}/${pokemonColor}`;
   console.log(
     'Creating new pokemon : ',
     pokemonType,
