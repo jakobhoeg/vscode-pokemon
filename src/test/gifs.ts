@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 
 import { PokemonColor } from '../common/types';
-import { getAllPokemon, POKEMON_DATA } from '../common/pokemon-data';
+import { getAllPokemon } from '../common/pokemon-data';
+import { POKEMON_DATA } from '../common/dex/index';
 
 const defaultPokemonConfig = {
   colors: [PokemonColor.default],

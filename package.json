@@ -55,7 +55,7 @@
                     "id": "pokemonView",
                     "name": "VS Code Pokémon",
                     "when": "vscode-pokemon.position == 'explorer'",
-                    "icon": "media/icon/dark-add.svg"
+                    "icon": "media/icons/dark-add.svg"
                 }
             ]
         },
@@ -99,8 +99,8 @@
                 "title": "Spawn additional pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-add.svg",
-                    "light": "media/icon/light-add.svg"
+                    "dark": "media/icons/dark-add.svg",
+                    "light": "media/icons/light-add.svg"
                 }
             },
             {
@@ -108,8 +108,8 @@
                 "title": "Spawn random additional pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-random.svg",
-                    "light": "media/icon/light-random.svg"
+                    "dark": "media/icons/dark-random.svg",
+                    "light": "media/icons/light-random.svg"
                 }
             },
             {
@@ -117,8 +117,8 @@
                 "title": "Remove pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-trash.svg",
-                    "light": "media/icon/light-trash.svg"
+                    "dark": "media/icons/dark-trash.svg",
+                    "light": "media/icons/light-trash.svg"
                 }
             },
             {
@@ -126,8 +126,8 @@
                 "title": "Remove all pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-trash.svg",
-                    "light": "media/icon/light-trash.svg"
+                    "dark": "media/icons/dark-trash.svg",
+                    "light": "media/icons/light-trash.svg"
                 }
             },
             {
@@ -249,17 +249,17 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile:panel": "webpack",
-        "compile:extension": "tsc -p ./tsconfig.extension.json",
-        "compile:test": "tsc -p ./tsconfig.test.json",
+        "compile:extension": "tsc -p ./config/tsconfig.extension.json",
+        "compile:test": "tsc -p ./config/tsconfig.test.json",
         "compile:web": "webpack",
         "compile": "npm run compile:panel && npm run compile:extension && npm run compile:test && npm run compile:web",
-        "watch": "webpack && tsc -watch -p ./tsconfig.extension.json",
+        "watch": "webpack && tsc -watch -p ./config/tsconfig.extension.json",
         "watch:web": "webpack --watch",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
         "lint:fix": "eslint src --ext ts --fix",
-        "format:check": "prettier --check src",
-        "format": "prettier --write src",
+        "format:check": "prettier --check .",
+        "format": "prettier --write .",
         "test": "node ./out/test/runTest.js",
         "test:coverage": "COVERAGE=1 node ./out/test/runTest.js",
         "test:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",

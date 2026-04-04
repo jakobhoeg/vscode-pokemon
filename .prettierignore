@@ -3,15 +3,19 @@ README.md
 LICENSE
 .gitignore
 .eslintrc.json
-out
-media
-.vscode
-.dist
-.out
-.github
 tsconfig.json
 tsconfig.panel.json
 tsconfig.extension.json
 tsconfig.test.json
 tsconfig.web.json
 webpack.config.js
+package-lock.json
+package.json
+
+// Directories
+l10n
+.vscode
+.dist
+.out
+.github
+out

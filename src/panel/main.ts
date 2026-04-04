@@ -146,7 +146,7 @@ function addPokemonToPanel(
 
   var speechBubbleElement: HTMLImageElement = document.createElement('img');
   speechBubbleElement.className = `bubble bubble-${pokemonSize} b-${originalSpriteSize}`;
-  speechBubbleElement.src = `${basePokemonUri}/heart.png`;
+  speechBubbleElement.src = `${basePokemonUri}/emotions/heart.png`;
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
     speechBubbleElement,
   );
@@ -228,7 +228,7 @@ function addPokemonToPanel(
 
     if (pokemonColor === PokemonColor.shiny) {
       const shinyOverlay = document.createElement('img');
-      shinyOverlay.src = `${basePokemonUri}/shiny-anim.gif?t=${Date.now()}`;
+      shinyOverlay.src = `${basePokemonUri}/animations/shiny-anim.gif?t=${Date.now()}`;
       shinyOverlay.className = 'shiny-overlay';
       shinyOverlay.style.left = pokemonSpriteElement.style.left;
       shinyOverlay.style.bottom = pokemonSpriteElement.style.bottom;

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "sourceMap": true,
+    "strict": true
+  }
+}

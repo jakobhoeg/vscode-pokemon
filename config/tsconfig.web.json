@@ -1,16 +1,20 @@
 {
+	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "esnext",
-		"outDir": "out",
-		"lib": ["es6", "DOM"],
-		"sourceMap": true,
-		"rootDirs": ["panel", "common", "test", "extension"],
-		"strict": true /* enable all strict type-checking options */
+		"target": "es2020",
+		"outDir": "../dist",
+		"lib": ["es6", "WebWorker"]
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
-	"exclude": ["node_modules"]
+	"exclude": [
+		"../node_modules",
+		"../.vscode-test-web",
+		"../src/test"
+	],
+	"include": [
+		"../src/**/*.ts"
+	]
 }

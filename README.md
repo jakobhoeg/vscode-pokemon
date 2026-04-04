@@ -24,9 +24,9 @@
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon.gif">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon-light.gif">
-  <img alt="Shows gif in dark or light mode" src="https://github.com/jakobhoeg/vscode-pokemon/raw/main/vscode-pokemon-light.gif">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon.gif">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon-light.gif">
+  <img alt="Shows gif in dark or light mode" src="https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/vscode-pokemon-light.gif">
 </picture>
 </div>
 
@@ -48,7 +48,7 @@ Your sponsorship helps me dedicate more energy to improve and expand the project
 
 Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon) or the [Open VSX Registry](https://open-vsx.org/extension/jakobhoeg/vscode-pokemon).
 
-![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/install.png)
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/install.png)
 
 OR
 
@@ -66,95 +66,15 @@ After installing, open the command palette with `Ctrl+Shift+P` on Windows/Linux 
 
 Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a Bulbasaur in VS Code:
 
-![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/usage.png)
+![Default view](https://github.com/jakobhoeg/vscode-pokemon/raw/main/.github/images/usage.png)
 
 Enjoy interacting with your favourite Pokémon!
-
-## Keyboard Shortcuts
-
-VS Code Pokémon comes with default keyboard shortcuts to make managing your Pokémon quick and easy:
-
-![Keybindings](https://github.com/jakobhoeg/vscode-pokemon/raw/main/keybindings.png)
-
-### Configuring Keyboard Shortcuts
-
-You can customize these shortcuts to match your preferences:
-
-1. Open the command palette (`Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS)
-2. Run the **`Pokemon Coding: Configure keybindings`** command
-3. Select the command you want to customize
-4. VS Code will open the Keyboard Shortcuts editor filtered to that command
-5. Click the pencil icon next to the command and press your desired key combination
 
 ## Changing settings
 
 Open the setting panel with Ctrl+, on Windows/Linux or Cmd(⌘)+, on MacOS. In the search bar, enter “vscode-pokemon" to see all available options.
 
 Set the size and position of the extension.
-
-### Default Pokémon
-
-You can configure specific Pokémon to automatically appear when you first start using the extension. This is useful for setting up your preferred team without having to manually spawn them when you open new windows.
-
-To configure default Pokémon, add the following to your `settings.json`:
-
-```json
-{
-  "vscode-pokemon.defaultPokemon": [
-    {
-      "type": "pikachu",
-      "name": "Sparky"
-    },
-    {
-      "type": "charizard",
-      "name": "Flame"
-    },
-    {
-      "type": "articuno"
-    }
-  ]
-}
-```
-
-- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
-- **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
-- **`shiny`** (optional): Determines if the Pokémon is shiny, if not set will use `vscode-pokemon.shinyOdds` setting.
-
-**Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
-- You start the extension for the first time
-- You open a new windows/repository
-- You have removed all Pokémon (no saved session exists)
-
-To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
-
-### Pokémon Language
-
-You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese.
-
-#### Using the Command
-
-1. Open the command palette (`Ctrl+Shift+P` on Windows/Linux or `Cmd(⌘)+Shift+P` on MacOS)
-2. Run the **`Pokemon Coding: Change Pokemon language`** command
-3. Select your preferred language from the list
-
-#### Using Settings
-
-You can also configure the language directly in your `settings.json`:
-
-```json
-{
-  "vscode-pokemon.pokemonLanguage": "fr-FR"
-}
-```
-
-Available options:
-- **`auto`** (default): Automatically uses VS Code's language setting
-- **`en-US`**: English (US) names
-- **`fr-FR`**: French names (e.g., "Bulbizarre", "Salamèche", "Dracaufeu")
-- **`de-DE`**: German names (e.g., "Bisasam", "Glumanda", "Glurak")
-- **`ja-JP`**: Japanese names (e.g., "フシギダネ", "ヒトカゲ", "リザードン")
-
-**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, and 4.
 
 ## Features
 

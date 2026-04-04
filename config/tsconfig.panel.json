@@ -1,23 +1,22 @@
 {
+	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "esnext",
-		"outDir": "./build",
+		"outDir": "../build",
 		"lib": [
 			"es6", "DOM"
-		],
-		"sourceMap": true,
-		"rootDirs": ["panel", "common"],
-		"strict": true   /* enable all strict type-checking options */
+		]
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
 	"exclude": [
-		"node_modules",
-		".vscode-test",
-		"src/extension",
-		"src/test"
+		"../node_modules",
+		"../.vscode-test",
+		"../src/extension",
+		"../src/test"
+	],
+	"include": [
+		"../src/**/*.ts"
 	]
 }
