@@ -1,11 +1,9 @@
 {
-    "compilerOptions": {
-        "noImplicitAny": true,
-        "moduleResolution": "node",
-        "strictNullChecks": true,
-        "outDir": "./.build-out",
-        "lib": ["es2016", "dom"],
-        "target": "esnext"
-    },
-    "include": ["src/**/*.ts"],
+	"extends": "./config/tsconfig.base.json",
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"lib": ["es2016", "dom"]
+	},
+	"include": ["src/**/*.ts"]
 }

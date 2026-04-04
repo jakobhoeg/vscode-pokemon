@@ -34,7 +34,7 @@ const desktopConfig = {
 				{
 					loader: 'ts-loader',
 					options: {
-						configFile: 'tsconfig.panel.json'
+						configFile: 'config/tsconfig.panel.json'
 					}
 				},
 			],
@@ -78,7 +78,7 @@ const webExtensionConfig = {
 					{
 						loader: 'ts-loader',
 						options: {
-							configFile: 'tsconfig.web.json'
+							configFile: 'config/tsconfig.web.json'
 						}
 					},
 				],

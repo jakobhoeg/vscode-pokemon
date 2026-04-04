@@ -4,7 +4,7 @@
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
-        "project": "./tsconfig.json"
+        "project": "./config/tsconfig.eslint.json"
     },
     "plugins": [
         "@typescript-eslint",
@@ -43,7 +43,8 @@
         "dist",
         "node_modules",
         ".vscode",
-        "src/test"
+        "src/test",
+        "webpack.config.js"
     ],
     "overrides": [
         {
