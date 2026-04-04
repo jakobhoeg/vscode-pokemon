@@ -55,7 +55,7 @@
                     "id": "pokemonView",
                     "name": "VS Code Pokémon",
                     "when": "vscode-pokemon.position == 'explorer'",
-                    "icon": "media/icon/dark-add.svg"
+                    "icon": "media/icons/dark-add.svg"
                 }
             ]
         },
@@ -99,8 +99,8 @@
                 "title": "Spawn additional pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-add.svg",
-                    "light": "media/icon/light-add.svg"
+                    "dark": "media/icons/dark-add.svg",
+                    "light": "media/icons/light-add.svg"
                 }
             },
             {
@@ -108,8 +108,8 @@
                 "title": "Spawn random additional pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-random.svg",
-                    "light": "media/icon/light-random.svg"
+                    "dark": "media/icons/dark-random.svg",
+                    "light": "media/icons/light-random.svg"
                 }
             },
             {
@@ -117,8 +117,8 @@
                 "title": "Remove pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-trash.svg",
-                    "light": "media/icon/light-trash.svg"
+                    "dark": "media/icons/dark-trash.svg",
+                    "light": "media/icons/light-trash.svg"
                 }
             },
             {
@@ -126,8 +126,8 @@
                 "title": "Remove all pokemon",
                 "category": "Pokemon Coding",
                 "icon": {
-                    "dark": "media/icon/dark-trash.svg",
-                    "light": "media/icon/light-trash.svg"
+                    "dark": "media/icons/dark-trash.svg",
+                    "light": "media/icons/light-trash.svg"
                 }
             },
             {
