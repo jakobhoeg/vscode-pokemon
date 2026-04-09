@@ -187,7 +187,6 @@ img.pokemon {
 	margin-left: 30px;
 }
 
-
 .bubble-large.b-64 {
 	margin-left: 37.5px;
 }
@@ -195,12 +194,13 @@ img.pokemon {
 .pokeball-sprite {
   --frame-size: 64px;
   --frames: 6;
+  --pokeball-image: url('pokeball_sprite_sheet.png');
 
   position: absolute;
   width: var(--frame-size);
   height: var(--frame-size);
 
-  background-image: url('pokeball_sprite_sheet.png');
+  background-image: var(--pokeball-image);
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: var(--frame-size)
@@ -209,13 +209,13 @@ img.pokemon {
   image-rendering: pixelated;
   z-index: 0;
 }
+
 .pokeball-sprite.pokeball-open {
   animation: pokeball-open 0.45s steps(var(--frames)) forwards;
 }
+
 @keyframes pokeball-open {
-  to {
-    background-position-y: calc(-1 * var(--frame-size) * (var(--frames)));
-  }
+  to { background-position-y: calc(-1 * var(--frame-size) * (var(--frames))); }
 }
 
 .pokeball-sprite.pokeball-close {
