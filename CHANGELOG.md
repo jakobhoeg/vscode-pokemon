@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [4.3.5]
+
+- fix: resolve delay when removing more than one pokemon quickly
+
 ## [4.3.4]
 
 - feat: add shiny configuration option to default Pokemon settings
