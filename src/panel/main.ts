@@ -290,6 +290,18 @@ function removePokemonFromPanel(
   console.log('Removing pokemon ', message.name);
   console.log('pokemon:', pokemon);
 
+  // Remove from collection immediately so rapid deletes of Pokemon don't interfere with each other
+  allPokemon.removeFromCollection(message.name);
+  pokemon.collision.remove();
+  pokemon.speech.remove();
+  pokemonCounter = normalizePokemonCounter(pokemonCounter - 1);
+  saveState(stateApi);
+
+  stateApi?.postMessage({
+    command: 'info',
+    text: '👋 Removed pokemon ' + message.name,
+  });
+
   // pokemon fade out
   pokemonSpriteElement.classList.add('fade-out');
 
@@ -324,18 +336,7 @@ function removePokemonFromPanel(
       if (e.animationName !== 'pokeball-close') {
         return;
       }
-
       pokeballEl.remove();
-
-      // 🔥 only now we change the state
-      allPokemon.remove(message.name);
-      pokemonCounter = normalizePokemonCounter(pokemonCounter - 1);
-      saveState(stateApi);
-
-      stateApi?.postMessage({
-        command: 'info',
-        text: '👋 Removed pokemon ' + message.name,
-      });
     },
     { once: true },
   );

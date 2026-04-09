@@ -317,67 +317,30 @@ interface IPokemonInfo {
   color: PokemonColor;
 }
 
-async function handleRemovePokemonMessage(
-  this: vscode.ExtensionContext,
-  message: WebviewMessage,
-) {
-  var pokemonList: IPokemonInfo[] = [];
-  switch (message.command) {
-    case 'list-pokemon':
-      message.text.split('\n').forEach((pokemon) => {
-        if (!pokemon) {
+function waitForPokemonList(webview: vscode.Webview): Promise<IPokemonInfo[]> {
+  return new Promise((resolve) => {
+    const disposable = webview.onDidReceiveMessage(
+      (message: WebviewMessage) => {
+        if (message.command !== 'list-pokemon') {
           return;
         }
-        var parts = pokemon.split(',');
-        pokemonList.push({
-          type: parts[0] as PokemonType,
-          name: parts[1],
-          color: parts[2] as PokemonColor,
+        disposable.dispose();
+        const pokemonList: IPokemonInfo[] = [];
+        message.text.split('\n').forEach((pokemon) => {
+          if (!pokemon) {
+            return;
+          }
+          var parts = pokemon.split(',');
+          pokemonList.push({
+            type: parts[0] as PokemonType,
+            name: parts[1],
+            color: parts[2] as PokemonColor,
+          });
         });
-      });
-      break;
-    default:
-      return;
-  }
-  if (!pokemonList) {
-    return;
-  }
-  if (!pokemonList.length) {
-    await vscode.window.showErrorMessage(
-      vscode.l10n.t('There are no pokemon to remove.'),
-    );
-    return;
-  }
-  await vscode.window
-    .showQuickPick<PokemonQuickPickItem>(
-      pokemonList.map((val) => {
-        return new PokemonQuickPickItem(val.name, val.type, val.color);
-      }),
-      {
-        placeHolder: vscode.l10n.t('Select the pokemon to remove.'),
+        resolve(pokemonList);
       },
-    )
-    .then(async (pokemon: PokemonQuickPickItem | undefined) => {
-      if (pokemon) {
-        const panel = getPokemonPanel();
-        if (panel !== undefined) {
-          panel.deletePokemon(pokemon.name);
-          const collection = pokemonList
-            .filter((item) => {
-              return item.name !== pokemon.name;
-            })
-            .map<PokemonSpecification>((item) => {
-              return new PokemonSpecification(
-                item.color,
-                item.type,
-                PokemonSize.medium,
-                item.name,
-              );
-            });
-          await storeCollectionAsMemento(this, collection);
-        }
-      }
-    });
+    );
+  });
 }
 
 function getPokemonPanel(): IPokemonPanel | undefined {
@@ -488,14 +451,47 @@ export function activate(context: vscode.ExtensionContext) {
       'vscode-pokemon.delete-pokemon',
       async () => {
         const panel = getPokemonPanel();
-        if (panel !== undefined) {
-          panel.listPokemon();
-          getWebview()?.onDidReceiveMessage(
-            handleRemovePokemonMessage,
-            context,
-          );
-        } else {
+        if (panel === undefined) {
           await createPokemonPlayground(context);
+          return;
+        }
+        const webview = getWebview();
+        if (!webview) {
+          return;
+        }
+        const listPromise = waitForPokemonList(webview);
+        panel.listPokemon();
+        const pokemonList = await listPromise;
+
+        if (!pokemonList.length) {
+          await vscode.window.showErrorMessage(
+            vscode.l10n.t('There are no pokemon to remove.'),
+          );
+          return;
+        }
+        const pokemon = await vscode.window.showQuickPick<PokemonQuickPickItem>(
+          pokemonList.map((val) => {
+            return new PokemonQuickPickItem(val.name, val.type, val.color);
+          }),
+          {
+            placeHolder: vscode.l10n.t('Select the pokemon to remove.'),
+          },
+        );
+        if (pokemon) {
+          panel.deletePokemon(pokemon.name);
+          const collection = pokemonList
+            .filter((item) => {
+              return item.name !== pokemon.name;
+            })
+            .map<PokemonSpecification>((item) => {
+              return new PokemonSpecification(
+                item.color,
+                item.type,
+                PokemonSize.medium,
+                item.name,
+              );
+            });
+          await storeCollectionAsMemento(context, collection);
         }
       },
     ),
