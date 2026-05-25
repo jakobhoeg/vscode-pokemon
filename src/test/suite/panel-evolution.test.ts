@@ -7,116 +7,116 @@
 import * as assert from 'assert';
 
 function setupWindow(): void {
-    const html = `<!doctype html><html><body>
+  const html = `<!doctype html><html><body>
         <canvas id="pokemonCanvas"></canvas>
         <div id="pokemonContainer"></div>
         <div id="foreground"></div>
     </body></html>`;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const jsdom = require('jsdom');
-    const dom = new jsdom.JSDOM(html, { url: 'http://localhost/' });
-    (global as any).document = dom.window.document;
-    (global as any).window = dom.window;
-    (global as any).HTMLImageElement = dom.window.HTMLImageElement;
-    (global as any).HTMLDivElement = dom.window.HTMLDivElement;
-    (global as any).HTMLCanvasElement = dom.window.HTMLCanvasElement;
-    (global as any).MouseEvent = dom.window.MouseEvent;
-    dom.window.console = global.console;
-    // Provide a sized "viewport" so randomStartPosition has a sensible window.innerWidth.
-    Object.defineProperty(dom.window, 'innerWidth', {
-        value: 800,
-        configurable: true,
-    });
-    Object.defineProperty(dom.window, 'innerHeight', {
-        value: 200,
-        configurable: true,
-    });
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const jsdom = require('jsdom');
+  const dom = new jsdom.JSDOM(html, { url: 'http://localhost/' });
+  (global as any).document = dom.window.document;
+  (global as any).window = dom.window;
+  (global as any).HTMLImageElement = dom.window.HTMLImageElement;
+  (global as any).HTMLDivElement = dom.window.HTMLDivElement;
+  (global as any).HTMLCanvasElement = dom.window.HTMLCanvasElement;
+  (global as any).MouseEvent = dom.window.MouseEvent;
+  dom.window.console = global.console;
+  // Provide a sized "viewport" so randomStartPosition has a sensible window.innerWidth.
+  Object.defineProperty(dom.window, 'innerWidth', {
+    value: 800,
+    configurable: true,
+  });
+  Object.defineProperty(dom.window, 'innerHeight', {
+    value: 200,
+    configurable: true,
+  });
 
-    // Stub acquireVsCodeApi — webview script calls this.
-    (global as any).acquireVsCodeApi = () => ({
-        getState: () => undefined,
-        setState: () => undefined,
-        postMessage: () => undefined,
-    });
-    (dom.window as any).acquireVsCodeApi = (global as any).acquireVsCodeApi;
+  // Stub acquireVsCodeApi — webview script calls this.
+  (global as any).acquireVsCodeApi = () => ({
+    getState: () => undefined,
+    setState: () => undefined,
+    postMessage: () => undefined,
+  });
+  (dom.window as any).acquireVsCodeApi = (global as any).acquireVsCodeApi;
 }
 
 suite('panel: evolve-pokemon message', () => {
-    suiteSetup(() => {
-        setupWindow();
+  suiteSetup(() => {
+    setupWindow();
+  });
+
+  test('replaces the active pokemon in-place, preserving its name', () => {
+    // Defer the import until JSDOM is set up — the webview module touches `document` at load
+    // for some types, and importing earlier could fail under bare Node.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const main = require('../../panel/main');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const collection = require('../../panel/pokemon-collection');
+
+    // Boot the panel app. Since upstream's panelApp starts an empty session and waits
+    // for spawn-pokemon messages, we'll seed the active pokemon ourselves below.
+    main.pokemonPanelApp(
+      'media',
+      'none',
+      2, // dark
+      'default',
+      'nano',
+      'bulbasaur',
+      'false',
+      '1',
+      32,
+    );
+
+    const allPokemon = main.allPokemon;
+    const win = (global as any).window;
+
+    // Seed the active pokemon by posting a spawn-pokemon message.
+    win.dispatchEvent(
+      new win.MessageEvent('message', {
+        data: {
+          command: 'spawn-pokemon',
+          type: 'bulbasaur',
+          color: 'default',
+          name: 'Sparky',
+          generation: '1',
+          originalSpriteSize: 32,
+        },
+      }),
+    );
+
+    assert.strictEqual(allPokemon.pokemonCollection.length, 1);
+    const originalName = allPokemon.pokemonCollection[0].pokemon.name;
+    assert.strictEqual(allPokemon.pokemonCollection[0].type, 'bulbasaur');
+
+    // Simulate the extension posting an evolve-pokemon message.
+    const event = new (global as any).window.MessageEvent('message', {
+      data: {
+        command: 'evolve-pokemon',
+        type: 'ivysaur',
+        generation: '1',
+        originalSpriteSize: 32,
+      },
     });
+    (global as any).window.dispatchEvent(event);
 
-    test('replaces the active pokemon in-place, preserving its name', () => {
-        // Defer the import until JSDOM is set up — the webview module touches `document` at load
-        // for some types, and importing earlier could fail under bare Node.
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const main = require('../../panel/main');
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const collection = require('../../panel/pokemon-collection');
+    assert.strictEqual(
+      allPokemon.pokemonCollection.length,
+      1,
+      'collection should still hold one pokemon',
+    );
+    assert.strictEqual(
+      allPokemon.pokemonCollection[0].type,
+      'ivysaur',
+      'type should switch to ivysaur',
+    );
+    assert.strictEqual(
+      allPokemon.pokemonCollection[0].pokemon.name,
+      originalName,
+      'evolved pokemon should keep its original name',
+    );
 
-        // Boot the panel app. Since upstream's panelApp starts an empty session and waits
-        // for spawn-pokemon messages, we'll seed the active pokemon ourselves below.
-        main.pokemonPanelApp(
-            'media',
-            'none',
-            2, // dark
-            'default',
-            'nano',
-            'bulbasaur',
-            'false',
-            '1',
-            32,
-        );
-
-        const allPokemon = main.allPokemon;
-        const win = (global as any).window;
-
-        // Seed the active pokemon by posting a spawn-pokemon message.
-        win.dispatchEvent(
-            new win.MessageEvent('message', {
-                data: {
-                    command: 'spawn-pokemon',
-                    type: 'bulbasaur',
-                    color: 'default',
-                    name: 'Sparky',
-                    generation: '1',
-                    originalSpriteSize: 32,
-                },
-            }),
-        );
-
-        assert.strictEqual(allPokemon.pokemonCollection.length, 1);
-        const originalName = allPokemon.pokemonCollection[0].pokemon.name;
-        assert.strictEqual(allPokemon.pokemonCollection[0].type, 'bulbasaur');
-
-        // Simulate the extension posting an evolve-pokemon message.
-        const event = new (global as any).window.MessageEvent('message', {
-            data: {
-                command: 'evolve-pokemon',
-                type: 'ivysaur',
-                generation: '1',
-                originalSpriteSize: 32,
-            },
-        });
-        (global as any).window.dispatchEvent(event);
-
-        assert.strictEqual(
-            allPokemon.pokemonCollection.length,
-            1,
-            'collection should still hold one pokemon',
-        );
-        assert.strictEqual(
-            allPokemon.pokemonCollection[0].type,
-            'ivysaur',
-            'type should switch to ivysaur',
-        );
-        assert.strictEqual(
-            allPokemon.pokemonCollection[0].pokemon.name,
-            originalName,
-            'evolved pokemon should keep its original name',
-        );
-
-        // Sanity: confirm collection module API is intact (not strictly needed, but catches accidental breakage).
-        assert.ok(collection.PokemonCollection);
-    });
+    // Sanity: confirm collection module API is intact (not strictly needed, but catches accidental breakage).
+    assert.ok(collection.PokemonCollection);
+  });
 });

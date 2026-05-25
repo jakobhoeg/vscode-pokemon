@@ -21,12 +21,9 @@ import {
   WebviewMessage,
 } from '../common/types';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import {
-  ActivePokemonState,
-  EvolutionNotificationMode,
-  XpTracker,
-  XpTrackerConfig,
-} from './xp-tracker';
+import { ActivePokemonState, XpTracker, XpTrackerConfig } from './xp-tracker';
+
+type EvolutionNotificationMode = 'silent' | 'info' | 'modal';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -1235,11 +1232,12 @@ function updateXpStatusBar(state: ActivePokemonState): void {
     xpStatusBar.hide();
     return;
   }
-  const speciesName = POKEMON_DATA[state.currentType]?.name ?? state.currentType;
+  const speciesName =
+    POKEMON_DATA[state.currentType]?.name ?? state.currentType;
   if (state.level >= 100) {
     xpStatusBar.text = `$(star-full) Lv 100 ${speciesName}`;
   } else {
-    xpStatusBar.text = `$(star-full) Lv ${state.level} ${state.xpIntoLevel}/${state.xpToNextLevel}`;
+    xpStatusBar.text = `$(star-full) Lv ${state.level} ${state.xpIntoLevel}/${state.xpForThisLevel}`;
   }
   xpStatusBar.tooltip = vscode.l10n.t(
     '{0} (Lv {1}) — {2} XP total. Click to reset XP.',
@@ -1272,11 +1270,7 @@ function handlePokemonEvolved(
   }
   const oldName = POKEMON_DATA[oldType]?.name ?? oldType;
   const newName = newConfig.name;
-  const message = vscode.l10n.t(
-    'Your {0} evolved into {1}!',
-    oldName,
-    newName,
-  );
+  const message = vscode.l10n.t('Your {0} evolved into {1}!', oldName, newName);
   if (mode === 'modal') {
     void vscode.window.showInformationMessage(message, { modal: true });
   } else {
@@ -1466,16 +1460,24 @@ class PokemonWebviewContainer implements IPokemonPanel {
     newGeneration: string,
     newOriginalSpriteSize: number,
   ): void {
-    // Keep our cached state in sync so the panel HTML regenerates with the evolved form on reload.
+    // Order matters: update the cached fields BEFORE attempting to post the message.
+    // If the webview view is hidden (PokemonWebviewViewProvider.getWebview() throws), the
+    // user will still see the evolved form next time the view is resolved because
+    // _getHtmlForWebview reads from these cached fields.
     this._pokemonType = newType;
     this._pokemonGeneration = newGeneration;
     this._pokemonOriginalSpriteSize = newOriginalSpriteSize;
-    void this.getWebview().postMessage({
-      command: 'evolve-pokemon',
-      type: newType,
-      generation: newGeneration,
-      originalSpriteSize: newOriginalSpriteSize,
-    });
+    try {
+      void this.getWebview().postMessage({
+        command: 'evolve-pokemon',
+        type: newType,
+        generation: newGeneration,
+        originalSpriteSize: newOriginalSpriteSize,
+      });
+    } catch {
+      // View not currently visible; the cache update above ensures the evolved form
+      // renders correctly when the view is reopened.
+    }
   }
 
   protected getWebview(): vscode.Webview {

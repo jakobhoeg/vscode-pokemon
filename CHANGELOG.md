@@ -2,6 +2,13 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [Unreleased]
+
+- feat: gain XP and evolve your active Pokémon while typing in the editor. Uses canonical per-species growth rates and real evolution thresholds for Gen 1-2; Gen 3+ species fall back to safe defaults (no evolution)
+- feat: status bar shows `Lv N XP/next` for the active Pokémon; click to reset
+- feat: new settings — `enableXp`, `xpGainMultiplier`, `xpPerEventCap`, `evolutionNotifications`, `showXpInStatusBar`
+- feat: new command — `vscode-pokemon.reset-xp` reverts the active Pokémon to its base form
+
 ## [4.3.5]
 
 - fix: resolve delay when removing more than one pokemon quickly
