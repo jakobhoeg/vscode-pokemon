@@ -483,6 +483,44 @@ export function pokemonPanelApp(
                 pokemonCounter = 1;
                 saveState(stateApi);
                 break;
+            case 'evolve-pokemon': {
+                // The "active" pokemon is the first one in the collection (the main pokemon spawned
+                // from settings). Replace it in-place: preserve name and position, swap species.
+                var first = allPokemon.pokemonCollection[0];
+                if (!first) {
+                    break;
+                }
+                var preservedName = first.pokemon.name;
+                var preservedLeft = first.el.style.left;
+                var preservedBottom = first.el.style.bottom;
+                var preservedColor = first.color;
+                allPokemon.remove(first.pokemon.name);
+                try {
+                    var evolved = addPokemonToPanel(
+                        message.type,
+                        basePokemonUri,
+                        message.generation,
+                        message.originalSpriteSize,
+                        preservedColor,
+                        pokemonSize,
+                        parseInt(preservedLeft || '0') || randomStartPosition(),
+                        parseInt(preservedBottom || '0') || floor,
+                        floor,
+                        preservedName,
+                        stateApi,
+                        false,
+                    );
+                    // Re-insert at the head so this remains the "active" pokemon.
+                    allPokemon.pokemonCollection.unshift(evolved);
+                    saveState(stateApi);
+                } catch (e: any) {
+                    stateApi?.postMessage({
+                        command: 'alert',
+                        text: `Failed to evolve pokemon: ${e?.message ?? e}`,
+                    });
+                }
+                break;
+            }
         }
     });
 }

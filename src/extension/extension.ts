@@ -16,6 +16,12 @@ import { randomName } from '../common/names';
 import * as localize from '../common/localize';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
 import { getDefaultPokemon, getPokemonByGeneration, getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
+import {
+    ActivePokemonState,
+    EvolutionNotificationMode,
+    XpTracker,
+    XpTrackerConfig,
+} from './xp-tracker';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -86,6 +92,31 @@ function getThrowWithMouseConfiguration(): boolean {
         .get<boolean>('throwBallWithMouse', true);
 }
 
+function getXpTrackerConfig(): XpTrackerConfig {
+    const cfg = vscode.workspace.getConfiguration('vscode-pokemon');
+    return {
+        enabled: cfg.get<boolean>('enableXp', true),
+        multiplier: cfg.get<number>('xpGainMultiplier', 10),
+        perEventCap: cfg.get<number>('xpPerEventCap', 200),
+    };
+}
+
+function getEvolutionNotificationMode(): EvolutionNotificationMode {
+    const mode = vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<EvolutionNotificationMode>('evolutionNotifications', 'info');
+    if (mode !== 'silent' && mode !== 'info' && mode !== 'modal') {
+        return 'info';
+    }
+    return mode;
+}
+
+function getShowXpInStatusBar(): boolean {
+    return vscode.workspace
+        .getConfiguration('vscode-pokemon')
+        .get<boolean>('showXpInStatusBar', true);
+}
+
 function updatePanelThrowWithMouse(): void {
     const panel = getPokemonPanel();
     if (panel !== undefined) {
@@ -122,14 +153,14 @@ export class PokemonSpecification {
         this.originalSpriteSize = POKEMON_DATA[type].originalSpriteSize || 32;
     }
 
-    static fromConfiguration(): PokemonSpecification {
+    static fromConfiguration(typeOverride?: PokemonType): PokemonSpecification {
         var color = vscode.workspace
             .getConfiguration('vscode-pokemon')
             .get<PokemonColor>('pokemonColor', DEFAULT_COLOR);
         if (ALL_COLORS.lastIndexOf(color) === -1) {
             color = DEFAULT_COLOR;
         }
-        var type = vscode.workspace
+        var type = typeOverride ?? vscode.workspace
             .getConfiguration('vscode-pokemon')
             .get<PokemonType>('pokemonType', DEFAULT_POKEMON_TYPE);
 
@@ -139,6 +170,17 @@ export class PokemonSpecification {
         }
 
         return new PokemonSpecification(color, type, getConfiguredSize());
+    }
+
+    /** Reads just the configured pokemonType setting (the base, pre-evolution species). */
+    static getConfiguredBaseType(): PokemonType {
+        var type = vscode.workspace
+            .getConfiguration('vscode-pokemon')
+            .get<PokemonType>('pokemonType', DEFAULT_POKEMON_TYPE);
+        if (!POKEMON_DATA[type]) {
+            type = DEFAULT_POKEMON_TYPE;
+        }
+        return type;
     }
 
     static collectionFromMemento(
@@ -195,6 +237,8 @@ export async function storeCollectionAsMemento(
 }
 
 let spawnPokemonStatusBar: vscode.StatusBarItem;
+let xpStatusBar: vscode.StatusBarItem;
+let xpTracker: XpTracker | undefined;
 
 interface IPokemonInfo {
     type: PokemonType;
@@ -298,7 +342,9 @@ export function activate(context: vscode.ExtensionContext) {
             ) {
                 await vscode.commands.executeCommand('pokemonView.focus');
             } else {
-                const spec = PokemonSpecification.fromConfiguration();
+                const spec = PokemonSpecification.fromConfiguration(
+                    xpTracker?.getState().currentType,
+                );
                 PokemonPanel.createOrShow(
                     context.extensionUri,
                     spec.color,
@@ -333,6 +379,13 @@ export function activate(context: vscode.ExtensionContext) {
     spawnPokemonStatusBar.command = 'vscode-pokemon.spawn-pokemon';
     context.subscriptions.push(spawnPokemonStatusBar);
 
+    xpStatusBar = vscode.window.createStatusBarItem(
+        vscode.StatusBarAlignment.Right,
+        99,
+    );
+    xpStatusBar.command = 'vscode-pokemon.reset-xp';
+    context.subscriptions.push(xpStatusBar);
+
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(updateStatusBar),
     );
@@ -346,7 +399,20 @@ export function activate(context: vscode.ExtensionContext) {
     );
     updateStatusBar();
 
-    const spec = PokemonSpecification.fromConfiguration();
+    // Initialize the XP tracker before creating any pokemon spec — the tracker decides what species
+    // the main pokemon should actually render as (post-evolution).
+    xpTracker = new XpTracker(
+        context,
+        PokemonSpecification.getConfiguredBaseType(),
+        getXpTrackerConfig,
+        {
+            onEvolve: (oldType, newType) => handlePokemonEvolved(oldType, newType),
+            onUpdate: (state) => updateXpStatusBar(state),
+        },
+    );
+    context.subscriptions.push(xpTracker.start());
+
+    const spec = PokemonSpecification.fromConfiguration(xpTracker.getState().currentType);
     webviewViewProvider = new PokemonWebviewViewProvider(
         context.extensionUri,
         spec.color,
@@ -634,6 +700,38 @@ export function activate(context: vscode.ExtensionContext) {
         }))
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-pokemon.reset-xp', async () => {
+            if (!xpTracker) {
+                return;
+            }
+            const choice = await vscode.window.showWarningMessage(
+                vscode.l10n.t(
+                    'Reset XP for your active Pokémon? This reverts it to its base form.',
+                ),
+                { modal: true },
+                vscode.l10n.t('Reset'),
+            );
+            if (choice !== vscode.l10n.t('Reset')) {
+                return;
+            }
+            const before = xpTracker.getState().currentType;
+            xpTracker.resetXp();
+            const after = xpTracker.getState().currentType;
+            if (before !== after) {
+                const panel = getPokemonPanel();
+                if (panel) {
+                    const config = POKEMON_DATA[after];
+                    panel.evolveActivePokemon(
+                        after,
+                        `gen${config.generation}`,
+                        config.originalSpriteSize ?? 32,
+                    );
+                }
+            }
+        }),
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand(
             'vscode-pokemon.remove-all-pokemon',
             async () => {
@@ -657,6 +755,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration(
             (e: vscode.ConfigurationChangeEvent): void => {
+                if (e.affectsConfiguration('vscode-pokemon.pokemonType')) {
+                    // User picked a different species — reset XP and revert to base form.
+                    xpTracker?.reset(PokemonSpecification.getConfiguredBaseType());
+                }
                 if (
                     e.affectsConfiguration('vscode-pokemon.pokemonColor') ||
                     e.affectsConfiguration('vscode-pokemon.pokemonType') ||
@@ -664,7 +766,9 @@ export function activate(context: vscode.ExtensionContext) {
                     e.affectsConfiguration('vscode-pokemon.theme') ||
                     e.affectsConfiguration('workbench.colorTheme')
                 ) {
-                    const spec = PokemonSpecification.fromConfiguration();
+                    const spec = PokemonSpecification.fromConfiguration(
+                        xpTracker?.getState().currentType,
+                    );
                     const panel = getPokemonPanel();
                     if (panel) {
                         panel.updatePokemonColor(spec.color);
@@ -685,6 +789,15 @@ export function activate(context: vscode.ExtensionContext) {
                 if (e.affectsConfiguration('vscode-pokemon.throwBallWithMouse')) {
                     updatePanelThrowWithMouse();
                 }
+
+                if (
+                    e.affectsConfiguration('vscode-pokemon.enableXp') ||
+                    e.affectsConfiguration('vscode-pokemon.showXpInStatusBar')
+                ) {
+                    if (xpTracker) {
+                        updateXpStatusBar(xpTracker.getState());
+                    }
+                }
             },
         ),
     );
@@ -697,7 +810,9 @@ export function activate(context: vscode.ExtensionContext) {
                 webviewPanel.webview.options = getWebviewOptions(
                     context.extensionUri,
                 );
-                const spec = PokemonSpecification.fromConfiguration();
+                const spec = PokemonSpecification.fromConfiguration(
+                    xpTracker?.getState().currentType,
+                );
                 PokemonPanel.revive(
                     webviewPanel,
                     context.extensionUri,
@@ -721,8 +836,66 @@ function updateStatusBar(): void {
     spawnPokemonStatusBar.show();
 }
 
+function updateXpStatusBar(state: ActivePokemonState): void {
+    if (!xpStatusBar) {
+        return;
+    }
+    const cfg = getXpTrackerConfig();
+    if (!cfg.enabled || !getShowXpInStatusBar()) {
+        xpStatusBar.hide();
+        return;
+    }
+    const speciesName = POKEMON_DATA[state.currentType]?.name ?? state.currentType;
+    if (state.level >= 100) {
+        xpStatusBar.text = `$(star-full) Lv 100 ${speciesName}`;
+    } else {
+        xpStatusBar.text = `$(star-full) Lv ${state.level} ${state.xpIntoLevel}/${state.xpToNextLevel}`;
+    }
+    xpStatusBar.tooltip = vscode.l10n.t(
+        '{0} (Lv {1}) — {2} XP total. Click to reset XP.',
+        speciesName,
+        state.level.toString(),
+        state.totalXp.toString(),
+    );
+    xpStatusBar.show();
+}
+
+function handlePokemonEvolved(oldType: PokemonType, newType: PokemonType): void {
+    const newConfig = POKEMON_DATA[newType];
+    if (!newConfig) {
+        return;
+    }
+    const panel = getPokemonPanel();
+    if (panel) {
+        panel.evolveActivePokemon(
+            newType,
+            `gen${newConfig.generation}`,
+            newConfig.originalSpriteSize ?? 32,
+        );
+    }
+    const mode = getEvolutionNotificationMode();
+    if (mode === 'silent') {
+        return;
+    }
+    const oldName = POKEMON_DATA[oldType]?.name ?? oldType;
+    const newName = newConfig.name;
+    const message = vscode.l10n.t(
+        'Your {0} evolved into {1}!',
+        oldName,
+        newName,
+    );
+    if (mode === 'modal') {
+        void vscode.window.showInformationMessage(message, { modal: true });
+    } else {
+        void vscode.window.showInformationMessage(message);
+    }
+}
+
 export function spawnPokemonDeactivate() {
     spawnPokemonStatusBar.dispose();
+    if (xpStatusBar) {
+        xpStatusBar.dispose();
+    }
 }
 
 function getWebviewOptions(
@@ -751,6 +924,7 @@ interface IPokemonPanel {
     updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind): void;
     update(): void;
     setThrowWithMouse(newThrowWithMouse: boolean): void;
+    evolveActivePokemon(newType: PokemonType, newGeneration: string, newOriginalSpriteSize: number): void;
 }
 
 class PokemonWebviewContainer implements IPokemonPanel {
@@ -887,6 +1061,23 @@ class PokemonWebviewContainer implements IPokemonPanel {
         void this.getWebview().postMessage({
             command: 'delete-pokemon',
             name: pokemonName,
+        });
+    }
+
+    public evolveActivePokemon(
+        newType: PokemonType,
+        newGeneration: string,
+        newOriginalSpriteSize: number,
+    ): void {
+        // Keep our cached state in sync so the panel HTML regenerates with the evolved form on reload.
+        this._pokemonType = newType;
+        this._pokemonGeneration = newGeneration;
+        this._pokemonOriginalSpriteSize = newOriginalSpriteSize;
+        void this.getWebview().postMessage({
+            command: 'evolve-pokemon',
+            type: newType,
+            generation: newGeneration,
+            originalSpriteSize: newOriginalSpriteSize,
         });
     }
 
@@ -1233,7 +1424,9 @@ function getNonce() {
 }
 
 async function createPokemonPlayground(context: vscode.ExtensionContext) {
-    const spec = PokemonSpecification.fromConfiguration();
+    const spec = PokemonSpecification.fromConfiguration(
+        xpTracker?.getState().currentType,
+    );
     PokemonPanel.createOrShow(
         context.extensionUri,
         spec.color,

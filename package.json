@@ -38,6 +38,7 @@
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
+        "onCommand:vscode-pokemon.reset-xp",
         "onWebviewPanel:pokemonCoding",
         "onView:explorer",
         "onView:pokemonView",
@@ -131,6 +132,11 @@
                 "command": "vscode-pokemon.roll-call",
                 "title": "Roll-call",
                 "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.reset-xp",
+                "title": "Reset XP for active Pokémon",
+                "category": "Pokemon Coding"
             }
         ],
         "configuration": [
@@ -166,6 +172,40 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
+                    },
+                    "vscode-pokemon.enableXp": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Earn XP for your active Pokémon by typing in the editor. When enough XP is gained, your Pokémon evolves."
+                    },
+                    "vscode-pokemon.xpGainMultiplier": {
+                        "type": "number",
+                        "default": 10,
+                        "minimum": 0,
+                        "maximum": 1000,
+                        "description": "XP awarded per character typed. Increase for faster evolution; set to 1 for canonical Pokémon pace."
+                    },
+                    "vscode-pokemon.xpPerEventCap": {
+                        "type": "number",
+                        "default": 200,
+                        "minimum": 1,
+                        "maximum": 100000,
+                        "description": "Maximum XP from a single edit. Prevents large pastes from instantly evolving your Pokémon."
+                    },
+                    "vscode-pokemon.evolutionNotifications": {
+                        "type": "string",
+                        "enum": [
+                            "silent",
+                            "info",
+                            "modal"
+                        ],
+                        "default": "info",
+                        "description": "How to announce when your Pokémon evolves."
+                    },
+                    "vscode-pokemon.showXpInStatusBar": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Show level and XP for the active Pokémon in the status bar."
                     }
                 }
             }
