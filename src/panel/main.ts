@@ -452,6 +452,47 @@ function initCanvas() {
   ctx.canvas.height = window.innerHeight;
 }
 
+function updateXpHud(payload: {
+  visible: boolean;
+  speciesName: string;
+  level: number;
+  percent: number;
+  numbersText: string;
+}): void {
+  const hud = document.getElementById('xp-hud');
+  if (!hud) {
+    return;
+  }
+  if (!payload.visible) {
+    hud.setAttribute('hidden', '');
+    return;
+  }
+  hud.removeAttribute('hidden');
+  const labelEl = document.getElementById('xp-hud-label');
+  const levelEl = document.getElementById('xp-hud-level');
+  const fillEl = document.getElementById(
+    'xp-hud-bar-fill',
+  ) as HTMLDivElement | null;
+  const numbersEl = document.getElementById('xp-hud-numbers');
+  if (labelEl) {
+    labelEl.textContent = payload.speciesName;
+  }
+  if (levelEl) {
+    levelEl.textContent = `Lv ${payload.level}`;
+  }
+  if (fillEl) {
+    fillEl.style.width = `${payload.percent}%`;
+    if (payload.numbersText === 'MAX') {
+      fillEl.classList.add('maxed');
+    } else {
+      fillEl.classList.remove('maxed');
+    }
+  }
+  if (numbersEl) {
+    numbersEl.textContent = payload.numbersText;
+  }
+}
+
 // It cannot access the main VS Code APIs directly.
 export function pokemonPanelApp(
   basePokemonUri: string,
@@ -463,6 +504,13 @@ export function pokemonPanelApp(
   throwBallWithMouse: boolean,
   gen: string,
   originalSpriteSize: number,
+  initialXpPayload?: {
+    visible: boolean;
+    speciesName: string;
+    level: number;
+    percent: number;
+    numbersText: string;
+  },
   stateApi?: VscodeStateApi,
 ) {
   var floor = 0;
@@ -516,6 +564,41 @@ export function pokemonPanelApp(
   if (hasRecoverableState) {
     console.log('Recovering state - ', state);
     recoverState(basePokemonUri, gen, pokemonSize, floor, stateApi);
+    // Ensure the active pokemon (index 0) reflects the evolved type passed from the extension.
+    // The webview-local saved state may lag behind if the view was hidden during an evolution.
+    if (allPokemon.pokemonCollection.length > 0) {
+      const active = allPokemon.pokemonCollection[0];
+      if (active.type !== pokemonType) {
+        const preservedName = active.pokemon.name;
+        const preservedLeft = active.el.style.left;
+        const preservedBottom = active.el.style.bottom;
+        const preservedColor = active.color;
+        allPokemon.remove(active.pokemon.name);
+        try {
+          const evolved = addPokemonToPanel(
+            pokemonType,
+            basePokemonUri,
+            gen,
+            originalSpriteSize,
+            preservedColor,
+            pokemonSize,
+            parseInt(preservedLeft || '0') || randomStartPosition(),
+            parseInt(preservedBottom || '0') || floor,
+            floor,
+            preservedName,
+            stateApi,
+            false,
+          );
+          allPokemon.pokemonCollection.unshift(evolved);
+          saveState(stateApi);
+        } catch (e: any) {
+          console.error(
+            'Failed to sync active pokemon type on view restore:',
+            e,
+          );
+        }
+      }
+    }
   } else {
     console.log('No recoverable pokemon state, starting an empty session.');
     pokemonCounter = normalizePokemonCounter(state?.pokemonCounter);
@@ -523,6 +606,11 @@ export function pokemonPanelApp(
   }
 
   initCanvas();
+
+  // Apply the initial XP HUD state provided by the extension host.
+  if (initialXpPayload) {
+    updateXpHud(initialXpPayload);
+  }
 
   // Handle messages sent from the extension to the webview
   window.addEventListener('message', (event): void => {
@@ -612,6 +700,9 @@ export function pokemonPanelApp(
       case 'pause-pokemon':
         pokemonCounter = 1;
         saveState(stateApi);
+        break;
+      case 'update-xp':
+        updateXpHud(message.payload);
         break;
       case 'evolve-pokemon': {
         // The "active" pokemon is the first one in the collection (the main pokemon spawned

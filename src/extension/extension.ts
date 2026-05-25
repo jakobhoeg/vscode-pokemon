@@ -482,7 +482,13 @@ export function activate(context: vscode.ExtensionContext) {
     getXpTrackerConfig,
     {
       onEvolve: (oldType, newType) => handlePokemonEvolved(oldType, newType),
-      onUpdate: (state) => updateXpStatusBar(state),
+      onUpdate: (state) => {
+        updateXpStatusBar(state);
+        const panel = getPokemonPanel();
+        if (panel) {
+          panel.updateXp(buildXpHudPayload(state));
+        }
+      },
     },
   );
   context.subscriptions.push(xpTracker.start());
@@ -1223,6 +1229,32 @@ function updateStatusBar(): void {
   spawnPokemonStatusBar.show();
 }
 
+function buildXpHudPayload(state: ActivePokemonState): IXpHudPayload {
+  const cfg = getXpTrackerConfig();
+  const speciesName =
+    POKEMON_DATA[state.currentType]?.name ?? state.currentType;
+  if (state.level >= 100) {
+    return {
+      visible: cfg.enabled,
+      speciesName,
+      level: 100,
+      percent: 100,
+      numbersText: 'MAX',
+    };
+  }
+  const percent =
+    state.xpForThisLevel > 0
+      ? Math.round((state.xpIntoLevel / state.xpForThisLevel) * 100)
+      : 0;
+  return {
+    visible: cfg.enabled,
+    speciesName,
+    level: state.level,
+    percent,
+    numbersText: `${state.xpIntoLevel} / ${state.xpForThisLevel}`,
+  };
+}
+
 function updateXpStatusBar(state: ActivePokemonState): void {
   if (!xpStatusBar) {
     return;
@@ -1316,6 +1348,7 @@ interface IPokemonPanel {
     newGeneration: string,
     newOriginalSpriteSize: number,
   ): void;
+  updateXp(payload: IXpHudPayload): void;
 }
 
 class PokemonWebviewContainer implements IPokemonPanel {
@@ -1535,6 +1568,11 @@ class PokemonWebviewContainer implements IPokemonPanel {
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
+    // Initial XP HUD payload — embedded into the HTML so the bar renders correctly on the
+    // very first paint, before any 'update-xp' message arrives from the extension.
+    const initialXp = this.getInitialXpHud();
+    const initialXpJson = JSON.stringify(initialXp);
+
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -1564,6 +1602,12 @@ class PokemonWebviewContainer implements IPokemonPanel {
                 <canvas id="pokemonCanvas"></canvas>
                 <div id="pokemonContainer"></div>
                 <div id="foreground"></div>
+                <div id="xp-hud"${initialXp.visible ? '' : ' hidden'}>
+                    <span id="xp-hud-label">${initialXp.speciesName}</span>
+                    <span id="xp-hud-level">Lv ${initialXp.level}</span>
+                    <div id="xp-hud-bar"><div id="xp-hud-bar-fill" style="width: ${initialXp.percent}%"></div></div>
+                    <span id="xp-hud-numbers">${initialXp.numbersText}</span>
+                </div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     pokemonApp.pokemonPanelApp(
@@ -1576,11 +1620,51 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",
+                        ${initialXpJson}
                     );
                 </script>
             </body>
 			</html>`;
   }
+
+  /**
+   * Override in concrete subclasses to provide an initial XP HUD payload from the live
+   * XpTracker. Default returns a hidden HUD so non-XP-aware contexts still work.
+   */
+  protected getInitialXpHud(): IXpHudPayload {
+    if (!xpTracker) {
+      return {
+        visible: false,
+        speciesName: '',
+        level: 1,
+        percent: 0,
+        numbersText: '',
+      };
+    }
+    return buildXpHudPayload(xpTracker.getState());
+  }
+
+  public updateXp(payload: IXpHudPayload): void {
+    try {
+      void this.getWebview().postMessage({
+        command: 'update-xp',
+        payload,
+      });
+    } catch {
+      // View not currently visible; the HUD will pick up the latest state from
+      // getInitialXpHud() when the view resolves next.
+    }
+  }
+}
+
+export interface IXpHudPayload {
+  visible: boolean;
+  speciesName: string;
+  level: number;
+  /** 0–100 for the bar fill width. */
+  percent: number;
+  /** Pre-formatted "xpIntoLevel / xpForThisLevel" or "MAX" for level 100. */
+  numbersText: string;
 }
 
 function handleWebviewMessage(message: WebviewMessage) {
