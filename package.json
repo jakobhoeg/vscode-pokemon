@@ -2,7 +2,7 @@
     "name": "vscode-pokemon",
     "displayName": "vscode-pokemon",
     "description": "Pokémon for your VS Code",
-    "version": "2.0.2",
+    "version": "4.3.5",
     "engines": {
         "vscode": "^1.73.0"
     },
@@ -38,6 +38,8 @@
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
         "onCommand:vscode-pokemon.import-pokemon-list",
+        "onCommand:vscode-pokemon.configure-keybindings",
+        "onCommand:vscode-pokemon.change-pokemon-language",
         "onCommand:vscode-pokemon.reset-xp",
         "onWebviewPanel:pokemonCoding",
         "onView:explorer",
@@ -53,7 +55,8 @@
                     "type": "webview",
                     "id": "pokemonView",
                     "name": "VS Code Pokémon",
-                    "when": "vscode-pokemon.position == 'explorer'"
+                    "when": "vscode-pokemon.position == 'explorer'",
+                    "icon": "media/icon/dark-add.svg"
                 }
             ]
         },
@@ -134,13 +137,46 @@
                 "category": "Pokemon Coding"
             },
             {
+                "command": "vscode-pokemon.configure-keybindings",
+                "title": "Configure keybindings",
+                "category": "Pokemon Coding"
+            },
+            {
+                "command": "vscode-pokemon.change-pokemon-language",
+                "title": "Change Pokemon language",
+                "category": "Pokemon Coding"
+            },
+            {
                 "command": "vscode-pokemon.reset-xp",
                 "title": "Reset XP for active Pokémon",
                 "category": "Pokemon Coding"
             }
         ],
+        "keybindings": [
+            {
+                "command": "vscode-pokemon.spawn-pokemon",
+                "key": "alt+shift+w",
+                "mac": "alt+shift+w"
+            },
+            {
+                "command": "vscode-pokemon.spawn-random-pokemon",
+                "key": "alt+shift+q",
+                "mac": "alt+shift+q"
+            },
+            {
+                "command": "vscode-pokemon.delete-pokemon",
+                "key": "alt+shift+d",
+                "mac": "alt+shift+d"
+            },
+            {
+                "command": "vscode-pokemon.remove-all-pokemon",
+                "key": "alt+shift+backspace",
+                "mac": "alt+shift+backspace"
+            }
+        ],
         "configuration": [
             {
+                "title": "VS Code Pokemon",
                 "properties": {
                     "vscode-pokemon.pokemonSize": {
                         "type": "string",
@@ -150,7 +186,7 @@
                             "medium",
                             "large"
                         ],
-                        "default": "nano",
+                        "default": "medium",
                         "description": "Pokemon size"
                     },
                     "vscode-pokemon.position": {
@@ -172,6 +208,45 @@
                         ],
                         "default": "none",
                         "description": "Background theme assets for your pokemon"
+                    },
+                    "vscode-pokemon.defaultPokemon": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "Pokemon type (e.g., 'pikachu', 'charizard', 'bulbasaur')"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Custom name for the pokemon (optional)"
+                                }
+                            },
+                            "required": [
+                                "type"
+                            ]
+                        },
+                        "default": [],
+                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"charizard\"}]"
+                    },
+                    "vscode-pokemon.shinyOdds": {
+                        "type": "number",
+                        "default": 8192,
+                        "minimum": 1,
+                        "description": "Odds (1 in N) for a Pokémon to be shiny. Lower = more shinies. Default is 8192."
+                    },
+                    "vscode-pokemon.pokemonLanguage": {
+                        "type": "string",
+                        "enum": [
+                            "auto",
+                            "en-US",
+                            "fr-FR",
+                            "de-DE",
+                            "ja-JP"
+                        ],
+                        "default": "auto",
+                        "description": "Language for Pokemon names. 'auto' uses VS Code's language, or you can choose a specific language (e.g., 'fr-FR' for French, 'en-US' for English, 'de-DE' for German, 'ja-JP' for Japanese). Only official Pokemon languages are supported."
                     },
                     "vscode-pokemon.enableXp": {
                         "type": "boolean",
@@ -221,12 +296,15 @@
         "watch": "webpack && tsc -watch -p ./tsconfig.extension.json",
         "watch:web": "webpack --watch",
         "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src --ext ts && prettier --check src",
-        "lint:fix": "eslint src --ext ts --fix && prettier --write src",
+        "lint": "eslint src --ext ts",
+        "lint:fix": "eslint src --ext ts --fix",
+        "format:check": "prettier --check src",
+        "format": "prettier --write src",
         "test": "node ./out/test/runTest.js",
         "test:coverage": "COVERAGE=1 node ./out/test/runTest.js",
         "test:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
-        "test:gifs": "node ./out/test/gifs.js"
+        "test:gifs": "node ./out/test/gifs.js",
+        "prepare": "husky"
     },
     "devDependencies": {
         "@rbarilani/remove-source-map-url-webpack-plugin": "^1.1.0",
@@ -240,15 +318,18 @@
         "@vscode/l10n-dev": "^0.0.29",
         "@vscode/test-web": "^0.0.50",
         "eslint": "^8.18.0",
+        "eslint-config-prettier": "^9.1.2",
+        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-unused-imports": "^2.0.0",
         "glob": "^8.0.3",
         "gulp": "^5.0.0",
+        "husky": "^9.1.7",
         "jsdom": "^20.0.0",
         "jsdom-global": "^3.0.2",
         "mocha": "^10.0.0",
         "nyc": "^15.1.0",
         "path-browserify": "^1.0.1",
-        "prettier": "^2.7.1",
+        "prettier": "^3.3.3",
         "process": "^0.11.10",
         "ts-loader": "^9.3.0",
         "typescript": "^4.7.4",
@@ -259,5 +340,11 @@
     },
     "dependencies": {
         "@vscode/l10n": "^0.0.10"
+    },
+    "lint-staged": {
+        "*.ts": [
+            "eslint --fix",
+            "prettier --write"
+        ]
     }
 }

@@ -54,7 +54,8 @@ suite('panel: evolve-pokemon message', () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const collection = require('../../panel/pokemon-collection');
 
-        // Boot the panel app with Bulbasaur.
+        // Boot the panel app. Since upstream's panelApp starts an empty session and waits
+        // for spawn-pokemon messages, we'll seed the active pokemon ourselves below.
         main.pokemonPanelApp(
             'media',
             'none',
@@ -68,6 +69,22 @@ suite('panel: evolve-pokemon message', () => {
         );
 
         const allPokemon = main.allPokemon;
+        const win = (global as any).window;
+
+        // Seed the active pokemon by posting a spawn-pokemon message.
+        win.dispatchEvent(
+            new win.MessageEvent('message', {
+                data: {
+                    command: 'spawn-pokemon',
+                    type: 'bulbasaur',
+                    color: 'default',
+                    name: 'Sparky',
+                    generation: '1',
+                    originalSpriteSize: 32,
+                },
+            }),
+        );
+
         assert.strictEqual(allPokemon.pokemonCollection.length, 1);
         const originalName = allPokemon.pokemonCollection[0].pokemon.name;
         assert.strictEqual(allPokemon.pokemonCollection[0].type, 'bulbasaur');

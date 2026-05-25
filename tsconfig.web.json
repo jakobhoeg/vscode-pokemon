@@ -3,12 +3,10 @@
 		"module": "commonjs",
 		"target": "es2020",
 		"outDir": "dist",
-		"lib": [
-			"es6", "WebWorker"
-		],
+		"lib": ["es6", "WebWorker"],
 		"sourceMap": true,
 		"rootDirs": ["panel", "common"],
-		"strict": true   /* enable all strict type-checking options */
+		"strict": true /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
@@ -19,6 +17,6 @@
 		".vscode-test-web",
 		"src/extension",
 		"src/test",
-		"src/panel",
+		"src/panel"
 	]
 }
