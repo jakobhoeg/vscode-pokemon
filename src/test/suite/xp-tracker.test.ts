@@ -42,31 +42,56 @@ function defaultConfig(): XpTrackerConfig {
 }
 
 suite('XpTracker', () => {
-  test('fresh state starts at base type, level 1, zero XP', () => {
+  test('fresh state has no active pokemon', () => {
     const ctx = makeContext();
     const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
     const s = tracker.getState();
-    assert.strictEqual(s.baseType, 'bulbasaur');
-    assert.strictEqual(s.currentType, 'bulbasaur');
-    assert.strictEqual(s.totalXp, 0);
-    assert.strictEqual(s.level, 1);
-    assert.ok(
-      s.xpForThisLevel > 0,
-      'expected positive xp-to-next-level at lvl 1',
+    assert.strictEqual(
+      s.hasActive,
+      false,
+      'fresh tracker should have no active pokemon — HUD should hide',
     );
   });
 
-  test('typing in a file accrues XP', () => {
+  test('addPokemon creates an active record at level 1, zero XP', () => {
     const ctx = makeContext();
     const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
+    const s = tracker.getState();
+    assert.strictEqual(s.hasActive, true);
+    assert.strictEqual(s.name, 'Sparky');
+    assert.strictEqual(s.baseType, 'bulbasaur');
+    assert.strictEqual(s.currentType, 'bulbasaur');
+    assert.strictEqual(s.totalXp, 0);
+    assert.strictEqual(s.level, 1);
+    assert.ok(s.xpForThisLevel > 0);
+  });
+
+  test('typing in a file accrues XP on the active pokemon', () => {
+    const ctx = makeContext();
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+      onEvolve: () => undefined,
+      onUpdate: () => undefined,
+    });
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     tracker._processEditForTesting(15, false, 'file');
     assert.strictEqual(tracker.getState().totalXp, 150);
+  });
+
+  test('typing when no pokemon is active accrues no XP', () => {
+    const ctx = makeContext();
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+      onEvolve: () => undefined,
+      onUpdate: () => undefined,
+    });
+    tracker._processEditForTesting(100, false, 'file');
+    assert.strictEqual(tracker.getState().hasActive, false);
   });
 
   test('undo events do not grant XP', () => {
@@ -75,6 +100,7 @@ suite('XpTracker', () => {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     tracker._processEditForTesting(50, true, 'file');
     assert.strictEqual(tracker.getState().totalXp, 0);
   });
@@ -85,6 +111,7 @@ suite('XpTracker', () => {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     tracker._processEditForTesting(50, false, 'output');
     assert.strictEqual(tracker.getState().totalXp, 0);
   });
@@ -96,9 +123,9 @@ suite('XpTracker', () => {
       onEvolve: (from, to) => evolveCalls.push({ from, to }),
       onUpdate: () => undefined,
     });
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     // Bulbasaur is medium-slow; lvl 16 = xpForLevel('medium-slow', 16) = 3752
     const targetXp = xpForLevel('medium-slow', 16);
-    // We need to grant at least targetXp. With multiplier=10, perEventCap=200, that's ceil(targetXp/200) events.
     const eventsNeeded = Math.ceil(targetXp / 200);
     for (let i = 0; i < eventsNeeded; i++) {
       tracker._processEditForTesting(100, false, 'file');
@@ -109,6 +136,7 @@ suite('XpTracker', () => {
       'ivysaur',
       `expected ivysaur, got ${s.currentType}`,
     );
+    assert.strictEqual(s.baseType, 'bulbasaur', 'base type stays at original');
     assert.strictEqual(evolveCalls.length, 1);
     assert.strictEqual(evolveCalls[0].from, 'bulbasaur');
     assert.strictEqual(evolveCalls[0].to, 'ivysaur');
@@ -126,28 +154,27 @@ suite('XpTracker', () => {
         onUpdate: () => undefined,
       },
     );
-    // Caterpie is medium-fast (n^3); evolves at lvl 7 -> metapod, lvl 10 -> butterfree.
-    // xpForLevel('medium-fast', 10) = 1000.
+    tracker.addPokemon('Wiggly', 'caterpie' as any);
     tracker._processEditForTesting(1500, false, 'file');
     const s = tracker.getState();
     assert.strictEqual(s.currentType, 'butterfree');
-    // Exactly two evolutions in the cascade.
     assert.strictEqual(evolveCalls.length, 1);
     assert.strictEqual(evolveCalls[0].from, 'caterpie');
     assert.strictEqual(evolveCalls[0].to, 'butterfree');
   });
 
-  test('reset(newType) zeros XP and switches base type', () => {
+  test('reset(newType) clears all records and seeds a fresh one', () => {
     const ctx = makeContext();
     const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    // 50 chars * 10 multiplier = 500, but capped at perEventCap (200).
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     tracker._processEditForTesting(50, false, 'file');
     assert.strictEqual(tracker.getState().totalXp, 200);
     tracker.reset('charmander' as any);
     const s = tracker.getState();
+    assert.strictEqual(s.hasActive, true);
     assert.strictEqual(s.baseType, 'charmander');
     assert.strictEqual(s.currentType, 'charmander');
     assert.strictEqual(s.totalXp, 0);
@@ -161,6 +188,7 @@ suite('XpTracker', () => {
       () => ({ enabled: true, multiplier: 1, perEventCap: 10_000_000 }),
       { onEvolve: () => undefined, onUpdate: () => undefined },
     );
+    tracker.addPokemon('Wiggly', 'caterpie' as any);
     tracker._processEditForTesting(1500, false, 'file');
     assert.strictEqual(tracker.getState().currentType, 'butterfree');
     tracker.resetXp();
@@ -170,48 +198,94 @@ suite('XpTracker', () => {
     assert.strictEqual(s.totalXp, 0);
   });
 
-  test('persistence: state restored from globalState when base type matches', () => {
+  test('removePokemon drops the active record; HUD falls back to a survivor', () => {
     const ctx = makeContext();
-    const tracker1 = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    tracker1._processEditForTesting(200, false, 'file');
-    // Force flush. resetXp triggers flush via the same code path; rebuild a tracker first.
-    // Easier: call resetXp via the tracker - wait, that zeroes it. Instead just rely on the
-    // debounced timer; but for the test, we call _processEditForTesting again to ensure a write...
-    // Actually FakeMemento.update is sync (returns resolved Promise), and applyGain calls
-    // markDirty which schedules a flush. The flush is via setTimeout — so it hasn't fired yet.
-    // Force a flush by calling resetXp's effect indirectly: trigger a second _processEditForTesting and
-    // then synchronously construct a new tracker — the timer won't have fired and globalState
-    // will still be empty. To verify persistence we need to bypass the debounce; do that by
-    // calling reset() which flushes immediately.
-    // Simpler: directly poke flushNow by calling a method that flushes. Use reset() to the
-    // same type — but that zeros XP. So instead seed the context with known keys directly.
-    const ctx2 = makeContext();
-    ctx2.globalState.update(
+    tracker.addPokemon('A', 'bulbasaur' as any);
+    tracker._processEditForTesting(10, false, 'file');
+    assert.strictEqual(tracker.getState().totalXp, 100);
+    tracker.addPokemon('B', 'charmander' as any);
+    assert.strictEqual(tracker.getState().name, 'B');
+    assert.strictEqual(tracker.getState().totalXp, 0, 'B starts fresh');
+    tracker.removePokemon('B');
+    const s = tracker.getState();
+    assert.strictEqual(s.hasActive, true);
+    assert.strictEqual(s.name, 'A');
+    assert.strictEqual(
+      s.totalXp,
+      100,
+      "A's XP was preserved while B was active",
+    );
+  });
+
+  test('removePokemon of the last record leaves no active', () => {
+    const ctx = makeContext();
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+      onEvolve: () => undefined,
+      onUpdate: () => undefined,
+    });
+    tracker.addPokemon('Only', 'bulbasaur' as any);
+    tracker.removePokemon('Only');
+    assert.strictEqual(tracker.getState().hasActive, false);
+  });
+
+  test('removeAll clears every record and hides the HUD', () => {
+    const ctx = makeContext();
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+      onEvolve: () => undefined,
+      onUpdate: () => undefined,
+    });
+    tracker.addPokemon('A', 'bulbasaur' as any);
+    tracker.addPokemon('B', 'charmander' as any);
+    tracker.removeAll();
+    assert.strictEqual(tracker.getState().hasActive, false);
+  });
+
+  test("each pokemon's XP is independent (deleting active discards its XP)", () => {
+    const ctx = makeContext();
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
+      onEvolve: () => undefined,
+      onUpdate: () => undefined,
+    });
+    tracker.addPokemon('A', 'bulbasaur' as any);
+    tracker._processEditForTesting(10, false, 'file');
+    tracker.addPokemon('B', 'charmander' as any);
+    tracker._processEditForTesting(20, false, 'file');
+    assert.strictEqual(tracker.getState().totalXp, 200, 'B has its own XP');
+    tracker.removePokemon('B');
+    const s = tracker.getState();
+    assert.strictEqual(s.totalXp, 100, "A's XP unchanged when B got deleted");
+  });
+
+  test('persistence: legacy single-pokemon state migrates into a v2 record', () => {
+    const ctx = makeContext();
+    ctx.globalState.update(
       'vscode-pokemon.active-pokemon.base-type',
       'bulbasaur',
     );
-    ctx2.globalState.update(
+    ctx.globalState.update(
       'vscode-pokemon.active-pokemon.current-type',
       'ivysaur',
     );
-    ctx2.globalState.update(
+    ctx.globalState.update(
       'vscode-pokemon.active-pokemon.total-xp',
       xpForLevel('medium-slow', 20),
     );
-    const tracker2 = new XpTracker(ctx2, 'bulbasaur' as any, defaultConfig, {
+    const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    const s = tracker2.getState();
+    const s = tracker.getState();
+    assert.strictEqual(s.hasActive, true);
     assert.strictEqual(s.baseType, 'bulbasaur');
     assert.strictEqual(s.currentType, 'ivysaur');
     assert.strictEqual(s.level, 20);
   });
 
-  test('persistence: state reset when configured base type differs from saved', () => {
+  test('persistence: legacy state is ignored when configured base type differs', () => {
     const ctx = makeContext();
     ctx.globalState.update(
       'vscode-pokemon.active-pokemon.base-type',
@@ -226,14 +300,14 @@ suite('XpTracker', () => {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    const s = tracker.getState();
-    assert.strictEqual(s.baseType, 'charmander');
-    assert.strictEqual(s.currentType, 'charmander');
-    assert.strictEqual(s.totalXp, 0);
+    assert.strictEqual(
+      tracker.getState().hasActive,
+      false,
+      'mismatched legacy state should be discarded, not silently converted',
+    );
   });
 
-  test('persistence: state reset when saved current-type is unknown to POKEMON_DATA', () => {
-    // Simulates a downgrade or stale saved state where the species no longer exists.
+  test('persistence: legacy state with unknown current-type is discarded', () => {
     const ctx = makeContext();
     ctx.globalState.update(
       'vscode-pokemon.active-pokemon.base-type',
@@ -241,28 +315,17 @@ suite('XpTracker', () => {
     );
     ctx.globalState.update(
       'vscode-pokemon.active-pokemon.current-type',
-      'mega-bulbasaur-xyz', // not a real species
+      'mega-bulbasaur-xyz',
     );
     ctx.globalState.update('vscode-pokemon.active-pokemon.total-xp', 5000);
     const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    const s = tracker.getState();
-    assert.strictEqual(s.baseType, 'bulbasaur');
-    assert.strictEqual(
-      s.currentType,
-      'bulbasaur',
-      'unknown species should be discarded, not restored',
-    );
-    assert.strictEqual(
-      s.totalXp,
-      0,
-      'XP should reset alongside the species reset',
-    );
+    assert.strictEqual(tracker.getState().hasActive, false);
   });
 
-  test('persistence: state reset when saved XP is not a finite non-negative number', () => {
+  test('persistence: legacy state with non-finite XP is discarded', () => {
     const ctx = makeContext();
     ctx.globalState.update(
       'vscode-pokemon.active-pokemon.base-type',
@@ -277,14 +340,10 @@ suite('XpTracker', () => {
       onEvolve: () => undefined,
       onUpdate: () => undefined,
     });
-    assert.strictEqual(tracker.getState().totalXp, 0);
-    assert.strictEqual(tracker.getState().currentType, 'bulbasaur');
+    assert.strictEqual(tracker.getState().hasActive, false);
   });
 
   test('onEvolve callback exceptions do not corrupt state', () => {
-    // Simulates the "view hidden" case: handlePokemonEvolved tries to post to a webview
-    // that isn't visible and throws. The tracker should still have advanced its state so
-    // that the next view-render sees the evolved form.
     const ctx = makeContext();
     const tracker = new XpTracker(
       ctx,
@@ -297,9 +356,8 @@ suite('XpTracker', () => {
         onUpdate: () => undefined,
       },
     );
-    // Caterpie evolves at lvl 7 (medium-fast, 343 XP).
+    tracker.addPokemon('Wiggly', 'caterpie' as any);
     assert.throws(() => tracker._processEditForTesting(1500, false, 'file'));
-    // Despite the throw, state advanced and persists in memory.
     const s = tracker.getState();
     assert.strictEqual(s.currentType, 'butterfree');
     assert.ok(s.totalXp >= 1000);
@@ -314,6 +372,7 @@ suite('XpTracker', () => {
       () => ({ enabled, multiplier: 10, perEventCap: 200 }),
       { onEvolve: () => undefined, onUpdate: () => undefined },
     );
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     tracker._processEditForTesting(10, false, 'file');
     assert.strictEqual(tracker.getState().totalXp, 100);
     enabled = false;
@@ -325,19 +384,23 @@ suite('XpTracker', () => {
     );
   });
 
-  test('onUpdate fires on each XP gain and on construction', () => {
+  test('onUpdate fires on start, on addPokemon, and on each XP gain', () => {
     const ctx = makeContext();
     const updates: ActivePokemonState[] = [];
     const tracker = new XpTracker(ctx, 'bulbasaur' as any, defaultConfig, {
       onEvolve: () => undefined,
       onUpdate: (s) => updates.push(s),
     });
-    // No update fires during construction; start() fires the initial update.
     const disposable = tracker.start();
+    // start() fires once with the empty initial state.
     assert.strictEqual(updates.length, 1);
-    tracker._processEditForTesting(10, false, 'file');
+    assert.strictEqual(updates[0].hasActive, false);
+    tracker.addPokemon('Sparky', 'bulbasaur' as any);
     assert.strictEqual(updates.length, 2);
-    assert.strictEqual(updates[1].totalXp, 100);
+    assert.strictEqual(updates[1].hasActive, true);
+    tracker._processEditForTesting(10, false, 'file');
+    assert.strictEqual(updates.length, 3);
+    assert.strictEqual(updates[2].totalXp, 100);
     disposable.dispose();
   });
 });

@@ -162,15 +162,9 @@ export class XpTracker {
       return { records: map, activeName: configuredType };
     }
 
-    // Fresh user: seed with the configured pokemonType at 0 XP so the HUD has
-    // something to display before any spawn.
-    const map = new Map<string, PokemonRecord>();
-    map.set(configuredType, {
-      baseType: configuredType,
-      type: configuredType,
-      totalXp: 0,
-    });
-    return { records: map, activeName: configuredType };
+    // Fresh user, no legacy state: start empty. The HUD stays hidden until the user
+    // actually spawns a pokemon — there's no implicit Bulbasaur conjured out of thin air.
+    return { records: new Map(), activeName: undefined };
   }
 
   private deriveState(): ActivePokemonState {
