@@ -21,7 +21,12 @@ import {
   WebviewMessage,
 } from '../common/types';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
-import { ActivePokemonState, XpTracker, XpTrackerConfig } from './xp-tracker';
+import {
+  PokemonEntryState,
+  TrackerState,
+  XpTracker,
+  XpTrackerConfig,
+} from './xp-tracker';
 
 type EvolutionNotificationMode = 'silent' | 'info' | 'modal';
 
@@ -422,9 +427,7 @@ export function activate(context: vscode.ExtensionContext) {
       ) {
         await vscode.commands.executeCommand('pokemonView.focus');
       } else {
-        const spec = PokemonSpecification.fromConfiguration(
-          xpTracker?.getState().currentType,
-        );
+        const spec = PokemonSpecification.fromConfiguration(undefined);
         PokemonPanel.createOrShow(
           context.extensionUri,
           spec.color,
@@ -481,7 +484,8 @@ export function activate(context: vscode.ExtensionContext) {
     PokemonSpecification.getConfiguredBaseType(),
     getXpTrackerConfig,
     {
-      onEvolve: (oldType, newType) => handlePokemonEvolved(oldType, newType),
+      onEvolve: (name, oldType, newType) =>
+        handlePokemonEvolved(name, oldType, newType),
       onUpdate: (state) => {
         updateXpStatusBar(state);
         const panel = getPokemonPanel();
@@ -504,9 +508,7 @@ export function activate(context: vscode.ExtensionContext) {
     persistedCollection.map((p) => ({ name: p.name, type: p.type })),
   );
 
-  const spec = PokemonSpecification.fromConfiguration(
-    xpTracker.getState().currentType,
-  );
+  const spec = PokemonSpecification.fromConfiguration(undefined);
   webviewViewProvider = new PokemonWebviewViewProvider(
     context,
     context.extensionUri,
@@ -1120,7 +1122,7 @@ export function activate(context: vscode.ExtensionContext) {
       const resetLabel = vscode.l10n.t('Reset');
       const choice = await vscode.window.showWarningMessage(
         vscode.l10n.t(
-          'Reset XP for your active Pokémon? This reverts it to its base form.',
+          'Reset XP for every tracked Pokémon? Each reverts to its base form.',
         ),
         { modal: true },
         resetLabel,
@@ -1128,24 +1130,10 @@ export function activate(context: vscode.ExtensionContext) {
       if (choice !== resetLabel) {
         return;
       }
-      const beforeState = xpTracker.getState();
-      const before = beforeState.currentType;
-      const beforeName = beforeState.name;
+      // xpTracker.resetXp() fires onEvolve for each pokemon that had evolved,
+      // which routes through handlePokemonEvolved → panel.evolveActivePokemon
+      // to swap each reverted sprite back. Nothing else to do here.
       xpTracker.resetXp();
-      const after = xpTracker.getState().currentType;
-      if (before !== after) {
-        const panel = getPokemonPanel();
-        if (panel) {
-          const config = POKEMON_DATA[after];
-          panel.evolveActivePokemon(
-            after,
-            `gen${config.generation}`,
-            config.originalSpriteSize ?? 32,
-            before,
-            beforeName,
-          );
-        }
-      }
     }),
   );
 
@@ -1164,9 +1152,7 @@ export function activate(context: vscode.ExtensionContext) {
           e.affectsConfiguration('vscode-pokemon.theme') ||
           e.affectsConfiguration('workbench.colorTheme')
         ) {
-          const spec = PokemonSpecification.fromConfiguration(
-            xpTracker?.getState().currentType,
-          );
+          const spec = PokemonSpecification.fromConfiguration(undefined);
           const panel = getPokemonPanel();
           if (panel) {
             panel.updatePokemonColor(spec.color);
@@ -1207,9 +1193,7 @@ export function activate(context: vscode.ExtensionContext) {
       async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         // Reset the webview options so we use latest uri for `localResourceRoots`.
         webviewPanel.webview.options = getWebviewOptions(context.extensionUri);
-        const spec = PokemonSpecification.fromConfiguration(
-          xpTracker?.getState().currentType,
-        );
+        const spec = PokemonSpecification.fromConfiguration(undefined);
         PokemonPanel.revive(
           webviewPanel,
           context.extensionUri,
@@ -1244,22 +1228,11 @@ function updateStatusBar(): void {
   spawnPokemonStatusBar.show();
 }
 
-function buildXpHudPayload(state: ActivePokemonState): IXpHudPayload {
-  const cfg = getXpTrackerConfig();
-  if (!cfg.enabled || !state.hasActive) {
+function buildHudEntry(e: PokemonEntryState): IXpHudEntry {
+  const speciesName = POKEMON_DATA[e.currentType]?.name ?? e.currentType;
+  if (e.level >= 100) {
     return {
-      visible: false,
-      speciesName: '',
-      level: 1,
-      percent: 0,
-      numbersText: '',
-    };
-  }
-  const speciesName =
-    POKEMON_DATA[state.currentType]?.name ?? state.currentType;
-  if (state.level >= 100) {
-    return {
-      visible: true,
+      name: e.name,
       speciesName,
       level: 100,
       percent: 100,
@@ -1267,44 +1240,71 @@ function buildXpHudPayload(state: ActivePokemonState): IXpHudPayload {
     };
   }
   const percent =
-    state.xpForThisLevel > 0
-      ? Math.round((state.xpIntoLevel / state.xpForThisLevel) * 100)
+    e.xpForThisLevel > 0
+      ? Math.round((e.xpIntoLevel / e.xpForThisLevel) * 100)
       : 0;
   return {
-    visible: true,
+    name: e.name,
     speciesName,
-    level: state.level,
+    level: e.level,
     percent,
-    numbersText: `${state.xpIntoLevel} / ${state.xpForThisLevel}`,
+    numbersText: `${e.xpIntoLevel} / ${e.xpForThisLevel}`,
   };
 }
 
-function updateXpStatusBar(state: ActivePokemonState): void {
+function buildXpHudPayload(state: TrackerState): IXpHudPayload {
+  const cfg = getXpTrackerConfig();
+  if (!cfg.enabled || state.entries.length === 0) {
+    return { visible: false, entries: [] };
+  }
+  return {
+    visible: true,
+    entries: state.entries.map(buildHudEntry),
+  };
+}
+
+function updateXpStatusBar(state: TrackerState): void {
   if (!xpStatusBar) {
     return;
   }
   const cfg = getXpTrackerConfig();
-  if (!cfg.enabled || !getShowXpInStatusBar() || !state.hasActive) {
+  if (!cfg.enabled || !getShowXpInStatusBar() || state.entries.length === 0) {
     xpStatusBar.hide();
     return;
   }
-  const speciesName =
-    POKEMON_DATA[state.currentType]?.name ?? state.currentType;
-  if (state.level >= 100) {
-    xpStatusBar.text = `$(star-full) Lv 100 ${speciesName}`;
+  if (state.entries.length === 1) {
+    const e = state.entries[0];
+    const speciesName = POKEMON_DATA[e.currentType]?.name ?? e.currentType;
+    if (e.level >= 100) {
+      xpStatusBar.text = `$(star-full) Lv 100 ${speciesName}`;
+    } else {
+      xpStatusBar.text = `$(star-full) Lv ${e.level} ${e.xpIntoLevel}/${e.xpForThisLevel}`;
+    }
+    xpStatusBar.tooltip = vscode.l10n.t(
+      '{0} (Lv {1}) — {2} XP total. Click to reset XP.',
+      speciesName,
+      e.level.toString(),
+      e.totalXp.toString(),
+    );
   } else {
-    xpStatusBar.text = `$(star-full) Lv ${state.level} ${state.xpIntoLevel}/${state.xpForThisLevel}`;
+    const minLevel = Math.min(...state.entries.map((e) => e.level));
+    const maxLevel = Math.max(...state.entries.map((e) => e.level));
+    const levelText =
+      minLevel === maxLevel ? `Lv ${minLevel}` : `Lv ${minLevel}-${maxLevel}`;
+    xpStatusBar.text = `$(star-full) ${state.entries.length} pokemon · ${levelText}`;
+    xpStatusBar.tooltip =
+      state.entries
+        .map((e) => {
+          const sp = POKEMON_DATA[e.currentType]?.name ?? e.currentType;
+          return `${e.name} (${sp}) Lv ${e.level}`;
+        })
+        .join('\n') + '\nClick to reset XP.';
   }
-  xpStatusBar.tooltip = vscode.l10n.t(
-    '{0} (Lv {1}) — {2} XP total. Click to reset XP.',
-    speciesName,
-    state.level.toString(),
-    state.totalXp.toString(),
-  );
   xpStatusBar.show();
 }
 
 function handlePokemonEvolved(
+  name: string,
   oldType: PokemonType,
   newType: PokemonType,
 ): void {
@@ -1313,16 +1313,13 @@ function handlePokemonEvolved(
     return;
   }
   const panel = getPokemonPanel();
-  // The active pokemon is the one that evolved — pass its name so the panel can
-  // find it unambiguously by name rather than guessing by type.
-  const activeName = xpTracker?.getState().name;
   if (panel) {
     panel.evolveActivePokemon(
       newType,
       `gen${newConfig.generation}`,
       newConfig.originalSpriteSize ?? 32,
       oldType,
-      activeName,
+      name,
     );
   }
   const mode = getEvolutionNotificationMode();
@@ -1647,12 +1644,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
                 <canvas id="pokemonCanvas"></canvas>
                 <div id="pokemonContainer"></div>
                 <div id="foreground"></div>
-                <div id="xp-hud"${initialXp.visible ? '' : ' hidden'}>
-                    <span id="xp-hud-label">${initialXp.speciesName}</span>
-                    <span id="xp-hud-level">Lv ${initialXp.level}</span>
-                    <div id="xp-hud-bar"><div id="xp-hud-bar-fill" style="width: ${initialXp.percent}%"></div></div>
-                    <span id="xp-hud-numbers">${initialXp.numbersText}</span>
-                </div>
+                <div id="xp-hud"${initialXp.visible ? '' : ' hidden'}></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     pokemonApp.pokemonPanelApp(
@@ -1679,13 +1671,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
    */
   protected getInitialXpHud(): IXpHudPayload {
     if (!xpTracker) {
-      return {
-        visible: false,
-        speciesName: '',
-        level: 1,
-        percent: 0,
-        numbersText: '',
-      };
+      return { visible: false, entries: [] };
     }
     return buildXpHudPayload(xpTracker.getState());
   }
@@ -1717,14 +1703,20 @@ class PokemonWebviewContainer implements IPokemonPanel {
   }
 }
 
-export interface IXpHudPayload {
-  visible: boolean;
+export interface IXpHudEntry {
+  /** Pokemon's display name (the canonical identifier). */
+  name: string;
   speciesName: string;
   level: number;
   /** 0–100 for the bar fill width. */
   percent: number;
   /** Pre-formatted "xpIntoLevel / xpForThisLevel" or "MAX" for level 100. */
   numbersText: string;
+}
+
+export interface IXpHudPayload {
+  visible: boolean;
+  entries: IXpHudEntry[];
 }
 
 function handleWebviewMessage(message: WebviewMessage) {
@@ -1992,9 +1984,7 @@ function getNonce() {
 }
 
 async function createPokemonPlayground(context: vscode.ExtensionContext) {
-  const spec = PokemonSpecification.fromConfiguration(
-    xpTracker?.getState().currentType,
-  );
+  const spec = PokemonSpecification.fromConfiguration(undefined);
   PokemonPanel.createOrShow(
     context.extensionUri,
     spec.color,

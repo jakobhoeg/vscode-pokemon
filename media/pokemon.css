@@ -310,7 +310,8 @@ img.pokemon {
 /* --- XP HUD --- */
 /*
  * In-panel XP/level display. Pinned to the top of the webview, above the foreground.
- * Hidden via the `hidden` attribute when XP is disabled or there is no active pokemon.
+ * One row per tracked pokemon — JS appends/updates .xp-hud-row children. Hidden via
+ * the `hidden` attribute when XP is disabled or no pokemon are tracked.
  */
 #xp-hud {
   position: fixed;
@@ -319,8 +320,8 @@ img.pokemon {
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 3px;
   padding: 4px 10px;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -333,22 +334,33 @@ img.pokemon {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   -webkit-font-smoothing: none;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  max-width: 90vw;
 }
 
 #xp-hud[hidden] {
   display: none;
 }
 
-#xp-hud-label {
+.xp-hud-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xp-hud-label {
   font-weight: bold;
   letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }
 
-#xp-hud-level {
+.xp-hud-level {
   color: #ffd34d;
+  min-width: 44px;
 }
 
-#xp-hud-bar {
+.xp-hud-bar {
   position: relative;
   width: 96px;
   height: 8px;
@@ -358,18 +370,18 @@ img.pokemon {
   overflow: hidden;
 }
 
-#xp-hud-bar-fill {
+.xp-hud-bar-fill {
   height: 100%;
   width: 0%;
   background: linear-gradient(180deg, #6ee06e 0%, #2fb02f 100%);
   transition: width 180ms ease-out;
 }
 
-#xp-hud-bar-fill.maxed {
+.xp-hud-bar-fill.maxed {
   background: linear-gradient(180deg, #ffd34d 0%, #d8a615 100%);
 }
 
-#xp-hud-numbers {
+.xp-hud-numbers {
   color: #ddd;
   min-width: 56px;
   text-align: right;

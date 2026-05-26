@@ -10,14 +10,13 @@ import { computeXpGain } from '../common/xp';
 import { PokemonType } from '../common/types';
 
 const KEY_RECORDS = 'vscode-pokemon.xp.records.v2';
-const KEY_ACTIVE_NAME = 'vscode-pokemon.xp.active-name.v2';
 
 // Legacy single-pokemon keys, kept for one-shot migration.
 const LEGACY_KEY_BASE_TYPE = 'vscode-pokemon.active-pokemon.base-type';
 const LEGACY_KEY_CURRENT_TYPE = 'vscode-pokemon.active-pokemon.current-type';
 const LEGACY_KEY_TOTAL_XP = 'vscode-pokemon.active-pokemon.total-xp';
 
-const SYNC_KEYS: readonly string[] = [KEY_RECORDS, KEY_ACTIVE_NAME];
+const SYNC_KEYS: readonly string[] = [KEY_RECORDS];
 
 const FLUSH_DEBOUNCE_MS = 500;
 
@@ -32,26 +31,25 @@ interface PokemonRecord {
 
 type SerializedRecords = Record<string, PokemonRecord>;
 
-/**
- * State for whichever pokemon the HUD is currently following.
- *
- * `hasActive=false` means there is no pokemon to display XP for — the HUD should hide.
- * When `hasActive=true`, the other fields describe the live state of that pokemon's record.
- */
-export interface ActivePokemonState {
-  hasActive: boolean;
-  /** Identity of the active record (its display name in the panel). */
+/** Derived display state for a single tracked pokemon. */
+export interface PokemonEntryState {
   name: string;
-  /** Original species when the record was created (used for resetXp). */
   baseType: PokemonType;
-  /** Current species — diverges from baseType after evolution. */
   currentType: PokemonType;
   totalXp: number;
   level: number;
   /** XP earned within the current level (0 to xpForThisLevel-1). */
   xpIntoLevel: number;
-  /** Total XP span of the current level (next-threshold − this-threshold). 0 at max level. */
+  /** Total XP span of the current level. 0 at max level. */
   xpForThisLevel: number;
+}
+
+/**
+ * Full tracker state — every tracked pokemon. `entries` is empty when no pokemon
+ * are being tracked; the HUD should hide.
+ */
+export interface TrackerState {
+  entries: PokemonEntryState[];
 }
 
 export interface XpTrackerConfig {
@@ -61,24 +59,24 @@ export interface XpTrackerConfig {
 }
 
 export interface XpTrackerCallbacks {
-  onEvolve: (oldType: PokemonType, newType: PokemonType) => void;
-  onUpdate: (state: ActivePokemonState) => void;
+  /** Fires for every pokemon that evolves on a given XP gain (one call per evolution). */
+  onEvolve: (name: string, oldType: PokemonType, newType: PokemonType) => void;
+  onUpdate: (state: TrackerState) => void;
 }
 
 /**
- * Tracks XP **per pokemon**. Each spawned pokemon gets its own record keyed by name;
- * deleting a pokemon discards its XP. Only the "active" pokemon (the one the HUD is
- * pointing at) accumulates XP from editor activity.
+ * Tracks XP **per pokemon**. Every spawned pokemon gets its own record keyed by
+ * name, and they ALL accumulate XP from editor activity simultaneously. Typing is
+ * training-camp for the whole team.
  *
- * State persists in globalState; writes are debounced.
+ * Deleting a pokemon discards its XP. State persists in globalState.
  */
 export class XpTracker {
   private context: vscode.ExtensionContext;
   private callbacks: XpTrackerCallbacks;
   private getConfig: () => XpTrackerConfig;
   private records: Map<string, PokemonRecord>;
-  private activeName: string | undefined;
-  private state: ActivePokemonState;
+  private state: TrackerState;
   private flushTimer: NodeJS.Timeout | undefined;
   private dirty = false;
 
@@ -91,25 +89,13 @@ export class XpTracker {
     this.context = context;
     this.callbacks = callbacks;
     this.getConfig = getConfig;
-    const loaded = this.loadRecords(configuredType);
-    this.records = loaded.records;
-    this.activeName = loaded.activeName;
+    this.records = this.loadRecords(configuredType);
     this.state = this.deriveState();
   }
 
-  /**
-   * Load persisted records. Migrates the legacy single-pokemon keys on first run.
-   * If neither persisted records nor legacy state are present, seeds with one record
-   * for `configuredType` (its name doubles as its identifier).
-   */
-  private loadRecords(configuredType: PokemonType): {
-    records: Map<string, PokemonRecord>;
-    activeName: string | undefined;
-  } {
+  private loadRecords(configuredType: PokemonType): Map<string, PokemonRecord> {
     const serialized =
       this.context.globalState.get<SerializedRecords>(KEY_RECORDS);
-    const activeName =
-      this.context.globalState.get<string>(KEY_ACTIVE_NAME) ?? undefined;
     if (serialized && typeof serialized === 'object') {
       const map = new Map<string, PokemonRecord>();
       for (const [name, rec] of Object.entries(serialized)) {
@@ -121,7 +107,6 @@ export class XpTracker {
           Number.isFinite(rec.totalXp) &&
           rec.totalXp >= 0
         ) {
-          // baseType is optional in older saved data; fall back to the current type.
           const baseType =
             typeof rec.baseType === 'string' && POKEMON_DATA[rec.baseType]
               ? (rec.baseType as PokemonType)
@@ -133,9 +118,7 @@ export class XpTracker {
           });
         }
       }
-      const resolvedActive =
-        activeName && map.has(activeName) ? activeName : undefined;
-      return { records: map, activeName: resolvedActive };
+      return map;
     }
 
     // No v2 records — try migrating legacy single-pokemon state.
@@ -159,37 +142,20 @@ export class XpTracker {
         type: legacyCurrent as PokemonType,
         totalXp: legacyXp,
       });
-      return { records: map, activeName: configuredType };
+      return map;
     }
 
-    // Fresh user, no legacy state: start empty. The HUD stays hidden until the user
-    // actually spawns a pokemon — there's no implicit Bulbasaur conjured out of thin air.
-    return { records: new Map(), activeName: undefined };
+    return new Map();
   }
 
-  private deriveState(): ActivePokemonState {
-    if (!this.activeName || !this.records.has(this.activeName)) {
-      return {
-        hasActive: false,
-        name: '',
-        baseType: 'bulbasaur',
-        currentType: 'bulbasaur',
-        totalXp: 0,
-        level: 1,
-        xpIntoLevel: 0,
-        xpForThisLevel: 0,
-      };
-    }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const rec = this.records.get(this.activeName)!;
+  private deriveEntry(name: string, rec: PokemonRecord): PokemonEntryState {
     const growth = growthRateFor(rec.type);
     const level = levelForXp(growth, rec.totalXp);
     const thisLevelXp = xpForLevel(growth, level);
     const nextLevelXp =
       level >= 100 ? thisLevelXp : xpForLevel(growth, level + 1);
     return {
-      hasActive: true,
-      name: this.activeName,
+      name,
       baseType: rec.baseType,
       currentType: rec.type,
       totalXp: rec.totalXp,
@@ -199,13 +165,20 @@ export class XpTracker {
     };
   }
 
+  private deriveState(): TrackerState {
+    const entries: PokemonEntryState[] = [];
+    for (const [name, rec] of this.records.entries()) {
+      entries.push(this.deriveEntry(name, rec));
+    }
+    return { entries };
+  }
+
   private recomputeAndNotify(): void {
     this.state = this.deriveState();
     this.markDirty();
     this.callbacks.onUpdate(this.state);
   }
 
-  /** Registers the onDidChangeTextDocument subscription. Returns a disposable. */
   start(): vscode.Disposable {
     this.context.globalState.setKeysForSync(SYNC_KEYS as string[]);
     const sub = vscode.workspace.onDidChangeTextDocument((event) =>
@@ -250,7 +223,7 @@ export class XpTracker {
     if (!cfg.enabled) {
       return;
     }
-    if (!this.activeName || !this.records.has(this.activeName)) {
+    if (this.records.size === 0) {
       return;
     }
     const gain = computeXpGain({
@@ -266,33 +239,40 @@ export class XpTracker {
     this.applyGain(gain);
   }
 
+  /** Apply XP gain to **every** record. Each can evolve independently. */
   private applyGain(gain: number): void {
-    if (!this.activeName) {
-      return;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const rec = this.records.get(this.activeName)!;
-    const oldType = rec.type;
-    const newTotal = rec.totalXp + gain;
-
-    let workingType: PokemonType = rec.type;
-    let evolved = false;
-    for (;;) {
-      const growth = growthRateFor(workingType);
-      const newLevel = levelForXp(growth, newTotal);
-      const evo = nextEvolution(workingType, newLevel);
-      if (!evo) {
-        break;
+    const evolutions: Array<{
+      name: string;
+      from: PokemonType;
+      to: PokemonType;
+    }> = [];
+    for (const [name, rec] of this.records.entries()) {
+      const oldType = rec.type;
+      const newTotal = rec.totalXp + gain;
+      let workingType: PokemonType = rec.type;
+      let evolved = false;
+      for (;;) {
+        const growth = growthRateFor(workingType);
+        const newLevel = levelForXp(growth, newTotal);
+        const evo = nextEvolution(workingType, newLevel);
+        if (!evo) {
+          break;
+        }
+        workingType = evo.type as PokemonType;
+        evolved = true;
       }
-      workingType = evo.type as PokemonType;
-      evolved = true;
+      rec.type = workingType;
+      rec.totalXp = newTotal;
+      if (evolved && oldType !== workingType) {
+        evolutions.push({ name, from: oldType, to: workingType });
+      }
     }
-
-    rec.type = workingType;
-    rec.totalXp = newTotal;
     this.recomputeAndNotify();
-    if (evolved && oldType !== workingType) {
-      this.callbacks.onEvolve(oldType, workingType);
+    // Fire evolution callbacks AFTER state update so handlers see consistent state.
+    // We swallow individual callback errors so a crash on one pokemon's onEvolve
+    // doesn't prevent others from firing.
+    for (const e of evolutions) {
+      this.callbacks.onEvolve(e.name, e.from, e.to);
     }
   }
 
@@ -322,73 +302,93 @@ export class XpTracker {
       };
     }
     void this.context.globalState.update(KEY_RECORDS, serialized);
-    void this.context.globalState.update(
-      KEY_ACTIVE_NAME,
-      this.activeName ?? null,
-    );
   }
 
-  getState(): ActivePokemonState {
+  getState(): TrackerState {
     return this.state;
   }
 
-  /**
-   * Add a fresh pokemon record (0 XP) and make it the active one.
-   * If a record with this name already exists, its XP is preserved but it becomes active.
-   */
+  /** Add a fresh pokemon record (0 XP). If a record with this name exists it's left alone. */
   addPokemon(name: string, type: PokemonType): void {
-    if (!this.records.has(name)) {
-      this.records.set(name, { baseType: type, type, totalXp: 0 });
+    if (this.records.has(name)) {
+      return;
     }
-    this.activeName = name;
+    this.records.set(name, { baseType: type, type, totalXp: 0 });
     this.recomputeAndNotify();
   }
 
-  /**
-   * Drop a pokemon's record entirely. If it was the active one, switch the HUD to
-   * the first remaining record, or empty if none remain.
-   */
+  /** Drop a pokemon's record. Its XP is gone. */
   removePokemon(name: string): void {
     if (!this.records.has(name)) {
       return;
     }
     this.records.delete(name);
-    if (this.activeName === name) {
-      const next = this.records.keys().next();
-      this.activeName = next.done ? undefined : next.value;
-    }
     this.recomputeAndNotify();
   }
 
-  /** Drop every record. HUD hides. */
+  /** Drop every record. */
   removeAll(): void {
-    if (this.records.size === 0 && this.activeName === undefined) {
+    if (this.records.size === 0) {
       return;
     }
     this.records.clear();
-    this.activeName = undefined;
+    this.recomputeAndNotify();
+  }
+
+  /** Clear all records and seed a single fresh one. Used by reset-xp on config change. */
+  reset(newBaseType: PokemonType): void {
+    this.records.clear();
+    this.records.set(newBaseType, {
+      baseType: newBaseType,
+      type: newBaseType,
+      totalXp: 0,
+    });
     this.recomputeAndNotify();
   }
 
   /**
-   * Reconcile records with the actual panel collection. Called on extension startup
-   * to drop records for pokemon that no longer exist (e.g. legacy migration produced
-   * a Bulbasaur record but the user has an empty panel) and to start tracking any
-   * pokemon in the saved collection that weren't being tracked.
+   * Zero every pokemon's XP and revert each to its baseType. Fires onEvolve for
+   * every pokemon that had evolved past its base form so the panel can swap its
+   * sprite back.
+   */
+  resetXp(): void {
+    if (this.records.size === 0) {
+      return;
+    }
+    const reversions: Array<{
+      name: string;
+      from: PokemonType;
+      to: PokemonType;
+    }> = [];
+    for (const [name, rec] of this.records.entries()) {
+      if (rec.type !== rec.baseType) {
+        reversions.push({ name, from: rec.type, to: rec.baseType });
+      }
+      rec.type = rec.baseType;
+      rec.totalXp = 0;
+    }
+    this.recomputeAndNotify();
+    for (const r of reversions) {
+      this.callbacks.onEvolve(r.name, r.from, r.to);
+    }
+  }
+
+  /**
+   * Reconcile records with the actual panel collection. Drops records whose names
+   * aren't in the collection and adds 0-XP records for any pokemon in the collection
+   * that aren't tracked yet.
    */
   syncWithCollection(
     collection: ReadonlyArray<{ name: string; type: PokemonType }>,
   ): void {
     const names = new Set(collection.map((c) => c.name));
     let changed = false;
-    // Drop records for pokemon the panel no longer has.
     for (const name of Array.from(this.records.keys())) {
       if (!names.has(name)) {
         this.records.delete(name);
         changed = true;
       }
     }
-    // Add records for pokemon present in the panel but not yet tracked.
     for (const item of collection) {
       if (!this.records.has(item.name)) {
         this.records.set(item.name, {
@@ -399,47 +399,8 @@ export class XpTracker {
         changed = true;
       }
     }
-    // Make sure activeName still points at a real record.
-    if (!this.activeName || !this.records.has(this.activeName)) {
-      const first = this.records.keys().next();
-      this.activeName = first.done ? undefined : first.value;
-      changed = true;
-    }
     if (changed) {
       this.recomputeAndNotify();
     }
-  }
-
-  /**
-   * Called when the user changes the configured pokemonType. Clears all records and
-   * seeds a single fresh one at the new type — this is "start over", which matches
-   * the legacy semantics for the setting.
-   */
-  reset(newBaseType: PokemonType): void {
-    this.records.clear();
-    this.records.set(newBaseType, {
-      baseType: newBaseType,
-      type: newBaseType,
-      totalXp: 0,
-    });
-    this.activeName = newBaseType;
-    this.recomputeAndNotify();
-  }
-
-  /**
-   * Zero the active pokemon's XP and revert its species to its base form.
-   * No-op when there is no active pokemon.
-   */
-  resetXp(): void {
-    if (!this.activeName) {
-      return;
-    }
-    const rec = this.records.get(this.activeName);
-    if (!rec) {
-      return;
-    }
-    rec.type = rec.baseType;
-    rec.totalXp = 0;
-    this.recomputeAndNotify();
   }
 }

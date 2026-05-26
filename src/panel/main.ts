@@ -452,44 +452,93 @@ function initCanvas() {
   ctx.canvas.height = window.innerHeight;
 }
 
-function updateXpHud(payload: {
-  visible: boolean;
+interface XpHudEntry {
+  name: string;
   speciesName: string;
   level: number;
   percent: number;
   numbersText: string;
-}): void {
+}
+
+interface XpHudPayload {
+  visible: boolean;
+  entries: XpHudEntry[];
+}
+
+/**
+ * Render one row per tracked pokemon. Reconciles by `name` so existing rows are
+ * updated in place (preserves smooth transitions); rows for removed pokemon are
+ * pruned, new ones are appended.
+ */
+function updateXpHud(payload: XpHudPayload): void {
   const hud = document.getElementById('xp-hud');
   if (!hud) {
     return;
   }
-  if (!payload.visible) {
+  if (!payload.visible || payload.entries.length === 0) {
     hud.setAttribute('hidden', '');
+    while (hud.firstChild) {
+      hud.removeChild(hud.firstChild);
+    }
     return;
   }
   hud.removeAttribute('hidden');
-  const labelEl = document.getElementById('xp-hud-label');
-  const levelEl = document.getElementById('xp-hud-level');
-  const fillEl = document.getElementById(
-    'xp-hud-bar-fill',
-  ) as HTMLDivElement | null;
-  const numbersEl = document.getElementById('xp-hud-numbers');
-  if (labelEl) {
-    labelEl.textContent = payload.speciesName;
-  }
-  if (levelEl) {
-    levelEl.textContent = `Lv ${payload.level}`;
-  }
-  if (fillEl) {
-    fillEl.style.width = `${payload.percent}%`;
-    if (payload.numbersText === 'MAX') {
+
+  // Index existing rows by name so we can update in place.
+  const existing = new Map<string, HTMLDivElement>();
+  hud.querySelectorAll('.xp-hud-row').forEach((el) => {
+    const name = (el as HTMLDivElement).dataset.name;
+    if (name) {
+      existing.set(name, el as HTMLDivElement);
+    }
+  });
+
+  const seen = new Set<string>();
+  for (const entry of payload.entries) {
+    seen.add(entry.name);
+    let row = existing.get(entry.name);
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'xp-hud-row';
+      row.dataset.name = entry.name;
+      const label = document.createElement('span');
+      label.className = 'xp-hud-label';
+      const level = document.createElement('span');
+      level.className = 'xp-hud-level';
+      const bar = document.createElement('div');
+      bar.className = 'xp-hud-bar';
+      const fill = document.createElement('div');
+      fill.className = 'xp-hud-bar-fill';
+      bar.appendChild(fill);
+      const numbers = document.createElement('span');
+      numbers.className = 'xp-hud-numbers';
+      row.appendChild(label);
+      row.appendChild(level);
+      row.appendChild(bar);
+      row.appendChild(numbers);
+      hud.appendChild(row);
+    }
+    const labelEl = row.querySelector('.xp-hud-label') as HTMLSpanElement;
+    const levelEl = row.querySelector('.xp-hud-level') as HTMLSpanElement;
+    const fillEl = row.querySelector('.xp-hud-bar-fill') as HTMLDivElement;
+    const numbersEl = row.querySelector('.xp-hud-numbers') as HTMLSpanElement;
+    // Show both the pet's name and its current species. "Sparky (Charmeleon)".
+    labelEl.textContent = `${entry.name} (${entry.speciesName})`;
+    levelEl.textContent = `Lv ${entry.level}`;
+    fillEl.style.width = `${entry.percent}%`;
+    if (entry.numbersText === 'MAX') {
       fillEl.classList.add('maxed');
     } else {
       fillEl.classList.remove('maxed');
     }
+    numbersEl.textContent = entry.numbersText;
   }
-  if (numbersEl) {
-    numbersEl.textContent = payload.numbersText;
+
+  // Remove rows for pokemon that are no longer tracked.
+  for (const [name, row] of existing.entries()) {
+    if (!seen.has(name)) {
+      row.remove();
+    }
   }
 }
 
@@ -504,13 +553,7 @@ export function pokemonPanelApp(
   throwBallWithMouse: boolean,
   gen: string,
   originalSpriteSize: number,
-  initialXpPayload?: {
-    visible: boolean;
-    speciesName: string;
-    level: number;
-    percent: number;
-    numbersText: string;
-  },
+  initialXpPayload?: XpHudPayload,
   prevPokemonType?: PokemonType,
   stateApi?: VscodeStateApi,
 ) {
@@ -656,8 +699,9 @@ export function pokemonPanelApp(
         saveState(stateApi);
         break;
 
-      case 'spawn-random-pokemon':
-        var [randomPokemonType, randomPokemonConfig] = getRandomPokemonConfig();
+      case 'spawn-random-pokemon': {
+        const [randomPokemonType, randomPokemonConfig] =
+          getRandomPokemonConfig();
         console.log('adding random pokemon to panel from message');
         allPokemon.push(
           addPokemonToPanel(
@@ -676,6 +720,7 @@ export function pokemonPanelApp(
         );
         saveState(stateApi);
         break;
+      }
 
       case 'update-config':
         if (message.theme !== undefined) {
@@ -719,8 +764,8 @@ export function pokemonPanelApp(
       case 'delete-pokemon':
         removePokemonFromPanel(message, stateApi);
         break;
-      case 'reset-pokemon':
-        var pokemonToRemove = [...allPokemon.pokemonCollection];
+      case 'reset-pokemon': {
+        const pokemonToRemove = [...allPokemon.pokemonCollection];
         pokemonToRemove.forEach((pokemon) => {
           removePokemonFromPanel({ name: pokemon.pokemon.name }, stateApi);
         });
@@ -731,6 +776,7 @@ export function pokemonPanelApp(
           saveState(stateApi);
         }, 500);
         break;
+      }
       case 'pause-pokemon':
         pokemonCounter = 1;
         saveState(stateApi);
@@ -741,7 +787,7 @@ export function pokemonPanelApp(
       case 'evolve-pokemon': {
         // Find the pokemon by name (canonical identifier when known). Fall back to
         // pre-evolution type for older saved-state recovery paths, then to index 0.
-        var evolveIdx = -1;
+        let evolveIdx = -1;
         if (message.name) {
           evolveIdx = allPokemon.pokemonCollection.findIndex(
             (p) => p.pokemon.name === message.name,
@@ -755,17 +801,17 @@ export function pokemonPanelApp(
         if (evolveIdx === -1) {
           evolveIdx = 0;
         }
-        var first = allPokemon.pokemonCollection[evolveIdx];
+        const first = allPokemon.pokemonCollection[evolveIdx];
         if (!first) {
           break;
         }
-        var preservedName = first.pokemon.name;
-        var preservedLeft = first.el.style.left;
-        var preservedBottom = first.el.style.bottom;
-        var preservedColor = first.color;
+        const preservedName = first.pokemon.name;
+        const preservedLeft = first.el.style.left;
+        const preservedBottom = first.el.style.bottom;
+        const preservedColor = first.color;
         allPokemon.remove(first.pokemon.name);
         try {
-          var evolved = addPokemonToPanel(
+          const evolved = addPokemonToPanel(
             message.type,
             basePokemonUri,
             message.generation,
