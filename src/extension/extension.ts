@@ -516,6 +516,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerWebviewViewProvider(
       PokemonWebviewViewProvider.viewType,
       webviewViewProvider,
+      { webviewOptions: { retainContextWhenHidden: true } },
     ),
   );
 
@@ -1134,12 +1135,27 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration(
       (e: vscode.ConfigurationChangeEvent): void => {
         if (e.affectsConfiguration('vscode-pokemon.pokemonType')) {
-          // User picked a different species — reset XP and revert to base form.
-          xpTracker?.reset(PokemonSpecification.getConfiguredBaseType());
+          // User switched species — send an evolve-pokemon message so the webview swaps
+          // the main pokemon in-place without a full HTML reload (codachi update-pet pattern).
+          const panel = getPokemonPanel();
+          const oldType = panel?.pokemonType();
+          const newBaseType = PokemonSpecification.getConfiguredBaseType();
+          xpTracker?.reset(newBaseType);
+          if (panel && oldType && oldType !== newBaseType) {
+            const newConfig = POKEMON_DATA[newBaseType];
+            if (newConfig) {
+              panel.evolveActivePokemon(
+                newBaseType,
+                `gen${newConfig.generation}`,
+                newConfig.originalSpriteSize ?? 32,
+                oldType,
+              );
+            }
+          }
         }
+
         if (
           e.affectsConfiguration('vscode-pokemon.pokemonColor') ||
-          e.affectsConfiguration('vscode-pokemon.pokemonType') ||
           e.affectsConfiguration('vscode-pokemon.pokemonSize') ||
           e.affectsConfiguration('vscode-pokemon.theme') ||
           e.affectsConfiguration('workbench.colorTheme')
@@ -1151,9 +1167,8 @@ export function activate(context: vscode.ExtensionContext) {
           if (panel) {
             panel.updatePokemonColor(spec.color);
             panel.updatePokemonSize(spec.size);
-            panel.updatePokemonType(spec.type);
             panel.updateTheme(getConfiguredTheme(), getConfiguredThemeKind());
-            panel.update();
+            panel.updateConfig();
           }
         }
 
@@ -1166,13 +1181,8 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (e.affectsConfiguration('vscode-pokemon.pokemonLanguage')) {
-          // Reset the Pokemon translations cache when the language changes
           localize.resetPokemonTranslationsCache();
-          // Update the panel to reflect the new language
-          const panel = getPokemonPanel();
-          if (panel) {
-            panel.update();
-          }
+          // Localization only affects extension-host UI (quick picks, menus) — no panel reload needed.
         }
 
         if (
@@ -1323,15 +1333,14 @@ function getWebviewOptions(
   extensionUri: vscode.Uri,
 ): vscode.WebviewOptions & vscode.WebviewPanelOptions {
   return {
-    // Enable javascript in the webview
     enableScripts: true,
-    // And restrict the webview to only loading content from our extension's `media` directory.
     localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+    retainContextWhenHidden: true,
   };
 }
 
 interface IPokemonPanel {
-  // throwBall(): void;
+  pokemonType(): PokemonType;
   resetPokemon(): void;
   spawnPokemon(spec: PokemonSpecification): void;
   deletePokemon(pokemonName: string): void;
@@ -1352,6 +1361,7 @@ interface IPokemonPanel {
     prevType?: PokemonType,
   ): void;
   updateXp(payload: IXpHudPayload): void;
+  updateConfig(): void;
 }
 
 class PokemonWebviewContainer implements IPokemonPanel {
@@ -1671,6 +1681,20 @@ class PokemonWebviewContainer implements IPokemonPanel {
       // getInitialXpHud() when the view resolves next.
     }
   }
+
+  public updateConfig(): void {
+    try {
+      void this.getWebview().postMessage({
+        command: 'update-config',
+        theme: this._theme,
+        themeKind: this._themeKind,
+        pokemonSize: this._pokemonSize,
+        pokemonColor: this.pokemonColor(),
+      });
+    } catch {
+      // View not yet visible; next HTML render will use the updated fields.
+    }
+  }
 }
 
 export interface IXpHudPayload {
@@ -1839,15 +1863,6 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
     // This happens when the user closes the panel or when the panel is closed programmatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Update the content based on view changes
-    this._panel.onDidChangeViewState(
-      () => {
-        this.update();
-      },
-      null,
-      this._disposables,
-    );
-
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       handleWebviewMessage,
@@ -1870,11 +1885,9 @@ class PokemonPanel extends PokemonWebviewContainer implements IPokemonPanel {
     }
   }
 
-  public update() {
-    if (this._panel.visible) {
-      this._update();
-    }
-  }
+  // HTML is generated once; all in-session changes go through postMessages.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public update() {}
 
   getWebview(): vscode.Webview {
     return this._panel.webview;
@@ -1931,9 +1944,9 @@ class PokemonWebviewViewProvider extends PokemonWebviewContainer {
     }
   }
 
-  update() {
-    this._update();
-  }
+  // HTML is generated once in resolveWebviewView; all in-session changes go through postMessages.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  update() {}
 
   getWebview(): vscode.Webview {
     if (this._webviewView === undefined) {

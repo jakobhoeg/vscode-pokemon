@@ -514,37 +514,46 @@ export function pokemonPanelApp(
   prevPokemonType?: PokemonType,
   stateApi?: VscodeStateApi,
 ) {
+  // Mutable config — updated in-place by update-config messages without an HTML reload.
+  var currentTheme = theme;
+  var currentThemeKind = themeKind;
+  var currentPokemonSize = pokemonSize;
+
   var floor = 0;
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }
-  // Apply Theme backgrounds
-  const foregroundEl = document.getElementById('foreground');
-  if (theme !== Theme.none) {
-    var _themeKind = '';
-    switch (themeKind) {
-      case ColorThemeKind.dark:
-        _themeKind = 'dark';
-        break;
-      case ColorThemeKind.light:
-        _themeKind = 'light';
-        break;
-      case ColorThemeKind.highContrast:
-      default:
-        _themeKind = 'light';
-        break;
+
+  function applyTheme(t: Theme, tk: ColorThemeKind, sz: PokemonSize) {
+    const foregroundEl = document.getElementById('foreground');
+    if (t !== Theme.none) {
+      var _themeKind = '';
+      switch (tk) {
+        case ColorThemeKind.dark:
+          _themeKind = 'dark';
+          break;
+        case ColorThemeKind.light:
+          _themeKind = 'light';
+          break;
+        case ColorThemeKind.highContrast:
+        default:
+          _themeKind = 'light';
+          break;
+      }
+      document.body.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${t}/background-${_themeKind}-${sz}.png')`;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      foregroundEl!.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${t}/foreground-${_themeKind}-${sz}.png')`;
+      floor = calculateFloor(sz, t);
+    } else {
+      document.body.style.backgroundImage = '';
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      foregroundEl!.style.backgroundImage = '';
+      floor = 0;
     }
-
-    document.body.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${theme}/background-${_themeKind}-${pokemonSize}.png')`;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    foregroundEl!.style.backgroundImage = `url('${basePokemonUri}/backgrounds/${theme}/foreground-${_themeKind}-${pokemonSize}.png')`;
-
-    floor = calculateFloor(pokemonSize, theme); // Themes have pokemonCollection at a specified height from the ground
-  } else {
-    document.body.style.backgroundImage = '';
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    foregroundEl!.style.backgroundImage = '';
   }
+
+  // Apply Theme backgrounds
+  applyTheme(currentTheme, currentThemeKind, currentPokemonSize);
 
   console.log(
     'Starting pokemon session',
@@ -564,7 +573,7 @@ export function pokemonPanelApp(
 
   if (hasRecoverableState) {
     console.log('Recovering state - ', state);
-    recoverState(basePokemonUri, gen, pokemonSize, floor, stateApi);
+    recoverState(basePokemonUri, gen, currentPokemonSize, floor, stateApi);
     // Sync the active pokemon's species when the type changed since the webview last saved
     // state (hidden evolution or pokemonType setting change).  We identify the stale pokemon
     // by its previous type (prevPokemonType) rather than by collection index so that
@@ -591,7 +600,7 @@ export function pokemonPanelApp(
             gen,
             originalSpriteSize,
             preservedColor,
-            pokemonSize,
+            currentPokemonSize,
             parseInt(preservedLeft || '0') || randomStartPosition(),
             parseInt(preservedBottom || '0') || floor,
             floor,
@@ -636,7 +645,7 @@ export function pokemonPanelApp(
             message.generation,
             message.originalSpriteSize,
             message.color,
-            pokemonSize,
+            currentPokemonSize,
             randomStartPosition(),
             floor,
             floor,
@@ -657,7 +666,7 @@ export function pokemonPanelApp(
             randomPokemonConfig.generation.toString(),
             randomPokemonConfig.originalSpriteSize ?? 32,
             PokemonColor.default,
-            pokemonSize,
+            currentPokemonSize,
             randomStartPosition(),
             floor,
             floor,
@@ -666,6 +675,19 @@ export function pokemonPanelApp(
           ),
         );
         saveState(stateApi);
+        break;
+
+      case 'update-config':
+        if (message.theme !== undefined) {
+          currentTheme = message.theme;
+        }
+        if (message.themeKind !== undefined) {
+          currentThemeKind = message.themeKind;
+        }
+        if (message.pokemonSize !== undefined) {
+          currentPokemonSize = message.pokemonSize;
+        }
+        applyTheme(currentTheme, currentThemeKind, currentPokemonSize);
         break;
 
       case 'list-pokemon':
@@ -742,7 +764,7 @@ export function pokemonPanelApp(
             message.generation,
             message.originalSpriteSize,
             preservedColor,
-            pokemonSize,
+            currentPokemonSize,
             parseInt(preservedLeft || '0') || randomStartPosition(),
             parseInt(preservedBottom || '0') || floor,
             floor,
