@@ -371,6 +371,46 @@ export class XpTracker {
   }
 
   /**
+   * Reconcile records with the actual panel collection. Called on extension startup
+   * to drop records for pokemon that no longer exist (e.g. legacy migration produced
+   * a Bulbasaur record but the user has an empty panel) and to start tracking any
+   * pokemon in the saved collection that weren't being tracked.
+   */
+  syncWithCollection(
+    collection: ReadonlyArray<{ name: string; type: PokemonType }>,
+  ): void {
+    const names = new Set(collection.map((c) => c.name));
+    let changed = false;
+    // Drop records for pokemon the panel no longer has.
+    for (const name of Array.from(this.records.keys())) {
+      if (!names.has(name)) {
+        this.records.delete(name);
+        changed = true;
+      }
+    }
+    // Add records for pokemon present in the panel but not yet tracked.
+    for (const item of collection) {
+      if (!this.records.has(item.name)) {
+        this.records.set(item.name, {
+          baseType: item.type,
+          type: item.type,
+          totalXp: 0,
+        });
+        changed = true;
+      }
+    }
+    // Make sure activeName still points at a real record.
+    if (!this.activeName || !this.records.has(this.activeName)) {
+      const first = this.records.keys().next();
+      this.activeName = first.done ? undefined : first.value;
+      changed = true;
+    }
+    if (changed) {
+      this.recomputeAndNotify();
+    }
+  }
+
+  /**
    * Called when the user changes the configured pokemonType. Clears all records and
    * seeds a single fresh one at the new type — this is "start over", which matches
    * the legacy semantics for the setting.

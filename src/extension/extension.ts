@@ -493,6 +493,17 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(xpTracker.start());
 
+  // Reconcile tracker records with whatever pokemon the panel actually has saved.
+  // Without this, legacy migration (or stale v2 state) can leave a Bulbasaur record
+  // attached to a user who deleted everything — and the HUD keeps showing it.
+  const persistedCollection = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  );
+  xpTracker.syncWithCollection(
+    persistedCollection.map((p) => ({ name: p.name, type: p.type })),
+  );
+
   const spec = PokemonSpecification.fromConfiguration(
     xpTracker.getState().currentType,
   );
