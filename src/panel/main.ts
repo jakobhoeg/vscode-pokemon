@@ -690,11 +690,11 @@ export function pokemonPanelApp(
         applyTheme(currentTheme, currentThemeKind, currentPokemonSize);
         break;
 
-      case 'list-pokemon':
-        var pokemonCollection = allPokemon.pokemonCollection;
+      case 'list-pokemon': {
+        const listCollection = allPokemon.pokemonCollection;
         stateApi?.postMessage({
           command: 'list-pokemon',
-          text: pokemonCollection
+          text: listCollection
             .map(
               (pokemon) =>
                 `${pokemon.type},${pokemon.pokemon.name},${pokemon.color}`,
@@ -702,18 +702,20 @@ export function pokemonPanelApp(
             .join('\n'),
         });
         break;
+      }
 
-      case 'roll-call':
-        var pokemonCollection = allPokemon.pokemonCollection;
+      case 'roll-call': {
+        const rollCallCollection = allPokemon.pokemonCollection;
         // go through every single
         // pokemon and then print out their name
-        pokemonCollection.forEach((pokemon) => {
+        rollCallCollection.forEach((pokemon) => {
           stateApi?.postMessage({
             command: 'info',
             text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}): ${pokemon.pokemon.hello}`,
           });
         });
         break;
+      }
       case 'delete-pokemon':
         removePokemonFromPanel(message, stateApi);
         break;
