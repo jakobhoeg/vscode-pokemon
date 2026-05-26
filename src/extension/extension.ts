@@ -553,18 +553,27 @@ export function activate(context: vscode.ExtensionContext) {
         );
         if (pokemon) {
           panel.deletePokemon(pokemon.name);
-          const collection = pokemonList
-            .filter((item) => {
-              return item.name !== pokemon.name;
-            })
-            .map<PokemonSpecification>((item) => {
-              return new PokemonSpecification(
-                item.color,
-                item.type,
-                PokemonSize.medium,
-                item.name,
-              );
-            });
+          const survivors = pokemonList.filter(
+            (item) => item.name !== pokemon.name,
+          );
+          // If we just deleted the pokemon the HUD was tracking, switch to a survivor
+          // so the HUD doesn't keep showing a pokemon that no longer exists in the panel.
+          if (
+            xpTracker &&
+            pokemon.type === xpTracker.getState().currentType &&
+            survivors.length > 0
+          ) {
+            // HUD was tracking the pokemon we just deleted — follow a survivor.
+            xpTracker.switchActiveType(survivors[0].type);
+          }
+          const collection = survivors.map<PokemonSpecification>((item) => {
+            return new PokemonSpecification(
+              item.color,
+              item.type,
+              PokemonSize.medium,
+              item.name,
+            );
+          });
           await storeCollectionAsMemento(context, collection);
         }
       },
@@ -979,6 +988,7 @@ export function activate(context: vscode.ExtensionContext) {
                   );
 
                   panel.spawnPokemon(spec);
+                  xpTracker?.switchActiveType(spec.type);
                   var collection = PokemonSpecification.collectionFromMemento(
                     context,
                     getConfiguredSize(),
@@ -1038,6 +1048,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
 
           panel.spawnPokemon(spec);
+          xpTracker?.switchActiveType(spec.type);
           var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),
@@ -1078,6 +1089,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
 
           panel.spawnPokemon(spec);
+          xpTracker?.switchActiveType(spec.type);
           var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),

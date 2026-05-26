@@ -247,6 +247,21 @@ export class XpTracker {
     this.callbacks.onUpdate(this.state);
   }
 
+  /**
+   * Switch the tracked species without zeroing XP. Used when the user spawns a new
+   * pokemon — they expect the HUD to follow whatever pokemon they're using, and they
+   * keep the XP they've earned. Level is re-derived under the new species' growth rate.
+   */
+  switchActiveType(newType: PokemonType): void {
+    if (newType === this.state.currentType && newType === this.state.baseType) {
+      return;
+    }
+    this.state = this.deriveState(newType, newType, this.state.totalXp);
+    this.dirty = true;
+    this.flushNow();
+    this.callbacks.onUpdate(this.state);
+  }
+
   /** Manual reset (for the reset-xp command). Keeps base type, reverts current to base, zeros XP. */
   resetXp(): void {
     this.state = this.deriveState(this.state.baseType, this.state.baseType, 0);
