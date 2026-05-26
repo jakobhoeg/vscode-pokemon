@@ -553,19 +553,10 @@ export function activate(context: vscode.ExtensionContext) {
         );
         if (pokemon) {
           panel.deletePokemon(pokemon.name);
+          xpTracker?.removePokemon(pokemon.name);
           const survivors = pokemonList.filter(
             (item) => item.name !== pokemon.name,
           );
-          // If we just deleted the pokemon the HUD was tracking, switch to a survivor
-          // so the HUD doesn't keep showing a pokemon that no longer exists in the panel.
-          if (
-            xpTracker &&
-            pokemon.type === xpTracker.getState().currentType &&
-            survivors.length > 0
-          ) {
-            // HUD was tracking the pokemon we just deleted — follow a survivor.
-            xpTracker.switchActiveType(survivors[0].type);
-          }
           const collection = survivors.map<PokemonSpecification>((item) => {
             return new PokemonSpecification(
               item.color,
@@ -587,6 +578,7 @@ export function activate(context: vscode.ExtensionContext) {
         const panel = getPokemonPanel();
         if (panel !== undefined) {
           panel.resetPokemon();
+          xpTracker?.removeAll();
           await storeCollectionAsMemento(context, []);
         } else {
           await createPokemonPlayground(context);
@@ -822,6 +814,7 @@ export function activate(context: vscode.ExtensionContext) {
               if (panel !== undefined) {
                 panel.spawnPokemon(pokemonSpec);
               }
+              xpTracker?.addPokemon(pokemonSpec.name, pokemonSpec.type);
             }
             await storeCollectionAsMemento(context, collection);
           } catch (e: any) {
@@ -988,7 +981,7 @@ export function activate(context: vscode.ExtensionContext) {
                   );
 
                   panel.spawnPokemon(spec);
-                  xpTracker?.switchActiveType(spec.type);
+                  xpTracker?.addPokemon(spec.name, spec.type);
                   var collection = PokemonSpecification.collectionFromMemento(
                     context,
                     getConfiguredSize(),
@@ -1048,7 +1041,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
 
           panel.spawnPokemon(spec);
-          xpTracker?.switchActiveType(spec.type);
+          xpTracker?.addPokemon(spec.name, spec.type);
           var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),
@@ -1089,7 +1082,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
 
           panel.spawnPokemon(spec);
-          xpTracker?.switchActiveType(spec.type);
+          xpTracker?.addPokemon(spec.name, spec.type);
           var collection = PokemonSpecification.collectionFromMemento(
             context,
             getConfiguredSize(),
@@ -1124,7 +1117,9 @@ export function activate(context: vscode.ExtensionContext) {
       if (choice !== resetLabel) {
         return;
       }
-      const before = xpTracker.getState().currentType;
+      const beforeState = xpTracker.getState();
+      const before = beforeState.currentType;
+      const beforeName = beforeState.name;
       xpTracker.resetXp();
       const after = xpTracker.getState().currentType;
       if (before !== after) {
@@ -1136,6 +1131,7 @@ export function activate(context: vscode.ExtensionContext) {
             `gen${config.generation}`,
             config.originalSpriteSize ?? 32,
             before,
+            beforeName,
           );
         }
       }
@@ -1146,25 +1142,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(
       (e: vscode.ConfigurationChangeEvent): void => {
-        if (e.affectsConfiguration('vscode-pokemon.pokemonType')) {
-          // User switched species — send an evolve-pokemon message so the webview swaps
-          // the main pokemon in-place without a full HTML reload (codachi update-pet pattern).
-          const panel = getPokemonPanel();
-          const oldType = panel?.pokemonType();
-          const newBaseType = PokemonSpecification.getConfiguredBaseType();
-          xpTracker?.reset(newBaseType);
-          if (panel && oldType && oldType !== newBaseType) {
-            const newConfig = POKEMON_DATA[newBaseType];
-            if (newConfig) {
-              panel.evolveActivePokemon(
-                newBaseType,
-                `gen${newConfig.generation}`,
-                newConfig.originalSpriteSize ?? 32,
-                oldType,
-              );
-            }
-          }
-        }
+        // Note: changes to vscode-pokemon.pokemonType no longer touch XP. Each
+        // pokemon owns its own XP keyed by name. The setting is only consulted as
+        // the seed type on a fresh install. To change which pokemon the HUD follows,
+        // use the spawn / delete commands.
 
         if (
           e.affectsConfiguration('vscode-pokemon.pokemonColor') ||
@@ -1254,11 +1235,20 @@ function updateStatusBar(): void {
 
 function buildXpHudPayload(state: ActivePokemonState): IXpHudPayload {
   const cfg = getXpTrackerConfig();
+  if (!cfg.enabled || !state.hasActive) {
+    return {
+      visible: false,
+      speciesName: '',
+      level: 1,
+      percent: 0,
+      numbersText: '',
+    };
+  }
   const speciesName =
     POKEMON_DATA[state.currentType]?.name ?? state.currentType;
   if (state.level >= 100) {
     return {
-      visible: cfg.enabled,
+      visible: true,
       speciesName,
       level: 100,
       percent: 100,
@@ -1270,7 +1260,7 @@ function buildXpHudPayload(state: ActivePokemonState): IXpHudPayload {
       ? Math.round((state.xpIntoLevel / state.xpForThisLevel) * 100)
       : 0;
   return {
-    visible: cfg.enabled,
+    visible: true,
     speciesName,
     level: state.level,
     percent,
@@ -1283,7 +1273,7 @@ function updateXpStatusBar(state: ActivePokemonState): void {
     return;
   }
   const cfg = getXpTrackerConfig();
-  if (!cfg.enabled || !getShowXpInStatusBar()) {
+  if (!cfg.enabled || !getShowXpInStatusBar() || !state.hasActive) {
     xpStatusBar.hide();
     return;
   }
@@ -1312,12 +1302,16 @@ function handlePokemonEvolved(
     return;
   }
   const panel = getPokemonPanel();
+  // The active pokemon is the one that evolved — pass its name so the panel can
+  // find it unambiguously by name rather than guessing by type.
+  const activeName = xpTracker?.getState().name;
   if (panel) {
     panel.evolveActivePokemon(
       newType,
       `gen${newConfig.generation}`,
       newConfig.originalSpriteSize ?? 32,
       oldType,
+      activeName,
     );
   }
   const mode = getEvolutionNotificationMode();
@@ -1371,6 +1365,7 @@ interface IPokemonPanel {
     newGeneration: string,
     newOriginalSpriteSize: number,
     prevType?: PokemonType,
+    name?: string,
   ): void;
   updateXp(payload: IXpHudPayload): void;
   updateConfig(): void;
@@ -1526,9 +1521,11 @@ class PokemonWebviewContainer implements IPokemonPanel {
     newGeneration: string,
     newOriginalSpriteSize: number,
     prevType?: PokemonType,
+    name?: string,
   ): void {
-    // Track the previous type so the HTML recovery check can locate the exact pokemon
-    // to replace rather than blindly targeting collection[0].
+    // `name` is the canonical identifier: the panel finds pokemon by name. `prevType`
+    // remains as a legacy fallback for cases where the caller doesn't know the name
+    // (cross-restart recovery from old saved state).
     const resolvedPrevType = prevType ?? this._pokemonType;
     if (resolvedPrevType !== newType) {
       this._prevPokemonType = resolvedPrevType;
@@ -1543,10 +1540,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
         generation: newGeneration,
         originalSpriteSize: newOriginalSpriteSize,
         prevType: resolvedPrevType,
+        name,
       });
     } catch {
-      // View not currently visible; the cache update above ensures the evolved form
-      // renders correctly when the view is reopened.
+      // View not currently visible.
     }
   }
 

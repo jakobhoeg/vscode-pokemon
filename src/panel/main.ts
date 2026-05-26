@@ -737,14 +737,19 @@ export function pokemonPanelApp(
         updateXpHud(message.payload);
         break;
       case 'evolve-pokemon': {
-        // Locate the pokemon to evolve by its pre-evolution type (prevType).
-        // This avoids accidentally evolving an unrelated pokemon that happens to
-        // be at collection[0].  Fall back to index 0 only when prevType is absent.
-        var evolveIdx = message.prevType
-          ? allPokemon.pokemonCollection.findIndex(
-              (p) => p.type === message.prevType,
-            )
-          : -1;
+        // Find the pokemon by name (canonical identifier when known). Fall back to
+        // pre-evolution type for older saved-state recovery paths, then to index 0.
+        var evolveIdx = -1;
+        if (message.name) {
+          evolveIdx = allPokemon.pokemonCollection.findIndex(
+            (p) => p.pokemon.name === message.name,
+          );
+        }
+        if (evolveIdx === -1 && message.prevType) {
+          evolveIdx = allPokemon.pokemonCollection.findIndex(
+            (p) => p.type === message.prevType,
+          );
+        }
         if (evolveIdx === -1) {
           evolveIdx = 0;
         }
