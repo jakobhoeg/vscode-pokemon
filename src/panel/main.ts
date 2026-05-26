@@ -511,6 +511,7 @@ export function pokemonPanelApp(
     percent: number;
     numbersText: string;
   },
+  prevPokemonType?: PokemonType,
   stateApi?: VscodeStateApi,
 ) {
   var floor = 0;
@@ -564,16 +565,25 @@ export function pokemonPanelApp(
   if (hasRecoverableState) {
     console.log('Recovering state - ', state);
     recoverState(basePokemonUri, gen, pokemonSize, floor, stateApi);
-    // Ensure the active pokemon (index 0) reflects the evolved type passed from the extension.
-    // The webview-local saved state may lag behind if the view was hidden during an evolution.
-    if (allPokemon.pokemonCollection.length > 0) {
-      const active = allPokemon.pokemonCollection[0];
-      if (active.type !== pokemonType) {
-        const preservedName = active.pokemon.name;
-        const preservedLeft = active.el.style.left;
-        const preservedBottom = active.el.style.bottom;
-        const preservedColor = active.color;
-        allPokemon.remove(active.pokemon.name);
+    // Sync the active pokemon's species when the type changed since the webview last saved
+    // state (hidden evolution or pokemonType setting change).  We identify the stale pokemon
+    // by its previous type (prevPokemonType) rather than by collection index so that
+    // unrelated extra-spawned pokemon are never accidentally overwritten.
+    if (
+      prevPokemonType &&
+      prevPokemonType !== pokemonType &&
+      allPokemon.pokemonCollection.length > 0
+    ) {
+      const staleIdx = allPokemon.pokemonCollection.findIndex(
+        (p) => p.type === prevPokemonType,
+      );
+      if (staleIdx !== -1) {
+        const stale = allPokemon.pokemonCollection[staleIdx];
+        const preservedName = stale.pokemon.name;
+        const preservedLeft = stale.el.style.left;
+        const preservedBottom = stale.el.style.bottom;
+        const preservedColor = stale.color;
+        allPokemon.remove(stale.pokemon.name);
         try {
           const evolved = addPokemonToPanel(
             pokemonType,
@@ -589,7 +599,7 @@ export function pokemonPanelApp(
             stateApi,
             false,
           );
-          allPokemon.pokemonCollection.unshift(evolved);
+          allPokemon.pokemonCollection.splice(staleIdx, 0, evolved);
           saveState(stateApi);
         } catch (e: any) {
           console.error(
@@ -705,9 +715,18 @@ export function pokemonPanelApp(
         updateXpHud(message.payload);
         break;
       case 'evolve-pokemon': {
-        // The "active" pokemon is the first one in the collection (the main pokemon spawned
-        // from settings). Replace it in-place: preserve name and position, swap species.
-        var first = allPokemon.pokemonCollection[0];
+        // Locate the pokemon to evolve by its pre-evolution type (prevType).
+        // This avoids accidentally evolving an unrelated pokemon that happens to
+        // be at collection[0].  Fall back to index 0 only when prevType is absent.
+        var evolveIdx = message.prevType
+          ? allPokemon.pokemonCollection.findIndex(
+              (p) => p.type === message.prevType,
+            )
+          : -1;
+        if (evolveIdx === -1) {
+          evolveIdx = 0;
+        }
+        var first = allPokemon.pokemonCollection[evolveIdx];
         if (!first) {
           break;
         }
@@ -731,8 +750,8 @@ export function pokemonPanelApp(
             stateApi,
             false,
           );
-          // Re-insert at the head so this remains the "active" pokemon.
-          allPokemon.pokemonCollection.unshift(evolved);
+          // Re-insert at the same slot so the collection order is preserved.
+          allPokemon.pokemonCollection.splice(evolveIdx, 0, evolved);
           saveState(stateApi);
         } catch (e: any) {
           stateApi?.postMessage({

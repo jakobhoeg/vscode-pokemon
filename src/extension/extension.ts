@@ -1122,6 +1122,7 @@ export function activate(context: vscode.ExtensionContext) {
             after,
             `gen${config.generation}`,
             config.originalSpriteSize ?? 32,
+            before,
           );
         }
       }
@@ -1294,6 +1295,7 @@ function handlePokemonEvolved(
       newType,
       `gen${newConfig.generation}`,
       newConfig.originalSpriteSize ?? 32,
+      oldType,
     );
   }
   const mode = getEvolutionNotificationMode();
@@ -1347,6 +1349,7 @@ interface IPokemonPanel {
     newType: PokemonType,
     newGeneration: string,
     newOriginalSpriteSize: number,
+    prevType?: PokemonType,
   ): void;
   updateXp(payload: IXpHudPayload): void;
 }
@@ -1356,6 +1359,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
   protected _disposables: vscode.Disposable[] = [];
   protected _pokemonColor: PokemonColor;
   protected _pokemonType: PokemonType;
+  protected _prevPokemonType: PokemonType | undefined;
   protected _pokemonSize: PokemonSize;
   protected _pokemonGeneration: string;
   protected _pokemonOriginalSpriteSize: number;
@@ -1393,6 +1397,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
     return this._pokemonType;
   }
 
+  public prevPokemonType(): PokemonType | undefined {
+    return this._prevPokemonType;
+  }
+
   public pokemonSize(): PokemonSize {
     return this._pokemonSize;
   }
@@ -1422,7 +1430,10 @@ class PokemonWebviewContainer implements IPokemonPanel {
   }
 
   public updatePokemonType(newType: PokemonType) {
-    this._pokemonType = newType;
+    if (newType !== this._pokemonType) {
+      this._prevPokemonType = this._pokemonType;
+      this._pokemonType = newType;
+    }
   }
 
   public updatePokemonSize(newSize: PokemonSize) {
@@ -1492,11 +1503,14 @@ class PokemonWebviewContainer implements IPokemonPanel {
     newType: PokemonType,
     newGeneration: string,
     newOriginalSpriteSize: number,
+    prevType?: PokemonType,
   ): void {
-    // Order matters: update the cached fields BEFORE attempting to post the message.
-    // If the webview view is hidden (PokemonWebviewViewProvider.getWebview() throws), the
-    // user will still see the evolved form next time the view is resolved because
-    // _getHtmlForWebview reads from these cached fields.
+    // Track the previous type so the HTML recovery check can locate the exact pokemon
+    // to replace rather than blindly targeting collection[0].
+    const resolvedPrevType = prevType ?? this._pokemonType;
+    if (resolvedPrevType !== newType) {
+      this._prevPokemonType = resolvedPrevType;
+    }
     this._pokemonType = newType;
     this._pokemonGeneration = newGeneration;
     this._pokemonOriginalSpriteSize = newOriginalSpriteSize;
@@ -1506,6 +1520,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
         type: newType,
         generation: newGeneration,
         originalSpriteSize: newOriginalSpriteSize,
+        prevType: resolvedPrevType,
       });
     } catch {
       // View not currently visible; the cache update above ensures the evolved form
@@ -1620,7 +1635,8 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",
-                        ${initialXpJson}
+                        ${initialXpJson},
+                        ${this.prevPokemonType() ? `"${this.prevPokemonType()}"` : 'undefined'}
                     );
                 </script>
             </body>
