@@ -194,8 +194,12 @@ export class XpTracker {
   }
 
   private handleEdit(event: vscode.TextDocumentChangeEvent): void {
+    // Count only non-whitespace characters. Pressing Enter with auto-indent
+    // inserts a newline plus a chunk of spaces, which would otherwise count as
+    // a fat XP gain for a single keystroke. Words and symbols are the
+    // meaningful signal that the user is actually writing code.
     const textLength = event.contentChanges.reduce(
-      (sum, c) => sum + (c.text ? c.text.length : 0),
+      (sum, c) => sum + (c.text ? c.text.replace(/\s/g, '').length : 0),
       0,
     );
     this.ingestEdit(

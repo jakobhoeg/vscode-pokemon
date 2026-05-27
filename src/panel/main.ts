@@ -422,8 +422,7 @@ function recoverState(
     }
 
     // Resolve friend relationships
-    let friend: (typeof allPokemon.pokemonCollection)[number] | undefined =
-      undefined;
+    let friend: (typeof allPokemon.pokemonCollection)[number] | undefined;
     if (state.pokemonFriend) {
       friend = allPokemon.locate(state.pokemonFriend);
       if (friend) {

@@ -255,14 +255,14 @@
                     },
                     "vscode-pokemon.xpGainMultiplier": {
                         "type": "number",
-                        "default": 10,
+                        "default": 1,
                         "minimum": 0,
                         "maximum": 1000,
-                        "description": "XP awarded per character typed. Increase for faster evolution; set to 1 for canonical Pokémon pace."
+                        "description": "XP awarded per non-whitespace character typed. Default 1 is roughly canonical Pokémon pace. Whitespace (spaces, tabs, newlines) is never counted, so Enter with auto-indent doesn't dump XP."
                     },
                     "vscode-pokemon.xpPerEventCap": {
                         "type": "number",
-                        "default": 200,
+                        "default": 50,
                         "minimum": 1,
                         "maximum": 100000,
                         "description": "Maximum XP from a single edit. Prevents large pastes from instantly evolving your Pokémon."

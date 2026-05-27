@@ -109,8 +109,8 @@ function getXpTrackerConfig(): XpTrackerConfig {
   const cfg = vscode.workspace.getConfiguration('vscode-pokemon');
   return {
     enabled: cfg.get<boolean>('enableXp', true),
-    multiplier: cfg.get<number>('xpGainMultiplier', 10),
-    perEventCap: cfg.get<number>('xpPerEventCap', 200),
+    multiplier: cfg.get<number>('xpGainMultiplier', 1),
+    perEventCap: cfg.get<number>('xpPerEventCap', 50),
   };
 }
 
