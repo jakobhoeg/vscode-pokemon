@@ -30,8 +30,8 @@ declare global {
   function acquireVsCodeApi(): VscodeStateApi;
 }
 
-export var allPokemon: IPokemonCollection = new PokemonCollection();
-var pokemonCounter: number;
+export const allPokemon: IPokemonCollection = new PokemonCollection();
+let pokemonCounter: number;
 
 function normalizePokemonCounter(counter: number | undefined): number {
   if (counter === undefined || Number.isNaN(counter)) {
@@ -84,7 +84,7 @@ function calculateFloor(size: PokemonSize, theme: Theme): number {
 }
 
 function handleMouseOver(e: MouseEvent) {
-  var el = e.currentTarget as HTMLDivElement;
+  const el = e.currentTarget as HTMLDivElement;
   allPokemon.pokemonCollection.forEach((element) => {
     if (element.collision === el) {
       if (!element.pokemon.canSwipe) {
@@ -106,7 +106,7 @@ function startAnimations(
 
   collision.addEventListener('mouseover', handleMouseOver);
   setInterval(() => {
-    var updates = allPokemon.seekNewFriends();
+    const updates = allPokemon.seekNewFriends();
     updates.forEach((message) => {
       stateApi?.postMessage({
         text: message,
@@ -132,19 +132,19 @@ function addPokemonToPanel(
   stateApi?: VscodeStateApi,
   incrementCounter: boolean = true,
 ): PokemonElement {
-  var pokemonSpriteElement: HTMLImageElement = document.createElement('img');
+  const pokemonSpriteElement: HTMLImageElement = document.createElement('img');
   pokemonSpriteElement.className = 'pokemon';
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
     pokemonSpriteElement,
   );
 
-  var collisionElement: HTMLDivElement = document.createElement('div');
+  const collisionElement: HTMLDivElement = document.createElement('div');
   collisionElement.className = 'collision';
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
     collisionElement,
   );
 
-  var speechBubbleElement: HTMLImageElement = document.createElement('img');
+  const speechBubbleElement: HTMLImageElement = document.createElement('img');
   speechBubbleElement.className = `bubble bubble-${pokemonSize} b-${originalSpriteSize}`;
   speechBubbleElement.src = `${basePokemonUri}/heart.png`;
   (document.getElementById('pokemonContainer') as HTMLDivElement).appendChild(
@@ -161,24 +161,25 @@ function addPokemonToPanel(
     name,
     originalSpriteSize,
   );
+  const newPokemon = createPokemon(
+    pokemonType,
+    pokemonSpriteElement,
+    collisionElement,
+    speechBubbleElement,
+    pokemonSize,
+    left,
+    bottom,
+    root,
+    floor,
+    name,
+    gen,
+    originalSpriteSize,
+  );
   try {
     if (!availableColors(pokemonType).includes(pokemonColor)) {
       throw new InvalidPokemonException('Invalid color for pokemon type');
     }
-    var newPokemon = createPokemon(
-      pokemonType,
-      pokemonSpriteElement,
-      collisionElement,
-      speechBubbleElement,
-      pokemonSize,
-      left,
-      bottom,
-      root,
-      floor,
-      name,
-      gen,
-      originalSpriteSize,
-    );
+
     if (incrementCounter) {
       pokemonCounter++;
     }
@@ -276,7 +277,7 @@ function removePokemonFromPanel(
     stateApi = acquireVsCodeApi();
   }
   // Remove elements
-  var pokemon = allPokemon.locate(message.name);
+  const pokemon = allPokemon.locate(message.name);
 
   if (!pokemon) {
     stateApi?.postMessage({
@@ -286,7 +287,7 @@ function removePokemonFromPanel(
     return;
   }
 
-  var pokemonSpriteElement = pokemon.el;
+  const pokemonSpriteElement = pokemon.el;
   console.log('Removing pokemon ', message.name);
   console.log('pokemon:', pokemon);
 
@@ -346,7 +347,7 @@ export function saveState(stateApi?: VscodeStateApi) {
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }
-  var state = new PokemonPanelState();
+  const state = new PokemonPanelState();
   state.pokemonStates = [];
 
   allPokemon.pokemonCollection.forEach((pokemonItem) => {
@@ -376,14 +377,14 @@ function recoverState(
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }
-  var state = stateApi?.getState();
+  const state = stateApi?.getState();
   if (!state) {
     pokemonCounter = 0;
   } else {
     pokemonCounter = normalizePokemonCounter(state.pokemonCounter);
   }
 
-  var recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
+  const recoveryMap: Map<IPokemonType, PokemonElementState> = new Map();
   console.log(
     'recoverState: saved pokemon count =',
     state?.pokemonStates?.length ?? 0,
@@ -392,7 +393,7 @@ function recoverState(
     console.log('Recovering pokemon ', p.pokemonType, p.pokemonName);
     try {
       console.log('Adding pokemon to panel for recovery');
-      var newPokemon = addPokemonToPanel(
+      const newPokemon = addPokemonToPanel(
         p.pokemonType ?? 'bulbasaur',
         basePokemonUri,
         p.pokemonGeneration ?? 'gen1',
@@ -421,7 +422,8 @@ function recoverState(
     }
 
     // Resolve friend relationships
-    var friend = undefined;
+    let friend: (typeof allPokemon.pokemonCollection)[number] | undefined =
+      undefined;
     if (state.pokemonFriend) {
       friend = allPokemon.locate(state.pokemonFriend);
       if (friend) {
@@ -558,11 +560,11 @@ export function pokemonPanelApp(
   stateApi?: VscodeStateApi,
 ) {
   // Mutable config — updated in-place by update-config messages without an HTML reload.
-  var currentTheme = theme;
-  var currentThemeKind = themeKind;
-  var currentPokemonSize = pokemonSize;
+  let currentTheme = theme;
+  let currentThemeKind = themeKind;
+  let currentPokemonSize = pokemonSize;
 
-  var floor = 0;
+  let floor = 0;
   if (!stateApi) {
     stateApi = acquireVsCodeApi();
   }
@@ -570,7 +572,7 @@ export function pokemonPanelApp(
   function applyTheme(t: Theme, tk: ColorThemeKind, sz: PokemonSize) {
     const foregroundEl = document.getElementById('foreground');
     if (t !== Theme.none) {
-      var _themeKind = '';
+      let _themeKind = '';
       switch (tk) {
         case ColorThemeKind.dark:
           _themeKind = 'dark';
@@ -607,7 +609,7 @@ export function pokemonPanelApp(
   );
 
   // New session
-  var state = stateApi?.getState();
+  const state = stateApi?.getState();
 
   const hasRecoverableState =
     state !== undefined &&

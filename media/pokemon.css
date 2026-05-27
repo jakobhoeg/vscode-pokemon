@@ -334,6 +334,8 @@ img.pokemon {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   -webkit-font-smoothing: none;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  /* Width is content-driven; the row floor below keeps the bar a real bar. */
+  width: max-content;
   max-width: 90vw;
 }
 
@@ -345,6 +347,7 @@ img.pokemon {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .xp-hud-label {
@@ -353,11 +356,14 @@ img.pokemon {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 160px;
+  flex-shrink: 1;
+  min-width: 60px;
 }
 
 .xp-hud-level {
   color: #ffd34d;
   min-width: 44px;
+  flex-shrink: 0;
 }
 
 .xp-hud-bar {
@@ -368,6 +374,7 @@ img.pokemon {
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 2px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .xp-hud-bar-fill {
@@ -385,4 +392,5 @@ img.pokemon {
   color: #ddd;
   min-width: 56px;
   text-align: right;
+  flex-shrink: 0;
 }
