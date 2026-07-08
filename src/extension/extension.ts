@@ -3,9 +3,11 @@ import { ColorThemeKind } from 'vscode';
 import * as localize from '../common/localize';
 import { randomName } from '../common/names';
 import {
+  getAllPokemon,
   getDefaultPokemon as getDefaultPokemonType,
   getPokemonByGeneration,
   getRandomPokemonConfig,
+  getRandomPokemonConfigFrom,
   POKEMON_DATA,
 } from '../common/pokemon-data';
 import {
@@ -111,6 +113,49 @@ interface IDefaultPokemonConfig {
   type: PokemonType;
   name?: string;
   shiny?: boolean;
+  pool?: PokemonType[];
+}
+
+/**
+ * Resolves a 'random' defaultPokemon entry to a concrete type, optionally
+ * constrained to `pool`. Falls back to the full types list if `pool` is
+ * empty or contains no valid entries (invalid entries are warned about, not
+ * treated as fatal).
+ */
+function resolveRandomPokemonType(pool?: PokemonType[]): PokemonType {
+  const allPokemon = getAllPokemon();
+
+  if (!pool || pool.length === 0) {
+    const [randomPokemonType] = getRandomPokemonConfigFrom(allPokemon);
+    return randomPokemonType;
+  }
+
+  // Normalize pool entries for case-insensitive matching
+  const normalizedPool = pool.map((entry) => entry.toLowerCase().trim());
+
+  const invalidPoolEntries = normalizedPool.filter(
+    (entry) => !allPokemon.includes(entry as PokemonType),
+  );
+  if (invalidPoolEntries.length > 0) {
+    console.warn(
+      `Invalid pokemon type(s) in defaultPokemon pool: ${invalidPoolEntries.join(', ')}`,
+    );
+  }
+
+  const validPoolEntries = normalizedPool.filter((entry) =>
+    allPokemon.includes(entry as PokemonType),
+  ) as PokemonType[];
+  if (validPoolEntries.length === 0) {
+    console.warn(
+      `No valid pokemon in defaultPokemon pool, falling back to random selection from all pokemon`,
+    );
+  }
+
+  // Fall back to the full pokemon list if the pool was empty or fully invalid
+  const candidateKeys =
+    validPoolEntries.length > 0 ? validPoolEntries : allPokemon;
+  const [randomPokemonType] = getRandomPokemonConfigFrom(candidateKeys);
+  return randomPokemonType;
 }
 
 function getConfiguredDefaultPokemon(): PokemonSpecification[] {
@@ -123,25 +168,35 @@ function getConfiguredDefaultPokemon(): PokemonSpecification[] {
 
   for (const config of defaultConfig) {
     // Validate that the pokemon type exists
-    if (POKEMON_DATA[config.type]) {
-      const name = config.name || randomName();
-
-      // If shiny is not specified, default to color to maybeShiny with the pokemon's available colors. If shiny is true, force shiny color. If shiny is false, force default color.
-      let color: PokemonColor;
-      if (config.shiny === undefined) {
-        color = maybeMakeShiny(availableColors(config.type));
-      } else if (config.shiny) {
-        color = PokemonColor.shiny;
-      } else {
-        color = DEFAULT_COLOR;
-      }
-
-      result.push(new PokemonSpecification(color, config.type, size, name));
-    } else {
+    if (config.type !== 'random' && !POKEMON_DATA[config.type]) {
       console.warn(
         `Invalid pokemon type in defaultPokemon config: ${config.type}`,
       );
+      continue;
     }
+
+    const resolvedType: PokemonType =
+      config.type === 'random'
+        ? resolveRandomPokemonType(config.pool)
+        : config.type;
+
+    const name = config.name || randomName();
+
+    /**
+     * If shiny is not specified, default color to maybeMakeShiny with the
+     * pokemon's available colors. If shiny is true, force shiny color. If
+     * shiny is false, force default color.
+     */
+    let color: PokemonColor;
+    if (config.shiny === undefined) {
+      color = maybeMakeShiny(availableColors(resolvedType));
+    } else if (config.shiny) {
+      color = PokemonColor.shiny;
+    } else {
+      color = DEFAULT_COLOR;
+    }
+
+    result.push(new PokemonSpecification(color, resolvedType, size, name));
   }
 
   return result;

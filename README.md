@@ -111,19 +111,33 @@ To configure default Pokémon, add the following to your `settings.json`:
     },
     {
       "type": "articuno"
+    },
+    {
+      "type": "mewtwo",
+      "shiny": true
+    },
+    {
+      "type": "random"
+    },
+    {
+      "type": "random",
+      "pool": ["pikachu", "eevee", "gengar", "snorlax"]
     }
   ]
 }
 ```
 
-- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`)
+- **`type`** (required): The Pokémon species (e.g., `"pikachu"`, `"charizard"`, `"mewtwo"`), or `"random"` to spawn a random species
 - **`name`** (optional): A custom name for your Pokémon. If not provided, a random name will be assigned
 - **`shiny`** (optional): Determines if the Pokémon is shiny, if not set will use `vscode-pokemon.shinyOdds` setting.
+- **`pool`** (optional): Only used when `type` is `"random"`. Restricts the random selection to this list of species. Invalid entries are dropped with a warning; if none are valid, selection falls back to any Pokémon.
 
 **Note:** The extension automatically saves your current Pokémon between sessions. The `defaultPokemon` setting is only used when:
 - You start the extension for the first time
 - You open a new windows/repository
 - You have removed all Pokémon (no saved session exists)
+
+A `"random"` entry is resolved to a specific species the first time it's applied, then saved like any other Pokémon — reopening the window won't re-roll it, only removing all Pokémon will.
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
