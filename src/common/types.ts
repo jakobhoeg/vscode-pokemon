@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { POKEMON_DATA } from './pokemon-data';
+import { PokemonTypeString } from './pokemon-data';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const enum PokemonColor {
   default = 'default',
   shiny = 'shiny',
@@ -12,9 +12,8 @@ export enum PokemonGeneration {
   Gen2 = 2,
   Gen3 = 3,
   Gen4 = 4,
+  Gen5 = 5,
 }
-
-export type PokemonTypeString = string & keyof typeof POKEMON_DATA;
 
 export type PokemonType = PokemonTypeString;
 

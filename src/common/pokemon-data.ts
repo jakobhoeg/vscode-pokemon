@@ -8,7 +8,9 @@ import {
   PokemonType,
 } from './types';
 
-export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
+export type PokemonTypeString = string & keyof typeof POKEMON_DATA_RAW;
+
+const POKEMON_DATA_RAW: Record<string, PokemonConfig> = {
   // Generation 1
   bulbasaur: {
     id: 1,
@@ -4015,6 +4017,13 @@ export const POKEMON_DATA: { [key: string]: PokemonConfig } = {
     originalSpriteSize: 64,
   },
 };
+
+export const POKEMON_DATA: Record<PokemonType, PokemonConfig> =
+  Object.fromEntries(
+    Object.entries(POKEMON_DATA_RAW).filter(
+      ([, config]) => config.possibleColors.length > 0,
+    ),
+  ) as Record<PokemonType, PokemonConfig>;
 
 export function getAllPokemon(): PokemonType[] {
   return Object.keys(POKEMON_DATA) as PokemonType[];
