@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [5.0.0]
+
+- feat: generation 5 sprites (partial)
+
 ## [4.3.4]
 
 - feat: add shiny configuration option to default Pokemon settings
