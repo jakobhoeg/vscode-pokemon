@@ -2,13 +2,9 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
-## [4.3.6]
+## [5.0.0]
 
-- feat: add random pokémon support to default pokemon settings
-
-## [4.3.5]
-
-- fix: resolve delay when removing more than one pokemon quickly
+- feat: generation 5 sprites (partial)
 
 ## [4.3.4]
 
