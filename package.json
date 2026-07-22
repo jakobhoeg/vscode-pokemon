@@ -210,11 +210,22 @@
                             "properties": {
                                 "type": {
                                     "type": "string",
-                                    "description": "Pokemon type (e.g., 'pikachu', 'charizard', 'bulbasaur')"
+                                    "description": "Pokemon type (e.g., 'pikachu', 'charizard', 'bulbasaur'), or 'random' to spawn a random species"
                                 },
                                 "name": {
                                     "type": "string",
                                     "description": "Custom name for the pokemon (optional)"
+                                },
+                                "shiny": {
+                                    "type": "boolean",
+                                    "description": "Force this pokemon to be shiny (true) or non-shiny (false). If omitted, uses vscode-pokemon.shinyOdds (optional)"
+                                },
+                                "pool": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "When type is 'random', restrict the random selection to this list of pokemon species (e.g. ['pikachu', 'eevee', 'gengar']). Ignored for non-random types (optional)"
                                 }
                             },
                             "required": [
@@ -222,7 +233,7 @@
                             ]
                         },
                         "default": [],
-                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required), and optionally 'name'. Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"charizard\"}]"
+                        "description": "List of default pokemon to automatically spawn on startup. Each pokemon should have a 'type' (required, or 'random' to spawn a random species), and optionally 'name', 'shiny', and 'pool' (for random selection). Example: [{\"type\": \"pikachu\", \"name\": \"Sparky\"}, {\"type\": \"random\", \"pool\": [\"eevee\", \"gengar\", \"snorlax\"]}]"
                     },
                     "vscode-pokemon.shinyOdds": {
                         "type": "number",

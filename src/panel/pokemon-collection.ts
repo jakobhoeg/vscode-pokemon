@@ -51,6 +51,7 @@ export interface IPokemonCollection {
   seekNewFriends(): string[];
   locate(name: string): PokemonElement | undefined;
   remove(name: string): void;
+  removeFromCollection(name: string): void;
 }
 
 export class PokemonCollection implements IPokemonCollection {
@@ -89,6 +90,16 @@ export class PokemonCollection implements IPokemonCollection {
       return;
     }
     this._pokemonCollection[idx].remove();
+    this._pokemonCollection.splice(idx, 1);
+  }
+
+  removeFromCollection(name: string): void {
+    const idx = this._pokemonCollection.findIndex(
+      (pokemon) => pokemon.pokemon.name === name,
+    );
+    if (idx === -1) {
+      return;
+    }
     this._pokemonCollection.splice(idx, 1);
   }
 

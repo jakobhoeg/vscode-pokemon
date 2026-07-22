@@ -5190,6 +5190,18 @@ export function getDefaultPokemon(): PokemonType {
   return 'bulbasaur';
 }
 
+/**
+ * Returns a random Pokemon config from a given pool.
+ * @param types The keys to choose from.
+ * @returns A random Pokemon config from the given pool.
+ */
+export function getRandomPokemonConfigFrom(
+  types: PokemonType[],
+): [PokemonType, PokemonConfig] {
+  const randomType = types[Math.floor(Math.random() * types.length)];
+  return [randomType, POKEMON_DATA[randomType]];
+}
+
 export function getRandomPokemonConfig(): [PokemonType, PokemonConfig] {
   const keys = Object.keys(POKEMON_DATA);
   const randomKey = keys[Math.floor(Math.random() * keys.length)];
