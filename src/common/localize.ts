@@ -19,7 +19,7 @@ export const SUPPORTED_LOCALES = ['en-US', 'fr-FR', 'de-DE', 'ja-JP'] as const;
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
-const GENERATIONS = ['gen1', 'gen2', 'gen3', 'gen4'] as const;
+const GENERATIONS = ['gen1', 'gen2', 'gen3', 'gen4', 'gen5'] as const;
 const FALLBACK_LOCALE = 'en-US';
 
 /**
