@@ -32,5 +32,5 @@
   "You must have a folder or workspace open to export pokemonCollection.": "Devi avere una cartella o uno spazio di lavoro aperto per esportare la collezione di Pokémon.",
   "Failed to import pokemon: {0}": "Impossibile importare i Pokémon: {0}",
   "default": "Predefinito",
-  "shiny": "Lucente"
+  "shiny": "Shiny"
 }
