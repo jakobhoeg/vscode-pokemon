@@ -170,7 +170,7 @@ Available options:
 - **`ko-KR`**: Korean names (e.g., "피카츄", "라이츄", "리자몽")
 - **`zh-CN`**: Chinese names (e.g., "妙蛙种子", "小火龙", "喷火龙")
 
-**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, and 4.
+**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, 4, and 5.
 
 ### Extension UI language
 
