@@ -176,9 +176,11 @@ Available options:
 
 The extension interface (commands, messages, panel labels) is localized. When VS Code’s display language is set to one of the supported locales, the extension UI will follow it:
 
-- **en-US** (English – US), **en-GB** (English – UK)
-- **fr-FR** (French), **de-DE** (German), **ja-JP** (Japanese), **zh-CN** (Chinese)
-- **pt-PT** (Portuguese), **es-ES** (Spanish), **it-IT** (Italian), **da-DK** (Danish)
+- **en** (English – default), **en-gb** (English – UK)
+- **fr** (French), **de** (German), **ja** (Japanese), **zh-cn** (Simplified Chinese)
+- **pt-br** (Portuguese – Brazil), **es** (Spanish), **it** (Italian), **da** (Danish)
+
+Bundle filenames use VS Code display language codes (e.g. `bundle.l10n.fr.json`), matching `vscode.env.language`.
 
 To use a translated UI, set your VS Code display language via the Command Palette: **Configure Display Language**, then choose the desired language and restart if prompted.
 
