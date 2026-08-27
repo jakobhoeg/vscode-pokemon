@@ -16,9 +16,9 @@
 
 <div align="center">
 
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/jakobhoeg.vscode-pokemon)
-![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/jakobhoeg.vscode-pokemon)
-![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/jakobhoeg.vscode-pokemon)
+![Visual Studio Marketplace Version](https://vsmarketplacebadges.dev/version-short/jakobhoeg.vscode-pokemon.png)
+![Visual Studio Marketplace Installs](https://vsmarketplacebadges.dev/installs-short/jakobhoeg.vscode-pokemon.png)
+![Visual Studio Marketplace Downloads](https://vsmarketplacebadges.dev/downloads-short/jakobhoeg.vscode-pokemon.png)
 
 </div>
 
