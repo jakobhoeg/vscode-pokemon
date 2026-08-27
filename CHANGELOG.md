@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [5.0.1]
+
+- chore: update readme with new badges
+
 ## [5.0.0]
 
 - feat: generation 5 sprites (partial)
