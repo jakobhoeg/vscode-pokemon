@@ -36,14 +36,6 @@ Seen used by engineers at [Microsoft](https://code.visualstudio.com/updates/v1_1
 
 </div>
 
-## 💖 Support
-
-If you enjoy this project, please consider supporting me.
-Manually creating the `.gif` files for each sprite takes a lot of time and effort.
-Your sponsorship helps me dedicate more energy to improve and expand the project.
-
-[![GitHub Sponsor](https://img.shields.io/badge/Sponsor-❤-blue?style=flat&logo=github)](https://github.com/sponsors/jakobhoeg)
-
 ## Installation
 
 Install this extension from the [VS Code marketplace](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon) or the [Open VSX Registry](https://open-vsx.org/extension/jakobhoeg/vscode-pokemon).
