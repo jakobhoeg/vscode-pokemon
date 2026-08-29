@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [5.0.2]
+
+- fix: Galvantual assets
+
 ## [5.0.1]
 
 - chore: update readme with new badges
