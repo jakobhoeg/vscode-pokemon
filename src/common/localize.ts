@@ -15,12 +15,38 @@ let pokemonTranslationsCache: { [locale: string]: { [key: string]: string } } =
  * Supported Pokemon translation locales
  * These correspond to the folders in l10n/pokemon/
  */
-export const SUPPORTED_LOCALES = ['en-US', 'fr-FR', 'de-DE', 'ja-JP'] as const;
+export const SUPPORTED_LOCALES = [
+  'en-US',
+  'fr-FR',
+  'de-DE',
+  'ja-JP',
+  'zh-CN',
+] as const;
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const GENERATIONS = ['gen1', 'gen2', 'gen3', 'gen4', 'gen5'] as const;
-const FALLBACK_LOCALE = 'en-US';
+const FALLBACK_LOCALE: SupportedLocale = 'en-US';
+
+/**
+ * Maps vscode.env.language / config values to l10n/pokemon/ folder names.
+ * VS Code uses short lowercase codes (fr, zh-cn); folders use region tags (fr-FR, zh-CN).
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+const LANGUAGE_TO_POKEMON_LOCALE: { [language: string]: SupportedLocale } = {
+  en: 'en-US',
+  'en-us': 'en-US',
+  'en-gb': 'en-US',
+  fr: 'fr-FR',
+  'fr-fr': 'fr-FR',
+  de: 'de-DE',
+  'de-de': 'de-DE',
+  ja: 'ja-JP',
+  'ja-jp': 'ja-JP',
+  'zh-cn': 'zh-CN',
+  'zh-hans': 'zh-CN',
+};
+/* eslint-enable @typescript-eslint/naming-convention */
 
 /**
  * Resets the Pokemon translations cache
@@ -28,6 +54,22 @@ const FALLBACK_LOCALE = 'en-US';
  */
 export function resetPokemonTranslationsCache(): void {
   pokemonTranslationsCache = {};
+}
+
+/**
+ * Resolves a language/locale string to a canonical pokemon folder locale.
+ */
+export function resolvePokemonLocale(
+  locale: string,
+): SupportedLocale | undefined {
+  const normalized = locale.toLowerCase().replace(/_/g, '-');
+  if (LANGUAGE_TO_POKEMON_LOCALE[normalized]) {
+    return LANGUAGE_TO_POKEMON_LOCALE[normalized];
+  }
+
+  return SUPPORTED_LOCALES.find(
+    (supported) => supported.toLowerCase() === normalized,
+  );
 }
 
 /**
@@ -40,13 +82,12 @@ function getPokemonLocale(): string {
   const config = vscode.workspace.getConfiguration('vscode-pokemon');
   const configuredLocale = config.get<string>('pokemonLanguage', 'auto');
 
-  // If a specific language is configured and different from 'auto'
-  if (configuredLocale && configuredLocale !== 'auto') {
-    return configuredLocale.toLowerCase().replace(/_/g, '-');
-  }
+  const rawLocale =
+    configuredLocale && configuredLocale !== 'auto'
+      ? configuredLocale
+      : vscode.env.language;
 
-  // Default: use VS Code's language
-  return vscode.env.language.toLowerCase().replace(/_/g, '-');
+  return resolvePokemonLocale(rawLocale) ?? FALLBACK_LOCALE;
 }
 
 /**
@@ -66,12 +107,17 @@ function resolvePokemonL10nPath(locale: string): string | undefined {
     ? path.join(extensionPath, 'l10n', 'pokemon')
     : path.join(__dirname, '../../l10n/pokemon');
 
-  const localePath = path.join(basePath, locale);
+  const canonicalLocale = resolvePokemonLocale(locale) ?? locale;
+  const localePath = path.join(basePath, canonicalLocale);
   if (fs.existsSync(localePath)) {
     return localePath;
   }
 
-  // Fallback to en-US
+  // English names come from POKEMON_DATA; no en-US folder is required
+  if (canonicalLocale === FALLBACK_LOCALE) {
+    return undefined;
+  }
+
   const fallbackPath = path.join(basePath, FALLBACK_LOCALE);
   return fs.existsSync(fallbackPath) ? fallbackPath : undefined;
 }
