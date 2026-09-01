@@ -11,6 +11,11 @@ import {
   POKEMON_DATA,
 } from '../common/pokemon-data';
 import {
+  DEFAULT_POKEBALL,
+  normalizePokeball,
+  Pokeball,
+} from '../common/pokeball-data';
+import {
   ALL_COLORS,
   ALL_SCALES,
   ALL_THEMES,
@@ -97,6 +102,14 @@ function getConfiguredShinyOdds(): number {
   return vscode.workspace
     .getConfiguration('vscode-pokemon')
     .get<number>('shinyOdds', 8192);
+}
+
+function getConfiguredPokeball(): Pokeball {
+  return normalizePokeball(
+    vscode.workspace
+      .getConfiguration('vscode-pokemon')
+      .get<string>('selectedPokeball', DEFAULT_POKEBALL),
+  );
 }
 
 function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
@@ -263,6 +276,14 @@ async function updateExtensionPositionContext() {
     'vscode-pokemon.position',
     getConfigurationPosition(),
   );
+}
+
+async function updateConfiguredPokeballInState(): Promise<void> {
+  const pokeball = getConfiguredPokeball();
+  const panel = getPokemonPanel();
+  if (panel) {
+    panel.updatePokeball(pokeball);
+  }
 }
 
 export class PokemonSpecification {
@@ -796,9 +817,12 @@ export function activate(context: vscode.ExtensionContext) {
               }
             }
             await storeCollectionAsMemento(context, collection);
-          } catch (e: any) {
+          } catch (e: unknown) {
             await vscode.window.showErrorMessage(
-              vscode.l10n.t('Failed to import pokemon: {0}', e?.message),
+              vscode.l10n.t(
+                'Failed to import pokemon: {0}',
+                e instanceof Error ? e.message : String(e),
+              ),
             );
           }
         }
@@ -818,6 +842,12 @@ export function activate(context: vscode.ExtensionContext) {
           await vscode.commands.executeCommand('pokemonView.focus');
         }
         if (panel) {
+          type PokemonQuickPickSelection = vscode.QuickPickItem & {
+            isGeneration?: boolean;
+            gen?: PokemonGeneration;
+            value?: PokemonType;
+          };
+
           // Dynamic QuickPick: show only generations by default; reveal Pokémon matches when typing
           const generationItems: Array<
             vscode.QuickPickItem & {
@@ -842,13 +872,7 @@ export function activate(context: vscode.ExtensionContext) {
             isGeneration: false as const,
           }));
 
-          const qp = vscode.window.createQuickPick<
-            vscode.QuickPickItem & {
-              isGeneration?: boolean;
-              gen?: PokemonGeneration;
-              value?: PokemonType;
-            }
-          >();
+          const qp = vscode.window.createQuickPick<PokemonQuickPickSelection>();
           qp.placeholder = vscode.l10n.t(
             'Select a generation or start typing to search for a Pokemon...',
           );
@@ -905,7 +929,7 @@ export function activate(context: vscode.ExtensionContext) {
 
           disposables.push(
             qp.onDidAccept(async () => {
-              const sel = qp.selectedItems[0] as any;
+              const sel = qp.selectedItems[0];
               if (!sel) {
                 qp.hide();
                 return;
@@ -968,7 +992,14 @@ export function activate(context: vscode.ExtensionContext) {
                   await storeCollectionAsMemento(context, collection);
                 }
               } else {
-                selectedPokemonType = sel as any;
+                if (!sel.value) {
+                  qp.hide();
+                  return;
+                }
+                selectedPokemonType = {
+                  label: sel.label,
+                  value: sel.value,
+                };
                 qp.hide();
               }
             }),
@@ -1107,6 +1138,10 @@ export function activate(context: vscode.ExtensionContext) {
           updatePanelThrowWithMouse();
         }
 
+        if (e.affectsConfiguration('vscode-pokemon.selectedPokeball')) {
+          void updateConfiguredPokeballInState();
+        }
+
         if (e.affectsConfiguration('vscode-pokemon.pokemonLanguage')) {
           // Reset the Pokemon translations cache when the language changes
           localize.resetPokemonTranslationsCache();
@@ -1188,6 +1223,7 @@ interface IPokemonPanel {
   updatePokemonColor(newColor: PokemonColor): void;
   updatePokemonType(newType: PokemonType): void;
   updatePokemonSize(newSize: PokemonSize): void;
+  updatePokeball(newPokeball: Pokeball): void;
   updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind): void;
   update(): void;
   setThrowWithMouse(newThrowWithMouse: boolean): void;
@@ -1269,6 +1305,13 @@ class PokemonWebviewContainer implements IPokemonPanel {
 
   public updatePokemonSize(newSize: PokemonSize) {
     this._pokemonSize = newSize;
+  }
+
+  public updatePokeball(newPokeball: Pokeball) {
+    void this.getWebview().postMessage({
+      command: 'update-pokeball',
+      pokeball: newPokeball,
+    });
   }
 
   public updatePokemonGeneration(newGeneration: string) {
@@ -1423,6 +1466,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.pokemonColor()}",
                         "${this.pokemonSize()}",
                         "${this.pokemonType()}",
+                      "${getConfiguredPokeball()}",
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",

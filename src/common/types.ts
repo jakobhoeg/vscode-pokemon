@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { Pokeball } from './pokeball-data';
 import { PokemonTypeString } from './pokemon-data';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -68,6 +70,14 @@ export const enum ColorThemeKind {
 export class WebviewMessage {
   text: string;
   command: string;
+  name?: string;
+  type?: PokemonType;
+  color?: PokemonColor;
+  generation?: string;
+  originalSpriteSize?: number;
+  size?: PokemonSize;
+  enabled?: boolean;
+  pokeball?: Pokeball;
 
   constructor(text: string, command: string) {
     this.text = text;
