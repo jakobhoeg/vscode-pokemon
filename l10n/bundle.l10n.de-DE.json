@@ -31,5 +31,12 @@
   "You must have a folder or workspace open to export pokemonCollection.": "Du musst einen Ordner oder Arbeitsbereich geöffnet haben, um die Pokemon-Sammlung zu exportieren.",
   "Failed to import pokemon: {0}": "Fehler beim Importieren von Pokemon: {0}",
   "default": "Standard",
-  "shiny": "Schillernd"
+  "shiny": "Schillernd",
+  "Currently selected": "Aktuell ausgewählt",
+  "Choose the item to feed (Ctrl/Cmd+click in the Pokemon view drops it)": "Wähle das Item zum Füttern (Strg/Cmd+Klick in der Pokemon-Ansicht lässt es fallen)",
+  "Feeding {0} - Ctrl/Cmd+click in the Pokemon view to drop one": "Füttern mit {0} – Strg/Cmd+Klick in der Pokemon-Ansicht lässt eines fallen",
+  "There is nobody here to feed - spawn a Pokemon first!": "Hier ist niemand zum Füttern – lass zuerst ein Pokemon erscheinen!",
+  "Whoever is closest": "Wer am nächsten ist",
+  "Who gets the {0}?": "Wer bekommt {0}?",
+  "Feed pokemon": "Pokemon füttern"
 }

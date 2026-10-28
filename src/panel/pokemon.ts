@@ -84,6 +84,11 @@ export class Pokemon extends BasePokemonType {
   static getPokemonData(type: string): PokemonConfig | undefined {
     return POKEMON_DATA[type];
   }
+
+  setType(type: string) {
+    super.setType(type);
+    this.config = POKEMON_DATA[type] || this.config;
+  }
 }
 
 export const POKEMON_NAMES: ReadonlyArray<string> = [

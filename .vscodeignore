@@ -12,3 +12,6 @@ src/**
 coverage/
 docs/
 node_modules
+scripts/**
+sprites/**
+User Stories/**

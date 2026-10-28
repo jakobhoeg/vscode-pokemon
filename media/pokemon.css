@@ -307,3 +307,138 @@ img.pokemon {
 	filter: saturate(0) brightness(3) contrast(1);
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Feeding                                                            */
+/* ------------------------------------------------------------------ */
+
+img.item {
+  position: absolute;
+  image-rendering: pixelated;
+  z-index: 1;
+  pointer-events: none;
+  transition-property: bottom;
+  transition-timing-function: cubic-bezier(0.3, 0, 0.8, 1); /* gravity-ish */
+}
+
+img.item.item-landed {
+  animation: item-land 320ms ease-out;
+}
+
+@keyframes item-land {
+  0%   { transform: translateY(0) scale(1.15, 0.85); }
+  40%  { transform: translateY(-18%) scale(0.95, 1.05); }
+  70%  { transform: translateY(0) scale(1.05, 0.95); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+img.item.item-eaten {
+  animation: item-eaten 650ms steps(5, end) forwards;
+}
+
+@keyframes item-eaten {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.2) rotate(-25deg); }
+}
+
+/* text that floats up from a Pokémon after eating */
+.float-text {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  font-family: 'silkscreen', monospace;
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+  animation: float-up 1.4s ease-out forwards;
+}
+
+.float-level { color: #ffd84d; }
+.float-heal  { color: #7be38a; }
+.float-love  { color: #ff7ab6; }
+.float-stat  { color: #8ec9ff; }
+
+@keyframes float-up {
+  0%   { opacity: 0; transform: translateY(6px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; transform: translateY(-18px); }
+  100% { opacity: 0; transform: translateY(-26px); }
+}
+
+/* sprite reactions (filter only - transform is used for facing) */
+img.pokemon.level-up {
+  animation: level-up-flash 900ms ease-out;
+}
+
+@keyframes level-up-flash {
+  0%   { filter: none; }
+  20%  { filter: brightness(2.2) saturate(0.4); }
+  40%  { filter: brightness(1.2); }
+  60%  { filter: brightness(1.9) saturate(0.6); }
+  100% { filter: none; }
+}
+
+img.pokemon.healed {
+  animation: heal-flash 700ms ease-out;
+}
+
+@keyframes heal-flash {
+  0%   { filter: none; }
+  30%  { filter: brightness(1.5) sepia(1) hue-rotate(70deg) saturate(2); }
+  100% { filter: none; }
+}
+
+img.pokemon.munch {
+  animation: munch 600ms ease-in-out;
+}
+
+@keyframes munch {
+  0%, 100% { filter: none; }
+  25%, 75% { filter: brightness(1.15); }
+}
+
+/* currently selected item, top-right corner */
+#itemHud {
+  position: fixed;
+  top: 6px;
+  right: 8px;
+  z-index: 1001;
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 150ms ease-out;
+}
+
+#itemHud:hover {
+  opacity: 1;
+}
+
+#itemHud img {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* evolution: flash to white and back, the sprite is swapped at the midpoint (main.ts EVOLUTION_MS) */
+img.pokemon.evolving {
+  animation: evolution-flash 2.6s ease-in-out;
+}
+
+@keyframes evolution-flash {
+  0%   { filter: none; }
+  15%  { filter: brightness(3) saturate(0); }
+  25%  { filter: brightness(1.3) saturate(0.3); }
+  35%  { filter: brightness(3) saturate(0); }
+  45%  { filter: brightness(1.6) saturate(0.2); }
+  50%  { filter: brightness(4) saturate(0); }
+  60%  { filter: brightness(3) saturate(0); }
+  75%  { filter: brightness(1.5) saturate(0.6); }
+  100% { filter: none; }
+}

@@ -18,7 +18,22 @@ import {
   InvalidPokemonException,
 } from './pokemon-collection';
 import { PokemonElementState, PokemonPanelState } from './states';
-import { getRandomPokemonConfig } from '../common/pokemon-data';
+import { getRandomPokemonConfig, POKEMON_DATA } from '../common/pokemon-data';
+import {
+  DEFAULT_FEED_ITEM,
+  getItem,
+  ItemEffect,
+  itemSpriteFile,
+} from '../common/items';
+import {
+  chooseFeeder,
+  floatKindFor,
+  floatText,
+  IFoodItem,
+  ItemDrop,
+  itemPixelSize,
+  ItemOutcome,
+} from './feeding';
 
 /* This is how the VS Code API can be invoked from the panel */
 declare global {
@@ -32,6 +47,276 @@ declare global {
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
 var pokemonCounter: number;
+
+// ---------------------------------------------------------------------------
+// Feeding
+// ---------------------------------------------------------------------------
+
+/** Item dropped by Ctrl/Cmd+click or the "Feed pokemon" command. */
+let selectedFeedItem: string = DEFAULT_FEED_ITEM;
+let feedWithMouse = true;
+let itemHud: HTMLDivElement | undefined;
+
+function container(): HTMLDivElement {
+  return document.getElementById('pokemonContainer') as HTMLDivElement;
+}
+
+function updateItemHud(basePokemonUri: string) {
+  const config = getItem(selectedFeedItem);
+  if (!itemHud) {
+    itemHud = document.createElement('div');
+    itemHud.id = 'itemHud';
+    const img = document.createElement('img');
+    img.className = 'item-hud-icon';
+    itemHud.appendChild(img);
+    document.body.appendChild(itemHud);
+  }
+  const img = itemHud.querySelector('img') as HTMLImageElement;
+  if (!config) {
+    itemHud.style.display = 'none';
+    return;
+  }
+  itemHud.style.display = feedWithMouse ? 'block' : 'none';
+  img.src = `${basePokemonUri}/${itemSpriteFile(selectedFeedItem)}`;
+  img.alt = config.name;
+  itemHud.title = `${config.name} - Ctrl/Cmd+click anywhere to drop one (click here to choose another item)`;
+}
+
+/**
+ * Drop an item at `x` and send the closest Pokémon (or `target`) to eat it.
+ * Returns the item, or undefined when nobody can eat it.
+ */
+export function dropItem(
+  basePokemonUri: string,
+  itemKey: string,
+  x: number,
+  startBottom: number,
+  floor: number,
+  pokemonSize: PokemonSize,
+  target?: PokemonElement,
+  stateApi?: VscodeStateApi,
+): IFoodItem | undefined {
+  const config = getItem(itemKey);
+  if (!config) {
+    stateApi?.postMessage({
+      command: 'error',
+      text: `Unknown item ${itemKey}`,
+    });
+    return undefined;
+  }
+  const candidates = allPokemon.pokemonCollection.map((element) => ({
+    pokemon: element.pokemon,
+    payload: element,
+  }));
+  const feeder =
+    target && target.pokemon.canFeed
+      ? { pokemon: target.pokemon, payload: target }
+      : chooseFeeder(candidates, x);
+  if (!feeder) {
+    stateApi?.postMessage({
+      command: 'info',
+      text:
+        allPokemon.pokemonCollection.length === 0
+          ? 'There is nobody here to feed - spawn a Pokemon first!'
+          : 'Everybody is busy right now, try again in a moment.',
+    });
+    return undefined;
+  }
+
+  const sizePx = itemPixelSize(pokemonSize);
+  const maxX = Math.max(sizePx, window.innerWidth - sizePx);
+  const item = new ItemDrop(
+    itemKey,
+    config,
+    `${basePokemonUri}/${itemSpriteFile(itemKey)}`,
+    Math.min(maxX, Math.max(sizePx, x)),
+    startBottom,
+    floor,
+    sizePx,
+    container(),
+  );
+  const element = feeder.payload;
+  element.pokemon.onItemEaten = (eaten, outcome) =>
+    renderEatEffects(basePokemonUri, element, eaten, outcome, stateApi);
+  element.pokemon.onEvolve = (eaten, toType) =>
+    evolvePokemon(
+      basePokemonUri,
+      element,
+      eaten,
+      toType,
+      pokemonSize,
+      stateApi,
+    );
+  element.pokemon.feed(item);
+  return item;
+}
+
+/** How long the white-flash evolution animation runs (keep in sync with pokemon.css). */
+export const EVOLUTION_MS = 2600;
+
+/**
+ * "What? Bulby is evolving!" - flash, swap the sprites for the evolved species,
+ * update the element/state and tell the extension so the saved collection follows.
+ */
+export function evolvePokemon(
+  basePokemonUri: string,
+  element: PokemonElement,
+  item: IFoodItem,
+  toType: string,
+  pokemonSize: PokemonSize,
+  stateApi?: VscodeStateApi,
+) {
+  const config = POKEMON_DATA[toType];
+  if (!config) {
+    stateApi?.postMessage({
+      command: 'error',
+      text: `Unknown Pokemon ${toType}`,
+    });
+    return;
+  }
+  const pokemon = element.pokemon;
+  const fromType = element.type;
+  const fromName = POKEMON_DATA[fromType]?.name ?? fromType;
+  pokemon.beginEvolution();
+  const sprite = element.el;
+  sprite.classList.remove('level-up', 'healed', 'munch');
+  sprite.classList.add('evolving');
+  stateApi?.postMessage({
+    command: 'info',
+    text: `${pokemon.emoji} What? ${pokemon.name} is evolving!`,
+  });
+
+  // Halfway through the flash the silhouette changes
+  setTimeout(() => {
+    const color = config.possibleColors.includes(element.color)
+      ? element.color
+      : PokemonColor.default;
+    const generation = `gen${config.generation}`;
+    const originalSpriteSize = config.originalSpriteSize ?? 32;
+    pokemon.changeForm(
+      toType,
+      `${basePokemonUri}/${generation}/${toType}/${color}`,
+      originalSpriteSize,
+    );
+    element.type = toType;
+    element.color = color;
+    element.generation = generation;
+    element.originalSpriteSize = originalSpriteSize;
+    element.speech.className = `bubble bubble-${pokemonSize} b-${originalSpriteSize}`;
+    saveState(stateApi);
+  }, EVOLUTION_MS / 2);
+
+  const finish = () => {
+    if (!pokemon.isEvolving) {
+      return;
+    }
+    sprite.classList.remove('evolving');
+    pokemon.endEvolution();
+    const width = parseFloat(sprite.style.width) || 32;
+    const bottom = parseFloat(sprite.style.bottom) || 0;
+    const left = parseFloat(sprite.style.left) || 0;
+    floatText(
+      container(),
+      item.config.floatText,
+      left,
+      bottom + width + 4,
+      width,
+      'level',
+    );
+    const sparkle = document.createElement('img');
+    sparkle.src = `${basePokemonUri}/shiny-anim.gif?t=${Date.now()}`;
+    sparkle.className = 'shiny-overlay';
+    sparkle.style.left = sprite.style.left;
+    sparkle.style.bottom = sprite.style.bottom;
+    sparkle.style.width = sprite.style.width;
+    sparkle.style.height = sprite.style.height;
+    container().appendChild(sparkle);
+    const removeOverlay = () => sparkle.remove();
+    sparkle.addEventListener('animationend', removeOverlay);
+    setTimeout(removeOverlay, 1500);
+    pokemon.showSpeechBubble(3000, true);
+    stateApi?.postMessage({
+      command: 'info',
+      text: `${pokemon.emoji} Congratulations! Your ${fromName} ${pokemon.name} evolved into ${config.name}!`,
+    });
+    stateApi?.postMessage({
+      command: 'pokemon-evolved',
+      text: JSON.stringify({
+        name: pokemon.name,
+        from: fromType,
+        to: toType,
+        color: element.color,
+      }),
+    });
+    saveState(stateApi);
+  };
+  sprite.addEventListener(
+    'animationend',
+    (e) => {
+      if (e.animationName === 'evolution-flash') {
+        finish();
+      }
+    },
+    { once: true },
+  );
+  setTimeout(finish, EVOLUTION_MS + 100); // fallback when animations don't run
+}
+
+function renderEatEffects(
+  basePokemonUri: string,
+  element: PokemonElement,
+  item: IFoodItem,
+  outcome: ItemOutcome,
+  stateApi?: VscodeStateApi,
+) {
+  const sprite = element.el;
+  const width = parseFloat(sprite.style.width) || 32;
+  const bottom = parseFloat(sprite.style.bottom) || 0;
+  const left = parseFloat(sprite.style.left) || 0;
+  floatText(
+    container(),
+    item.config.effect === ItemEffect.evolve ? '?' : item.config.floatText,
+    left,
+    bottom + width + 4,
+    width,
+    floatKindFor(item.config.effect),
+  );
+
+  const effectClass =
+    item.config.effect === ItemEffect.levelUp
+      ? 'level-up'
+      : item.config.effect === ItemEffect.heal
+        ? 'healed'
+        : 'munch';
+  sprite.classList.remove('level-up', 'healed', 'munch');
+  void sprite.offsetWidth; // restart the animation
+  sprite.classList.add(effectClass);
+  sprite.addEventListener(
+    'animationend',
+    () => sprite.classList.remove(effectClass),
+    { once: true },
+  );
+
+  if (item.config.effect === ItemEffect.levelUp && outcome.levelsGained > 0) {
+    const sparkle = document.createElement('img');
+    sparkle.src = `${basePokemonUri}/shiny-anim.gif?t=${Date.now()}`;
+    sparkle.className = 'shiny-overlay';
+    sparkle.style.left = sprite.style.left;
+    sparkle.style.bottom = sprite.style.bottom;
+    sparkle.style.width = sprite.style.width;
+    sparkle.style.height = sprite.style.height;
+    container().appendChild(sparkle);
+    const removeOverlay = () => sparkle.remove();
+    sparkle.addEventListener('animationend', removeOverlay);
+    setTimeout(removeOverlay, 1500);
+  }
+
+  stateApi?.postMessage({
+    command: 'info',
+    text: `${element.pokemon.emoji} ${element.pokemon.name} ate the ${item.config.name} and ${outcome.summary}`,
+  });
+  saveState(stateApi);
+}
 
 function normalizePokemonCounter(counter: number | undefined): number {
   if (counter === undefined || Number.isNaN(counter)) {
@@ -360,6 +645,9 @@ export function saveState(stateApi?: VscodeStateApi) {
       pokemonFriend: pokemonItem.pokemon.friend?.name ?? undefined,
       elLeft: pokemonItem.el.style.left,
       elBottom: pokemonItem.el.style.bottom,
+      pokemonLevel: pokemonItem.pokemon.stats.level,
+      pokemonHappiness: pokemonItem.pokemon.stats.happiness,
+      pokemonSpeedBoost: pokemonItem.pokemon.stats.speedBoost,
     });
   });
   state.pokemonCounter = normalizePokemonCounter(pokemonCounter);
@@ -419,6 +707,11 @@ function recoverState(
     if (state.pokemonState !== undefined) {
       pokemon.recoverState(state.pokemonState);
     }
+    pokemon.recoverStats({
+      level: state.pokemonLevel,
+      happiness: state.pokemonHappiness,
+      speedBoost: state.pokemonSpeedBoost,
+    });
 
     // Resolve friend relationships
     var friend = undefined;
@@ -463,6 +756,8 @@ export function pokemonPanelApp(
   throwBallWithMouse: boolean,
   gen: string,
   originalSpriteSize: number,
+  feedItem: string = DEFAULT_FEED_ITEM,
+  feedWithMouseEnabled: boolean | string = true,
   stateApi?: VscodeStateApi,
 ) {
   var floor = 0;
@@ -523,6 +818,37 @@ export function pokemonPanelApp(
   }
 
   initCanvas();
+
+  // Feeding: HUD with the selected item + Ctrl/Cmd+click to drop it
+  selectedFeedItem = getItem(feedItem) ? feedItem : DEFAULT_FEED_ITEM;
+  feedWithMouse = String(feedWithMouseEnabled) !== 'false';
+  updateItemHud(basePokemonUri);
+  itemHud?.addEventListener('click', () => {
+    stateApi?.postMessage({ command: 'pick-feed-item', text: '' });
+  });
+  document.addEventListener('click', (e: MouseEvent) => {
+    if (!feedWithMouse || !(e.ctrlKey || e.metaKey)) {
+      return;
+    }
+    if (itemHud && itemHud.contains(e.target as Node)) {
+      return;
+    }
+    e.preventDefault();
+    const collision = (e.target as HTMLElement | null)?.closest?.('.collision');
+    const target = collision
+      ? allPokemon.pokemonCollection.find((p) => p.collision === collision)
+      : undefined;
+    dropItem(
+      basePokemonUri,
+      selectedFeedItem,
+      e.clientX,
+      window.innerHeight - e.clientY,
+      floor,
+      pokemonSize,
+      target,
+      stateApi,
+    );
+  });
 
   // Handle messages sent from the extension to the webview
   window.addEventListener('message', (event): void => {
@@ -590,7 +916,7 @@ export function pokemonPanelApp(
         pokemonCollection.forEach((pokemon) => {
           stateApi?.postMessage({
             command: 'info',
-            text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}): ${pokemon.pokemon.hello}`,
+            text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}, Lv. ${pokemon.pokemon.stats.level}, ♥ ${pokemon.pokemon.stats.happiness}): ${pokemon.pokemon.hello}`,
           });
         });
         break;
@@ -613,6 +939,41 @@ export function pokemonPanelApp(
         pokemonCounter = 1;
         saveState(stateApi);
         break;
+      case 'set-feed-item':
+        if (getItem(message.item)) {
+          selectedFeedItem = message.item;
+        }
+        updateItemHud(basePokemonUri);
+        break;
+      case 'feed-with-mouse':
+        feedWithMouse = Boolean(message.enabled);
+        updateItemHud(basePokemonUri);
+        break;
+      case 'feed': {
+        // Drop the item from the top of the panel, near the target (or a random Pokémon)
+        const itemKey: string = message.item ?? selectedFeedItem;
+        const collection = allPokemon.pokemonCollection;
+        const target: PokemonElement | undefined = message.name
+          ? allPokemon.locate(message.name)
+          : collection[Math.floor(Math.random() * collection.length)];
+        const sizePx = itemPixelSize(pokemonSize);
+        const x = target
+          ? target.pokemon.left +
+            target.pokemon.width / 2 +
+            (Math.random() < 0.5 ? -1 : 1) * (target.pokemon.width + sizePx)
+          : randomStartPosition();
+        dropItem(
+          basePokemonUri,
+          itemKey,
+          x,
+          window.innerHeight,
+          floor,
+          pokemonSize,
+          target,
+          stateApi,
+        );
+        break;
+      }
     }
   });
 }

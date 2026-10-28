@@ -1,0 +1,40 @@
+name: Sprites & assets
+
+on:
+  push:
+    paths:
+      - 'media/**'
+      - 'l10n/**'
+      - 'scripts/sprites/**'
+      - 'src/common/**'
+      - 'src/test/**'
+      - 'package.json'
+      - '.github/workflows/sprites.yml'
+  pull_request:
+
+jobs:
+  generator:
+    name: Sprite generator (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/sprites/requirements.txt
+      - run: pip install -r scripts/sprites/requirements.txt
+      - run: python -m pytest scripts/sprites/tests -q
+
+  assets:
+    name: media/ and l10n/ match pokemon-data.ts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run test:unit

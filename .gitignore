@@ -10,3 +10,7 @@ coverage/
 media/main-bundle.js
 .DS_Store
 
+scripts/sprites/out/
+scripts/sprites/**/__pycache__/
+.pytest_cache/
+/sprites/

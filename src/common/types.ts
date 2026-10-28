@@ -13,6 +13,10 @@ export enum PokemonGeneration {
   Gen3 = 3,
   Gen4 = 4,
   Gen5 = 5,
+  Gen6 = 6,
+  Gen7 = 7,
+  Gen8 = 8,
+  Gen9 = 9,
 }
 
 export type PokemonType = PokemonTypeString;

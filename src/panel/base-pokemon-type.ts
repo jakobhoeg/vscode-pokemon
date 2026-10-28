@@ -7,6 +7,15 @@ import {
 } from '../common/types';
 import { ISequenceTree } from './sequences';
 import {
+  applyItemEffect,
+  defaultStats,
+  FeedState,
+  IFoodItem,
+  ItemOutcome,
+  PokemonStats,
+} from './feeding';
+import { findEvolution } from '../common/evolutions';
+import {
   States,
   IState,
   resolveState,
@@ -55,6 +64,12 @@ export abstract class BasePokemonType implements IPokemonType {
   private _size: PokemonSize;
   private _generation: string;
   private _originalSpriteSize: number;
+  private _stats: PokemonStats = defaultStats();
+  /** Called after an item has been eaten (main.ts renders the effects). */
+  onItemEaten: ((item: IFoodItem, outcome: ItemOutcome) => void) | undefined;
+  /** Called instead of onItemEaten when the item evolves this Pokémon. */
+  onEvolve: ((item: IFoodItem, toType: string) => void) | undefined;
+  private _evolving = false;
 
   constructor(
     spriteElement: HTMLImageElement,
@@ -184,7 +199,7 @@ export abstract class BasePokemonType implements IPokemonType {
   }
 
   get speed(): number {
-    const base = this._baseSpeed ?? 0;
+    const base = (this._baseSpeed ?? 0) * this._stats.speedBoost;
     switch (this._size) {
       case PokemonSize.nano:
         return base * 0.5; // much slower for nano
@@ -197,6 +212,111 @@ export abstract class BasePokemonType implements IPokemonType {
       default:
         return base;
     }
+  }
+
+  // ---------------------------------------------------------------------
+  // Feeding
+  // ---------------------------------------------------------------------
+
+  get stats(): PokemonStats {
+    return { ...this._stats };
+  }
+
+  recoverStats(stats: Partial<PokemonStats> | undefined) {
+    if (!stats) {
+      return;
+    }
+    const base = defaultStats();
+    this._stats = {
+      level: Number.isFinite(stats.level)
+        ? (stats.level as number)
+        : base.level,
+      happiness: Number.isFinite(stats.happiness)
+        ? (stats.happiness as number)
+        : base.happiness,
+      speedBoost: Number.isFinite(stats.speedBoost)
+        ? (stats.speedBoost as number)
+        : base.speedBoost,
+    };
+  }
+
+  get isFeeding(): boolean {
+    return this.currentStateEnum === States.feed;
+  }
+
+  get canFeed(): boolean {
+    return (
+      !isStateAboveGround(this.currentStateEnum) &&
+      !this.isFeeding &&
+      !this._evolving
+    );
+  }
+
+  /** Walk over to `item` and eat it (interrupts whatever we were doing). */
+  feed(item: IFoodItem) {
+    if (this.isFeeding) {
+      return;
+    }
+    this.holdState = undefined;
+    this.holdStateEnum = undefined;
+    this.currentStateEnum = States.feed;
+    this.currentState = new FeedState(this, item);
+  }
+
+  private finishEating(item: IFoodItem) {
+    const evolvesInto = findEvolution(this.label, item.key);
+    if (evolvesInto && this.onEvolve) {
+      this._stats = {
+        ...this._stats,
+        happiness: Math.min(255, this._stats.happiness + item.config.happiness),
+      };
+      this.onEvolve(item, evolvesInto);
+      return;
+    }
+    const outcome = applyItemEffect(this._stats, item.config);
+    this._stats = outcome.stats;
+    if (outcome.happinessGained > 0 || outcome.levelsGained > 0) {
+      this.showSpeechBubble(2500, true);
+    }
+    if (this.onItemEaten) {
+      this.onItemEaten(item, outcome);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Evolution
+  // ---------------------------------------------------------------------
+
+  get isEvolving(): boolean {
+    return this._evolving;
+  }
+
+  /** Freeze in place (idle sprite) while the evolution animation plays. */
+  beginEvolution() {
+    this._evolving = true;
+    this.holdState = undefined;
+    this.holdStateEnum = undefined;
+    this.currentStateEnum = States.sitIdle;
+    this.currentState = resolveState(this.currentStateEnum, this);
+  }
+
+  /** Swap to the evolved species' sprites (keeps position, name, stats). */
+  changeForm(type: string, pokemonRoot: string, originalSpriteSize: number) {
+    this.setType(type);
+    this.pokemonRoot = pokemonRoot;
+    this._originalSpriteSize = originalSpriteSize;
+    this.initSprite(this._size, this._left, this._bottom, originalSpriteSize);
+    // setAnimation() skips identical suffixes, so point the <img> at the new folder explicitly
+    this.el.src = `${pokemonRoot}_idle_8fps.gif`;
+  }
+
+  /** Override in subclasses that keep per-species config. */
+  setType(type: string) {
+    this.label = type;
+  }
+
+  endEvolution() {
+    this._evolving = false;
   }
 
   randomizeSpeed(speed: number): number {
@@ -219,6 +339,9 @@ export abstract class BasePokemonType implements IPokemonType {
     // TODO : Resolve a bug where if it was swiping before, it would fail
     // because holdState is no longer valid.
     this.currentStateEnum = state.currentStateEnum ?? States.sitIdle;
+    if (this.currentStateEnum === States.feed) {
+      this.currentStateEnum = States.sitIdle; // the snack did not survive the reload
+    }
     this.currentState = resolveState(this.currentStateEnum, this);
 
     if (!isStateAboveGround(this.currentStateEnum)) {
@@ -229,7 +352,11 @@ export abstract class BasePokemonType implements IPokemonType {
   }
 
   get canSwipe() {
-    return !isStateAboveGround(this.currentStateEnum);
+    return (
+      !isStateAboveGround(this.currentStateEnum) &&
+      !this.isFeeding &&
+      !this._evolving
+    );
   }
 
   get canChase() {
@@ -323,6 +450,10 @@ export abstract class BasePokemonType implements IPokemonType {
     } else {
       this.faceRight();
     }
+    if (this._evolving) {
+      this.setAnimation('idle', hasLeftFacingSprite);
+      return; // stand still and glow
+    }
     this.setAnimation(this.currentState.spriteLabel, hasLeftFacingSprite);
 
     // What's my buddy doing?
@@ -342,6 +473,17 @@ export abstract class BasePokemonType implements IPokemonType {
     }
 
     var frameResult = this.currentState.nextFrame();
+    if (this.currentStateEnum === States.feed) {
+      if (frameResult === FrameResult.stateComplete) {
+        this.finishEating((this.currentState as FeedState).item);
+      }
+      if (frameResult !== FrameResult.stateContinue) {
+        // eaten (or lost the item) -> back to the normal behaviour tree
+        this.currentStateEnum = this.sequence.startingState;
+        this.currentState = resolveState(this.currentStateEnum, this);
+      }
+      return;
+    }
     if (frameResult === FrameResult.stateComplete) {
       // If recovering from swipe..
       if (this.holdState && this.holdStateEnum) {

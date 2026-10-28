@@ -1,6 +1,16 @@
 import * as vscode from 'vscode';
 import { ColorThemeKind } from 'vscode';
 import * as localize from '../common/localize';
+import {
+  DEFAULT_FEED_ITEM,
+  getAllItemKeys,
+  getItem,
+  ITEM_CATEGORY_LABELS,
+  ITEMS,
+  ItemCategory,
+  ItemEffect,
+} from '../common/items';
+import { evolutionsWith, findEvolution } from '../common/evolutions';
 import { randomName } from '../common/names';
 import {
   getAllPokemon,
@@ -56,6 +66,7 @@ class PokemonQuickPickItem implements vscode.QuickPickItem {
 }
 
 let webviewViewProvider: PokemonWebviewViewProvider;
+let extensionContext: vscode.ExtensionContext | undefined;
 
 function getConfiguredSize(): PokemonSize {
   var size = vscode.workspace
@@ -91,6 +102,66 @@ function getThrowWithMouseConfiguration(): boolean {
   return vscode.workspace
     .getConfiguration('vscode-pokemon')
     .get<boolean>('throwBallWithMouse', true);
+}
+
+function getFeedItemConfiguration(): string {
+  const item = vscode.workspace
+    .getConfiguration('vscode-pokemon')
+    .get<string>('feedItem', DEFAULT_FEED_ITEM);
+  return getItem(item) ? item : DEFAULT_FEED_ITEM;
+}
+
+function getFeedWithMouseConfiguration(): boolean {
+  return vscode.workspace
+    .getConfiguration('vscode-pokemon')
+    .get<boolean>('feedWithMouse', true);
+}
+
+/** Quick pick of every feedable item, grouped by category. Returns the item key. */
+async function pickFeedItem(): Promise<string | undefined> {
+  const current = getFeedItemConfiguration();
+  const items: Array<vscode.QuickPickItem & { key?: string }> = [];
+  const categories = Object.values(ItemCategory) as ItemCategory[];
+  for (const category of categories) {
+    const keys = getAllItemKeys().filter(
+      (key) => ITEMS[key].category === category,
+    );
+    if (keys.length === 0) {
+      continue;
+    }
+    items.push({
+      label: ITEM_CATEGORY_LABELS[category],
+      kind: vscode.QuickPickItemKind.Separator,
+    });
+    for (const key of keys) {
+      const config = ITEMS[key];
+      const evolutions = evolutionsWith(key);
+      const description =
+        evolutions.length > 0
+          ? evolutions
+              .slice(0, 4)
+              .map(
+                (e) =>
+                  `${POKEMON_DATA[e.from]?.name ?? e.from} → ${POKEMON_DATA[e.to]?.name ?? e.to}`,
+              )
+              .join(', ') + (evolutions.length > 4 ? ', …' : '')
+          : config.floatText;
+      items.push({
+        key,
+        label: `${key === current ? '$(check) ' : ''}${config.name}`,
+        description,
+        detail:
+          key === current ? vscode.l10n.t('Currently selected') : undefined,
+      });
+    }
+  }
+  const picked = await vscode.window.showQuickPick(items, {
+    placeHolder: vscode.l10n.t(
+      'Choose the item to feed (Ctrl/Cmd+click in the Pokemon view drops it)',
+    ),
+    matchOnDescription: true,
+  });
+  return picked?.key;
 }
 
 function getConfiguredShinyOdds(): number {
@@ -366,6 +437,22 @@ export async function storeCollectionAsMemento(
 
 let spawnPokemonStatusBar: vscode.StatusBarItem;
 
+/** Ask the webview for its Pokémon; resolves to [] if it does not answer in time. */
+function waitForPokemonListWithTimeout(
+  panel: IPokemonPanel,
+  timeoutMs: number = 1500,
+): Promise<IPokemonInfo[]> {
+  const webview = panel.getWebview();
+  const list = waitForPokemonList(webview);
+  panel.listPokemon();
+  return Promise.race([
+    list,
+    new Promise<IPokemonInfo[]>((resolve) =>
+      setTimeout(() => resolve([]), timeoutMs),
+    ),
+  ]);
+}
+
 interface IPokemonInfo {
   type: PokemonType;
   name: string;
@@ -423,6 +510,7 @@ function getWebview(): vscode.Webview | undefined {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  extensionContext = context;
   // Reset the Pokemon translations cache at startup to load the correct language
   localize.resetPokemonTranslationsCache();
 
@@ -585,6 +673,104 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
+      'vscode-pokemon.choose-feed-item',
+      async () => {
+        const key = await pickFeedItem();
+        if (!key) {
+          return;
+        }
+        await vscode.workspace
+          .getConfiguration('vscode-pokemon')
+          .update('feedItem', key, vscode.ConfigurationTarget.Global);
+        getPokemonPanel()?.setFeedItem(key);
+        void vscode.window.setStatusBarMessage(
+          vscode.l10n.t(
+            'Feeding {0} - Ctrl/Cmd+click in the Pokemon view to drop one',
+            ITEMS[key].name,
+          ),
+          4000,
+        );
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-pokemon.feed-pokemon',
+      async (itemKey?: string, pokemonName?: string) => {
+        const panel = getPokemonPanel();
+        if (panel === undefined) {
+          await createPokemonPlayground(context);
+          return;
+        }
+        if (
+          getConfigurationPosition() === ExtPosition.explorer &&
+          webviewViewProvider
+        ) {
+          await vscode.commands.executeCommand('pokemonView.focus');
+        }
+        let key = itemKey && getItem(itemKey) ? itemKey : undefined;
+        if (!key) {
+          key = await pickFeedItem();
+        }
+        if (!key) {
+          return;
+        }
+        let name = pokemonName;
+        if (name === undefined) {
+          const pokemonList = await waitForPokemonListWithTimeout(panel);
+          if (pokemonList.length === 0) {
+            void vscode.window.showInformationMessage(
+              vscode.l10n.t(
+                'There is nobody here to feed - spawn a Pokemon first!',
+              ),
+            );
+            return;
+          }
+          const itemKey = key;
+          const canEvolve = (p: IPokemonInfo) => findEvolution(p.type, itemKey);
+          if (
+            pokemonList.length > 1 ||
+            ITEMS[itemKey].effect === ItemEffect.evolve
+          ) {
+            const anyone = vscode.l10n.t('Whoever is closest');
+            // Pokémon that evolve with this item first, marked with their evolution
+            const sorted = [...pokemonList].sort(
+              (a, b) =>
+                Number(Boolean(canEvolve(b))) - Number(Boolean(canEvolve(a))),
+            );
+            const picked = await vscode.window.showQuickPick(
+              [
+                ...sorted.map((p) => {
+                  const to = canEvolve(p);
+                  return {
+                    label: `${to ? '$(sparkle) ' : ''}${p.name}`,
+                    description: `${localize.getLocalizedPokemonName(p.type)}${p.color === PokemonColor.shiny ? ' ✨' : ''}${to ? ` → ${localize.getLocalizedPokemonName(to as PokemonType)}` : ''}`,
+                    name: p.name,
+                  };
+                }),
+                { label: `$(question) ${anyone}`, name: '' },
+              ],
+              {
+                placeHolder: vscode.l10n.t(
+                  'Who gets the {0}?',
+                  ITEMS[itemKey].name,
+                ),
+              },
+            );
+            if (!picked) {
+              return;
+            }
+            name = picked.name || undefined;
+          }
+        }
+        panel.feedPokemon(key, name);
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
       'vscode-pokemon.configure-keybindings',
       async () => {
         const items: Array<vscode.QuickPickItem & { commandId: string }> = [
@@ -607,6 +793,11 @@ export function activate(context: vscode.ExtensionContext) {
             label: vscode.l10n.t('Remove all pokemon'),
             description: 'vscode-pokemon.remove-all-pokemon',
             commandId: 'vscode-pokemon.remove-all-pokemon',
+          },
+          {
+            label: vscode.l10n.t('Feed pokemon'),
+            description: 'vscode-pokemon.feed-pokemon',
+            commandId: 'vscode-pokemon.feed-pokemon',
           },
         ];
 
@@ -825,7 +1016,12 @@ export function activate(context: vscode.ExtensionContext) {
               gen: PokemonGeneration;
             }
           > = Object.values(PokemonGeneration)
-            .filter((gen) => typeof gen === 'number')
+            // Only list generations that actually have spawnable Pokémon
+            .filter(
+              (gen): gen is PokemonGeneration =>
+                typeof gen === 'number' &&
+                getPokemonByGeneration(gen).length > 0,
+            )
             .map((gen) => ({
               label: `$(folder) ${vscode.l10n.t('Generation {0}', gen)}`,
               description: vscode.l10n.t('Browse Gen {0} Pokemon', gen),
@@ -1107,6 +1303,14 @@ export function activate(context: vscode.ExtensionContext) {
           updatePanelThrowWithMouse();
         }
 
+        if (e.affectsConfiguration('vscode-pokemon.feedItem')) {
+          getPokemonPanel()?.setFeedItem(getFeedItemConfiguration());
+        }
+
+        if (e.affectsConfiguration('vscode-pokemon.feedWithMouse')) {
+          getPokemonPanel()?.setFeedWithMouse(getFeedWithMouseConfiguration());
+        }
+
         if (e.affectsConfiguration('vscode-pokemon.pokemonLanguage')) {
           // Reset the Pokemon translations cache when the language changes
           localize.resetPokemonTranslationsCache();
@@ -1177,6 +1381,7 @@ function getWebviewOptions(
 }
 
 interface IPokemonPanel {
+  getWebview(): vscode.Webview;
   // throwBall(): void;
   resetPokemon(): void;
   spawnPokemon(spec: PokemonSpecification): void;
@@ -1191,6 +1396,9 @@ interface IPokemonPanel {
   updateTheme(newTheme: Theme, themeKind: vscode.ColorThemeKind): void;
   update(): void;
   setThrowWithMouse(newThrowWithMouse: boolean): void;
+  feedPokemon(itemKey: string, pokemonName?: string): void;
+  setFeedItem(itemKey: string): void;
+  setFeedWithMouse(enabled: boolean): void;
 }
 
 class PokemonWebviewContainer implements IPokemonPanel {
@@ -1294,6 +1502,28 @@ class PokemonWebviewContainer implements IPokemonPanel {
     });
   }
 
+  public feedPokemon(itemKey: string, pokemonName?: string) {
+    void this.getWebview().postMessage({
+      command: 'feed',
+      item: itemKey,
+      name: pokemonName,
+    });
+  }
+
+  public setFeedItem(itemKey: string) {
+    void this.getWebview().postMessage({
+      command: 'set-feed-item',
+      item: itemKey,
+    });
+  }
+
+  public setFeedWithMouse(enabled: boolean) {
+    void this.getWebview().postMessage({
+      command: 'feed-with-mouse',
+      enabled,
+    });
+  }
+
   public resetPokemon(): void {
     void this.getWebview().postMessage({
       command: 'reset-pokemon',
@@ -1330,7 +1560,7 @@ class PokemonWebviewContainer implements IPokemonPanel {
     });
   }
 
-  protected getWebview(): vscode.Webview {
+  public getWebview(): vscode.Webview {
     throw new Error('Not implemented');
   }
 
@@ -1426,6 +1656,8 @@ class PokemonWebviewContainer implements IPokemonPanel {
                         "${this.throwBallWithMouse()}",
                         "${this.pokemonGeneration()}",
                         "${this.pokemonOriginalSpriteSize()}",
+                        "${getFeedItemConfiguration()}",
+                        "${getFeedWithMouseConfiguration()}",
                     );
                 </script>
             </body>
@@ -1438,9 +1670,60 @@ function handleWebviewMessage(message: WebviewMessage) {
     case 'alert':
       void vscode.window.showErrorMessage(message.text);
       return;
+    case 'error':
+      void vscode.window.showErrorMessage(message.text);
+      return;
+    case 'pick-feed-item':
+      void vscode.commands.executeCommand('vscode-pokemon.choose-feed-item');
+      return;
     case 'info':
       void vscode.window.showInformationMessage(message.text);
       return;
+    case 'pokemon-evolved':
+      void handlePokemonEvolved(message.text);
+      return;
+  }
+}
+
+/**
+ * A Pokémon evolved in the webview: keep the persisted collection (used to
+ * respawn Pokémon in new windows) in sync with its new species.
+ */
+export async function handlePokemonEvolved(
+  payload: string,
+  context: vscode.ExtensionContext | undefined = extensionContext,
+): Promise<void> {
+  if (!context) {
+    return;
+  }
+  let evolved: { name: string; from: string; to: string; color: PokemonColor };
+  try {
+    evolved = JSON.parse(payload);
+  } catch {
+    return;
+  }
+  if (!POKEMON_DATA[evolved.to]) {
+    return;
+  }
+  const collection = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  );
+  let changed = false;
+  const updated = collection.map((spec) => {
+    if (spec.name === evolved.name && spec.type === evolved.from) {
+      changed = true;
+      return new PokemonSpecification(
+        evolved.color,
+        evolved.to as PokemonType,
+        spec.size,
+        spec.name,
+      );
+    }
+    return spec;
+  });
+  if (changed) {
+    await storeCollectionAsMemento(context, updated);
   }
 }
 

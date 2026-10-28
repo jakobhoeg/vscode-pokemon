@@ -2,6 +2,17 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [5.1.0]
+
+- feat: item evolutions – hand over a Thunder Stone, Auspicious Armor, Linking Cord, … (42 evolution items, 91 evolutions) and watch the Pokémon evolve; nickname, stats and shininess are kept and the saved collection follows
+- feat: feed your Pokémon – Ctrl/Cmd+click in the view drops the held item (39 items: candy, medicine, berries, treats, vitamins) and the closest Pokémon walks over and eats it; level/happiness/speed are tracked, shown in roll-call and persisted. New commands `Feed pokemon` (Alt+Shift+F) and `Choose item to feed`, settings `vscode-pokemon.feedItem` / `vscode-pokemon.feedWithMouse`
+- feat: Generations 5–9 – every Pokémon from #494 Victini to #1025 Pecharunt (688 sprite folders) with shinies, gender variants and ~150 alternate forms (Deerling/Sawsbuck seasons, Genesect Drives, Vivillon patterns, Flabébé/Floette/Florges colours, Furfrou trims, Silvally types, Alcremie flavours, Therian/Hisuian/Galarian forms, Kyurem Black/White, Zygarde, Necrozma, Crowned Zacian/Zamazenta, Calyrex riders, Ogerpon masks, Terapagos forms, …)
+- feat: sprite generation tooling for Generations 5–9 (`scripts/sprites/`): `generate_pokemon_gifs.py`, `apply_to_pokemon_data.py`, `fetch_l10n_names.py`, Pokédex metadata #494–#1025, tests (`npm run sprites:test`, `npm run test:media`) and a CI workflow
+- feat: `PokemonGeneration` now includes Gen 6–9; l10n loader reads gen6–gen9 files; spawn menu only lists generations that have Pokémon
+- fix: Arceus (Bug) was registered without `originalSpriteSize: 64` and rendered at half size
+- fix: localized names for Unown forms, spiky-eared Pichu, Corphish, Mime Jr. and Porygon-Z (keys were missing or misspelled)
+- chore: exclude `scripts/`, `sprites/` and `User Stories/` from the packaged extension; tsconfigs only compile `src/`
+
 ## [5.0.2]
 
 - fix: Galvantual assets

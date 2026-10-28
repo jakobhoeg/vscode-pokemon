@@ -133,6 +133,27 @@ A `"random"` entry is resolved to a specific species the first time it's applied
 
 To reset to your default Pokémon, use the "Remove all pokemon" command and restart VS Code.
 
+### Feeding your Pokémon
+
+Your Pokémon get hungry! **Ctrl+click** (**Cmd+click** on macOS) anywhere in the Pokémon view to drop the selected item – it falls to the floor and the closest Pokémon runs over to eat it. Ctrl+click directly on a Pokémon to feed that one.
+
+The item in the top-right corner of the view is what you're currently holding; click it (or run **`Pokemon Coding: Choose item to feed`**) to pick something else from the bag:
+
+| Category | Items | Effect |
+| --- | --- | --- |
+| Candy | Rare Candy, Exp. Candy XS / L | Level up (+1 / +1 / +3) with a sparkle |
+| Medicine | Potion … Full Restore, Revive, Max Revive | A healing flash |
+| Berries | Oran, Sitrus, Pecha, Cheri, Lum, Leppa, Razz, Pinap | Happiness up |
+| Treats | Lava Cookie, Old Gateau, Casteliacone, Lumiose Galette, Shalour Sable, Big Malasada, Pewter Crunchies, Rage Candy Bar, Sweet Heart, Moomoo Milk, Lemonade, Soda Pop, Fresh Water, Honey, Sweet Apple | Happiness up (more) |
+| Vitamins | Carbos, Protein, Iron, Calcium, Zinc, HP Up | Carbos makes them permanently faster (up to 1.5×); the rest are a stat-up cheer |
+| Evolution items | Fire/Water/Thunder/Leaf/Moon/Sun/Shiny/Dusk/Dawn/Ice Stone, Auspicious & Malicious Armor, Sweet/Tart/Syrupy Apple, Cracked/Chipped Pot, teacups, Black Augurite, Peat Block, Leader's Crest, Scrolls, Metal Coat, King's Rock, Dragon Scale, Up-Grade, Dubious Disc, Protector, Electirizer, Magmarizer, Reaper Cloth, Deep Sea Tooth/Scale, Razor Claw/Fang, Prism Scale, Whipped Dream, Sachet, Linking Cord, Strawberry Sweet | **Evolution!** |
+
+#### Evolution
+
+Give a Pokémon the right item and it evolves, right there in the view: a Thunder Stone turns Pikachu into Raichu, Auspicious Armor turns Charcadet into Armarouge (Malicious Armor → Ceruledge), a Water Stone makes Eevee a Vaporeon, a Linking Cord evolves Kadabra/Machoke/Graveler/Haunter, and so on – 90+ item evolutions are covered (`src/common/evolutions.ts`). The Pokémon keeps its nickname, level, happiness and shininess; the evolved form is saved so it's still evolved next time you open VS Code. Items a Pokémon can't use have no effect. In the **Feed pokemon** command, Pokémon that can evolve with the chosen item are listed first with their evolution.
+
+Level, happiness and speed are remembered between sessions and shown in the **Roll-call**. You can also feed from the keyboard with **`Pokemon Coding: Feed pokemon`** (`Alt+Shift+F`), which lets you pick the item and the Pokémon. Settings: `vscode-pokemon.feedItem` (the held item) and `vscode-pokemon.feedWithMouse` (turn Ctrl+click off).
+
 ### Pokémon Language
 
 You can customize the language used for Pokémon names. The extension supports official Pokémon languages: English (US), French, German, and Japanese.
@@ -160,16 +181,24 @@ Available options:
 - **`de-DE`**: German names (e.g., "Bisasam", "Glumanda", "Glurak")
 - **`ja-JP`**: Japanese names (e.g., "フシギダネ", "ヒトカゲ", "リザードン")
 
-**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1, 2, 3, and 4.
+**Note:** The language setting applies to all Pokémon names throughout the extension, including in the spawn selection menu, roll-call, and export features. Translations are available for all Pokémon from Generations 1–5; later generations fall back to English until their `l10n/pokemon/<locale>/gen<N>.json` files exist.
 
 ## Features
 
-Extracting and creating .gif files involves quite a bit of tedious manual work, but I’ll aim to add Gen 5 when possible.
+All nine generations are available – #001 Bulbasaur to #1025 Pecharunt, with shinies, gender variants and ~150 alternate forms (seasons, Drives, Vivillon patterns, Therian/Hisuian/Galarian forms, Necrozma, Calyrex riders, Ogerpon masks, …). Generations 1–4 are hand-made from overworld sprites; from Generation 5 (#494 Victini) onwards the idle/walk GIFs are **generated** from static front sprites with `scripts/sprites/generate_pokemon_gifs.py` – see [`scripts/sprites/README.md`](scripts/sprites/README.md) for how to run it and [`User Stories/`](User%20Stories/README.md) for the work log.
+
+```bash
+pip install -r scripts/sprites/requirements.txt
+npm run sprites:generate -- --ids 495,644,649   # -> media/gen5/<key>/*.gif
+npm run sprites:test                            # unit tests for the generator
+npm run test:media                              # media/ <-> pokemon-data.ts consistency
+```
 
 ## Credits
 
 ### Sprite Sources
 - Pokemon Sprites: © The Pokémon Company / Nintendo / Game Freak
+- Generation 5+ sprites are generated from the static front sprites collected by [PokéAPI/sprites](https://github.com/PokeAPI/sprites)
 - The sprites are used for non-commercial, fan project purposes only
 - Original sprite artwork belongs to the respective copyright holders
 

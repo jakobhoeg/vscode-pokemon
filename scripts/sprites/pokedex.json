@@ -1,0 +1,2692 @@
+{
+  "_comment": "Pokedex metadata for generating sprites. id -> {name, slug, generation, [sprite_size: 32|64], [base_form], [facing: left|right|front], [form_filter: regex]}. slug follows existing pokemon-data.ts key conventions (lowercase, punctuation stripped). facing describes the SOURCE sprite (default left = mirrored so the output faces right). form_filter limits which <id>-<form>.png variants are generated (e.g. Alcremie).",
+  "pokemon": {
+    "494": {
+      "name": "Victini",
+      "slug": "victini",
+      "generation": 5
+    },
+    "495": {
+      "name": "Snivy",
+      "slug": "snivy",
+      "generation": 5
+    },
+    "496": {
+      "name": "Servine",
+      "slug": "servine",
+      "generation": 5
+    },
+    "497": {
+      "name": "Serperior",
+      "slug": "serperior",
+      "generation": 5
+    },
+    "498": {
+      "name": "Tepig",
+      "slug": "tepig",
+      "generation": 5
+    },
+    "499": {
+      "name": "Pignite",
+      "slug": "pignite",
+      "generation": 5
+    },
+    "500": {
+      "name": "Emboar",
+      "slug": "emboar",
+      "generation": 5
+    },
+    "501": {
+      "name": "Oshawott",
+      "slug": "oshawott",
+      "generation": 5
+    },
+    "502": {
+      "name": "Dewott",
+      "slug": "dewott",
+      "generation": 5
+    },
+    "503": {
+      "name": "Samurott",
+      "slug": "samurott",
+      "generation": 5
+    },
+    "504": {
+      "name": "Patrat",
+      "slug": "patrat",
+      "generation": 5
+    },
+    "505": {
+      "name": "Watchog",
+      "slug": "watchog",
+      "generation": 5
+    },
+    "506": {
+      "name": "Lillipup",
+      "slug": "lillipup",
+      "generation": 5
+    },
+    "507": {
+      "name": "Herdier",
+      "slug": "herdier",
+      "generation": 5
+    },
+    "508": {
+      "name": "Stoutland",
+      "slug": "stoutland",
+      "generation": 5
+    },
+    "509": {
+      "name": "Purrloin",
+      "slug": "purrloin",
+      "generation": 5
+    },
+    "510": {
+      "name": "Liepard",
+      "slug": "liepard",
+      "generation": 5
+    },
+    "511": {
+      "name": "Pansage",
+      "slug": "pansage",
+      "generation": 5
+    },
+    "512": {
+      "name": "Simisage",
+      "slug": "simisage",
+      "generation": 5
+    },
+    "513": {
+      "name": "Pansear",
+      "slug": "pansear",
+      "generation": 5
+    },
+    "514": {
+      "name": "Simisear",
+      "slug": "simisear",
+      "generation": 5
+    },
+    "515": {
+      "name": "Panpour",
+      "slug": "panpour",
+      "generation": 5
+    },
+    "516": {
+      "name": "Simipour",
+      "slug": "simipour",
+      "generation": 5
+    },
+    "517": {
+      "name": "Munna",
+      "slug": "munna",
+      "generation": 5
+    },
+    "518": {
+      "name": "Musharna",
+      "slug": "musharna",
+      "generation": 5
+    },
+    "519": {
+      "name": "Pidove",
+      "slug": "pidove",
+      "generation": 5
+    },
+    "520": {
+      "name": "Tranquill",
+      "slug": "tranquill",
+      "generation": 5
+    },
+    "521": {
+      "name": "Unfezant",
+      "slug": "unfezant",
+      "generation": 5
+    },
+    "522": {
+      "name": "Blitzle",
+      "slug": "blitzle",
+      "generation": 5
+    },
+    "523": {
+      "name": "Zebstrika",
+      "slug": "zebstrika",
+      "generation": 5
+    },
+    "524": {
+      "name": "Roggenrola",
+      "slug": "roggenrola",
+      "generation": 5
+    },
+    "525": {
+      "name": "Boldore",
+      "slug": "boldore",
+      "generation": 5
+    },
+    "526": {
+      "name": "Gigalith",
+      "slug": "gigalith",
+      "generation": 5
+    },
+    "527": {
+      "name": "Woobat",
+      "slug": "woobat",
+      "generation": 5
+    },
+    "528": {
+      "name": "Swoobat",
+      "slug": "swoobat",
+      "generation": 5
+    },
+    "529": {
+      "name": "Drilbur",
+      "slug": "drilbur",
+      "generation": 5
+    },
+    "530": {
+      "name": "Excadrill",
+      "slug": "excadrill",
+      "generation": 5
+    },
+    "531": {
+      "name": "Audino",
+      "slug": "audino",
+      "generation": 5
+    },
+    "532": {
+      "name": "Timburr",
+      "slug": "timburr",
+      "generation": 5
+    },
+    "533": {
+      "name": "Gurdurr",
+      "slug": "gurdurr",
+      "generation": 5
+    },
+    "534": {
+      "name": "Conkeldurr",
+      "slug": "conkeldurr",
+      "generation": 5
+    },
+    "535": {
+      "name": "Tympole",
+      "slug": "tympole",
+      "generation": 5
+    },
+    "536": {
+      "name": "Palpitoad",
+      "slug": "palpitoad",
+      "generation": 5
+    },
+    "537": {
+      "name": "Seismitoad",
+      "slug": "seismitoad",
+      "generation": 5
+    },
+    "538": {
+      "name": "Throh",
+      "slug": "throh",
+      "generation": 5
+    },
+    "539": {
+      "name": "Sawk",
+      "slug": "sawk",
+      "generation": 5
+    },
+    "540": {
+      "name": "Sewaddle",
+      "slug": "sewaddle",
+      "generation": 5
+    },
+    "541": {
+      "name": "Swadloon",
+      "slug": "swadloon",
+      "generation": 5
+    },
+    "542": {
+      "name": "Leavanny",
+      "slug": "leavanny",
+      "generation": 5
+    },
+    "543": {
+      "name": "Venipede",
+      "slug": "venipede",
+      "generation": 5
+    },
+    "544": {
+      "name": "Whirlipede",
+      "slug": "whirlipede",
+      "generation": 5
+    },
+    "545": {
+      "name": "Scolipede",
+      "slug": "scolipede",
+      "generation": 5
+    },
+    "546": {
+      "name": "Cottonee",
+      "slug": "cottonee",
+      "generation": 5
+    },
+    "547": {
+      "name": "Whimsicott",
+      "slug": "whimsicott",
+      "generation": 5
+    },
+    "548": {
+      "name": "Petilil",
+      "slug": "petilil",
+      "generation": 5
+    },
+    "549": {
+      "name": "Lilligant",
+      "slug": "lilligant",
+      "generation": 5
+    },
+    "550": {
+      "name": "Basculin",
+      "slug": "basculin",
+      "generation": 5,
+      "base_form": "red_striped"
+    },
+    "551": {
+      "name": "Sandile",
+      "slug": "sandile",
+      "generation": 5
+    },
+    "552": {
+      "name": "Krokorok",
+      "slug": "krokorok",
+      "generation": 5
+    },
+    "553": {
+      "name": "Krookodile",
+      "slug": "krookodile",
+      "generation": 5
+    },
+    "554": {
+      "name": "Darumaka",
+      "slug": "darumaka",
+      "generation": 5
+    },
+    "555": {
+      "name": "Darmanitan",
+      "slug": "darmanitan",
+      "generation": 5
+    },
+    "556": {
+      "name": "Maractus",
+      "slug": "maractus",
+      "generation": 5
+    },
+    "557": {
+      "name": "Dwebble",
+      "slug": "dwebble",
+      "generation": 5
+    },
+    "558": {
+      "name": "Crustle",
+      "slug": "crustle",
+      "generation": 5
+    },
+    "559": {
+      "name": "Scraggy",
+      "slug": "scraggy",
+      "generation": 5
+    },
+    "560": {
+      "name": "Scrafty",
+      "slug": "scrafty",
+      "generation": 5
+    },
+    "561": {
+      "name": "Sigilyph",
+      "slug": "sigilyph",
+      "generation": 5
+    },
+    "562": {
+      "name": "Yamask",
+      "slug": "yamask",
+      "generation": 5
+    },
+    "563": {
+      "name": "Cofagrigus",
+      "slug": "cofagrigus",
+      "generation": 5
+    },
+    "564": {
+      "name": "Tirtouga",
+      "slug": "tirtouga",
+      "generation": 5
+    },
+    "565": {
+      "name": "Carracosta",
+      "slug": "carracosta",
+      "generation": 5
+    },
+    "566": {
+      "name": "Archen",
+      "slug": "archen",
+      "generation": 5
+    },
+    "567": {
+      "name": "Archeops",
+      "slug": "archeops",
+      "generation": 5
+    },
+    "568": {
+      "name": "Trubbish",
+      "slug": "trubbish",
+      "generation": 5
+    },
+    "569": {
+      "name": "Garbodor",
+      "slug": "garbodor",
+      "generation": 5
+    },
+    "570": {
+      "name": "Zorua",
+      "slug": "zorua",
+      "generation": 5
+    },
+    "571": {
+      "name": "Zoroark",
+      "slug": "zoroark",
+      "generation": 5
+    },
+    "572": {
+      "name": "Minccino",
+      "slug": "minccino",
+      "generation": 5
+    },
+    "573": {
+      "name": "Cinccino",
+      "slug": "cinccino",
+      "generation": 5
+    },
+    "574": {
+      "name": "Gothita",
+      "slug": "gothita",
+      "generation": 5
+    },
+    "575": {
+      "name": "Gothorita",
+      "slug": "gothorita",
+      "generation": 5
+    },
+    "576": {
+      "name": "Gothitelle",
+      "slug": "gothitelle",
+      "generation": 5
+    },
+    "577": {
+      "name": "Solosis",
+      "slug": "solosis",
+      "generation": 5
+    },
+    "578": {
+      "name": "Duosion",
+      "slug": "duosion",
+      "generation": 5
+    },
+    "579": {
+      "name": "Reuniclus",
+      "slug": "reuniclus",
+      "generation": 5
+    },
+    "580": {
+      "name": "Ducklett",
+      "slug": "ducklett",
+      "generation": 5
+    },
+    "581": {
+      "name": "Swanna",
+      "slug": "swanna",
+      "generation": 5
+    },
+    "582": {
+      "name": "Vanillite",
+      "slug": "vanillite",
+      "generation": 5
+    },
+    "583": {
+      "name": "Vanillish",
+      "slug": "vanillish",
+      "generation": 5
+    },
+    "584": {
+      "name": "Vanilluxe",
+      "slug": "vanilluxe",
+      "generation": 5
+    },
+    "585": {
+      "name": "Deerling",
+      "slug": "deerling",
+      "generation": 5,
+      "base_form": "spring"
+    },
+    "586": {
+      "name": "Sawsbuck",
+      "slug": "sawsbuck",
+      "generation": 5,
+      "base_form": "spring"
+    },
+    "587": {
+      "name": "Emolga",
+      "slug": "emolga",
+      "generation": 5
+    },
+    "588": {
+      "name": "Karrablast",
+      "slug": "karrablast",
+      "generation": 5
+    },
+    "589": {
+      "name": "Escavalier",
+      "slug": "escavalier",
+      "generation": 5
+    },
+    "590": {
+      "name": "Foongus",
+      "slug": "foongus",
+      "generation": 5
+    },
+    "591": {
+      "name": "Amoonguss",
+      "slug": "amoonguss",
+      "generation": 5
+    },
+    "592": {
+      "name": "Frillish",
+      "slug": "frillish",
+      "generation": 5
+    },
+    "593": {
+      "name": "Jellicent",
+      "slug": "jellicent",
+      "generation": 5
+    },
+    "594": {
+      "name": "Alomomola",
+      "slug": "alomomola",
+      "generation": 5
+    },
+    "595": {
+      "name": "Joltik",
+      "slug": "joltik",
+      "generation": 5
+    },
+    "596": {
+      "name": "Galvantula",
+      "slug": "galvantula",
+      "generation": 5
+    },
+    "597": {
+      "name": "Ferroseed",
+      "slug": "ferroseed",
+      "generation": 5
+    },
+    "598": {
+      "name": "Ferrothorn",
+      "slug": "ferrothorn",
+      "generation": 5
+    },
+    "599": {
+      "name": "Klink",
+      "slug": "klink",
+      "generation": 5
+    },
+    "600": {
+      "name": "Klang",
+      "slug": "klang",
+      "generation": 5
+    },
+    "601": {
+      "name": "Klinklang",
+      "slug": "klinklang",
+      "generation": 5
+    },
+    "602": {
+      "name": "Tynamo",
+      "slug": "tynamo",
+      "generation": 5
+    },
+    "603": {
+      "name": "Eelektrik",
+      "slug": "eelektrik",
+      "generation": 5
+    },
+    "604": {
+      "name": "Eelektross",
+      "slug": "eelektross",
+      "generation": 5
+    },
+    "605": {
+      "name": "Elgyem",
+      "slug": "elgyem",
+      "generation": 5
+    },
+    "606": {
+      "name": "Beheeyem",
+      "slug": "beheeyem",
+      "generation": 5
+    },
+    "607": {
+      "name": "Litwick",
+      "slug": "litwick",
+      "generation": 5
+    },
+    "608": {
+      "name": "Lampent",
+      "slug": "lampent",
+      "generation": 5
+    },
+    "609": {
+      "name": "Chandelure",
+      "slug": "chandelure",
+      "generation": 5
+    },
+    "610": {
+      "name": "Axew",
+      "slug": "axew",
+      "generation": 5
+    },
+    "611": {
+      "name": "Fraxure",
+      "slug": "fraxure",
+      "generation": 5
+    },
+    "612": {
+      "name": "Haxorus",
+      "slug": "haxorus",
+      "generation": 5
+    },
+    "613": {
+      "name": "Cubchoo",
+      "slug": "cubchoo",
+      "generation": 5
+    },
+    "614": {
+      "name": "Beartic",
+      "slug": "beartic",
+      "generation": 5
+    },
+    "615": {
+      "name": "Cryogonal",
+      "slug": "cryogonal",
+      "generation": 5
+    },
+    "616": {
+      "name": "Shelmet",
+      "slug": "shelmet",
+      "generation": 5
+    },
+    "617": {
+      "name": "Accelgor",
+      "slug": "accelgor",
+      "generation": 5
+    },
+    "618": {
+      "name": "Stunfisk",
+      "slug": "stunfisk",
+      "generation": 5
+    },
+    "619": {
+      "name": "Mienfoo",
+      "slug": "mienfoo",
+      "generation": 5
+    },
+    "620": {
+      "name": "Mienshao",
+      "slug": "mienshao",
+      "generation": 5
+    },
+    "621": {
+      "name": "Druddigon",
+      "slug": "druddigon",
+      "generation": 5
+    },
+    "622": {
+      "name": "Golett",
+      "slug": "golett",
+      "generation": 5
+    },
+    "623": {
+      "name": "Golurk",
+      "slug": "golurk",
+      "generation": 5
+    },
+    "624": {
+      "name": "Pawniard",
+      "slug": "pawniard",
+      "generation": 5
+    },
+    "625": {
+      "name": "Bisharp",
+      "slug": "bisharp",
+      "generation": 5
+    },
+    "626": {
+      "name": "Bouffalant",
+      "slug": "bouffalant",
+      "generation": 5
+    },
+    "627": {
+      "name": "Rufflet",
+      "slug": "rufflet",
+      "generation": 5
+    },
+    "628": {
+      "name": "Braviary",
+      "slug": "braviary",
+      "generation": 5
+    },
+    "629": {
+      "name": "Vullaby",
+      "slug": "vullaby",
+      "generation": 5
+    },
+    "630": {
+      "name": "Mandibuzz",
+      "slug": "mandibuzz",
+      "generation": 5
+    },
+    "631": {
+      "name": "Heatmor",
+      "slug": "heatmor",
+      "generation": 5
+    },
+    "632": {
+      "name": "Durant",
+      "slug": "durant",
+      "generation": 5
+    },
+    "633": {
+      "name": "Deino",
+      "slug": "deino",
+      "generation": 5
+    },
+    "634": {
+      "name": "Zweilous",
+      "slug": "zweilous",
+      "generation": 5
+    },
+    "635": {
+      "name": "Hydreigon",
+      "slug": "hydreigon",
+      "generation": 5
+    },
+    "636": {
+      "name": "Larvesta",
+      "slug": "larvesta",
+      "generation": 5
+    },
+    "637": {
+      "name": "Volcarona",
+      "slug": "volcarona",
+      "generation": 5
+    },
+    "638": {
+      "name": "Cobalion",
+      "slug": "cobalion",
+      "generation": 5
+    },
+    "639": {
+      "name": "Terrakion",
+      "slug": "terrakion",
+      "generation": 5
+    },
+    "640": {
+      "name": "Virizion",
+      "slug": "virizion",
+      "generation": 5
+    },
+    "641": {
+      "name": "Tornadus",
+      "slug": "tornadus",
+      "generation": 5
+    },
+    "642": {
+      "name": "Thundurus",
+      "slug": "thundurus",
+      "generation": 5
+    },
+    "643": {
+      "name": "Reshiram",
+      "slug": "reshiram",
+      "generation": 5,
+      "sprite_size": 64
+    },
+    "644": {
+      "name": "Zekrom",
+      "slug": "zekrom",
+      "generation": 5,
+      "sprite_size": 64
+    },
+    "645": {
+      "name": "Landorus",
+      "slug": "landorus",
+      "generation": 5
+    },
+    "646": {
+      "name": "Kyurem",
+      "slug": "kyurem",
+      "generation": 5,
+      "sprite_size": 64
+    },
+    "647": {
+      "name": "Keldeo",
+      "slug": "keldeo",
+      "generation": 5
+    },
+    "648": {
+      "name": "Meloetta",
+      "slug": "meloetta",
+      "generation": 5
+    },
+    "649": {
+      "name": "Genesect",
+      "slug": "genesect",
+      "generation": 5
+    },
+    "650": {
+      "name": "Chespin",
+      "slug": "chespin",
+      "generation": 6
+    },
+    "651": {
+      "name": "Quilladin",
+      "slug": "quilladin",
+      "generation": 6
+    },
+    "652": {
+      "name": "Chesnaught",
+      "slug": "chesnaught",
+      "generation": 6
+    },
+    "653": {
+      "name": "Fennekin",
+      "slug": "fennekin",
+      "generation": 6
+    },
+    "654": {
+      "name": "Braixen",
+      "slug": "braixen",
+      "generation": 6
+    },
+    "655": {
+      "name": "Delphox",
+      "slug": "delphox",
+      "generation": 6
+    },
+    "656": {
+      "name": "Froakie",
+      "slug": "froakie",
+      "generation": 6
+    },
+    "657": {
+      "name": "Frogadier",
+      "slug": "frogadier",
+      "generation": 6
+    },
+    "658": {
+      "name": "Greninja",
+      "slug": "greninja",
+      "generation": 6
+    },
+    "659": {
+      "name": "Bunnelby",
+      "slug": "bunnelby",
+      "generation": 6
+    },
+    "660": {
+      "name": "Diggersby",
+      "slug": "diggersby",
+      "generation": 6
+    },
+    "661": {
+      "name": "Fletchling",
+      "slug": "fletchling",
+      "generation": 6
+    },
+    "662": {
+      "name": "Fletchinder",
+      "slug": "fletchinder",
+      "generation": 6
+    },
+    "663": {
+      "name": "Talonflame",
+      "slug": "talonflame",
+      "generation": 6
+    },
+    "664": {
+      "name": "Scatterbug",
+      "slug": "scatterbug",
+      "generation": 6
+    },
+    "665": {
+      "name": "Spewpa",
+      "slug": "spewpa",
+      "generation": 6
+    },
+    "666": {
+      "name": "Vivillon",
+      "slug": "vivillon",
+      "generation": 6
+    },
+    "667": {
+      "name": "Litleo",
+      "slug": "litleo",
+      "generation": 6
+    },
+    "668": {
+      "name": "Pyroar",
+      "slug": "pyroar",
+      "generation": 6
+    },
+    "669": {
+      "name": "Flabébé",
+      "slug": "flabebe",
+      "generation": 6
+    },
+    "670": {
+      "name": "Floette",
+      "slug": "floette",
+      "generation": 6
+    },
+    "671": {
+      "name": "Florges",
+      "slug": "florges",
+      "generation": 6
+    },
+    "672": {
+      "name": "Skiddo",
+      "slug": "skiddo",
+      "generation": 6
+    },
+    "673": {
+      "name": "Gogoat",
+      "slug": "gogoat",
+      "generation": 6
+    },
+    "674": {
+      "name": "Pancham",
+      "slug": "pancham",
+      "generation": 6
+    },
+    "675": {
+      "name": "Pangoro",
+      "slug": "pangoro",
+      "generation": 6
+    },
+    "676": {
+      "name": "Furfrou",
+      "slug": "furfrou",
+      "generation": 6
+    },
+    "677": {
+      "name": "Espurr",
+      "slug": "espurr",
+      "generation": 6
+    },
+    "678": {
+      "name": "Meowstic",
+      "slug": "meowstic",
+      "generation": 6
+    },
+    "679": {
+      "name": "Honedge",
+      "slug": "honedge",
+      "generation": 6
+    },
+    "680": {
+      "name": "Doublade",
+      "slug": "doublade",
+      "generation": 6
+    },
+    "681": {
+      "name": "Aegislash",
+      "slug": "aegislash",
+      "generation": 6
+    },
+    "682": {
+      "name": "Spritzee",
+      "slug": "spritzee",
+      "generation": 6
+    },
+    "683": {
+      "name": "Aromatisse",
+      "slug": "aromatisse",
+      "generation": 6
+    },
+    "684": {
+      "name": "Swirlix",
+      "slug": "swirlix",
+      "generation": 6
+    },
+    "685": {
+      "name": "Slurpuff",
+      "slug": "slurpuff",
+      "generation": 6
+    },
+    "686": {
+      "name": "Inkay",
+      "slug": "inkay",
+      "generation": 6
+    },
+    "687": {
+      "name": "Malamar",
+      "slug": "malamar",
+      "generation": 6
+    },
+    "688": {
+      "name": "Binacle",
+      "slug": "binacle",
+      "generation": 6
+    },
+    "689": {
+      "name": "Barbaracle",
+      "slug": "barbaracle",
+      "generation": 6
+    },
+    "690": {
+      "name": "Skrelp",
+      "slug": "skrelp",
+      "generation": 6
+    },
+    "691": {
+      "name": "Dragalge",
+      "slug": "dragalge",
+      "generation": 6
+    },
+    "692": {
+      "name": "Clauncher",
+      "slug": "clauncher",
+      "generation": 6
+    },
+    "693": {
+      "name": "Clawitzer",
+      "slug": "clawitzer",
+      "generation": 6
+    },
+    "694": {
+      "name": "Helioptile",
+      "slug": "helioptile",
+      "generation": 6
+    },
+    "695": {
+      "name": "Heliolisk",
+      "slug": "heliolisk",
+      "generation": 6
+    },
+    "696": {
+      "name": "Tyrunt",
+      "slug": "tyrunt",
+      "generation": 6
+    },
+    "697": {
+      "name": "Tyrantrum",
+      "slug": "tyrantrum",
+      "generation": 6
+    },
+    "698": {
+      "name": "Amaura",
+      "slug": "amaura",
+      "generation": 6
+    },
+    "699": {
+      "name": "Aurorus",
+      "slug": "aurorus",
+      "generation": 6
+    },
+    "700": {
+      "name": "Sylveon",
+      "slug": "sylveon",
+      "generation": 6
+    },
+    "701": {
+      "name": "Hawlucha",
+      "slug": "hawlucha",
+      "generation": 6
+    },
+    "702": {
+      "name": "Dedenne",
+      "slug": "dedenne",
+      "generation": 6
+    },
+    "703": {
+      "name": "Carbink",
+      "slug": "carbink",
+      "generation": 6
+    },
+    "704": {
+      "name": "Goomy",
+      "slug": "goomy",
+      "generation": 6
+    },
+    "705": {
+      "name": "Sliggoo",
+      "slug": "sliggoo",
+      "generation": 6
+    },
+    "706": {
+      "name": "Goodra",
+      "slug": "goodra",
+      "generation": 6
+    },
+    "707": {
+      "name": "Klefki",
+      "slug": "klefki",
+      "generation": 6
+    },
+    "708": {
+      "name": "Phantump",
+      "slug": "phantump",
+      "generation": 6
+    },
+    "709": {
+      "name": "Trevenant",
+      "slug": "trevenant",
+      "generation": 6
+    },
+    "710": {
+      "name": "Pumpkaboo",
+      "slug": "pumpkaboo",
+      "generation": 6
+    },
+    "711": {
+      "name": "Gourgeist",
+      "slug": "gourgeist",
+      "generation": 6
+    },
+    "712": {
+      "name": "Bergmite",
+      "slug": "bergmite",
+      "generation": 6
+    },
+    "713": {
+      "name": "Avalugg",
+      "slug": "avalugg",
+      "generation": 6
+    },
+    "714": {
+      "name": "Noibat",
+      "slug": "noibat",
+      "generation": 6
+    },
+    "715": {
+      "name": "Noivern",
+      "slug": "noivern",
+      "generation": 6
+    },
+    "716": {
+      "name": "Xerneas",
+      "slug": "xerneas",
+      "generation": 6,
+      "sprite_size": 64,
+      "form_filter": "^neutral$"
+    },
+    "717": {
+      "name": "Yveltal",
+      "slug": "yveltal",
+      "generation": 6,
+      "sprite_size": 64
+    },
+    "718": {
+      "name": "Zygarde",
+      "slug": "zygarde",
+      "generation": 6,
+      "sprite_size": 64
+    },
+    "719": {
+      "name": "Diancie",
+      "slug": "diancie",
+      "generation": 6
+    },
+    "720": {
+      "name": "Hoopa",
+      "slug": "hoopa",
+      "generation": 6
+    },
+    "721": {
+      "name": "Volcanion",
+      "slug": "volcanion",
+      "generation": 6
+    },
+    "722": {
+      "name": "Rowlet",
+      "slug": "rowlet",
+      "generation": 7
+    },
+    "723": {
+      "name": "Dartrix",
+      "slug": "dartrix",
+      "generation": 7
+    },
+    "724": {
+      "name": "Decidueye",
+      "slug": "decidueye",
+      "generation": 7
+    },
+    "725": {
+      "name": "Litten",
+      "slug": "litten",
+      "generation": 7
+    },
+    "726": {
+      "name": "Torracat",
+      "slug": "torracat",
+      "generation": 7
+    },
+    "727": {
+      "name": "Incineroar",
+      "slug": "incineroar",
+      "generation": 7
+    },
+    "728": {
+      "name": "Popplio",
+      "slug": "popplio",
+      "generation": 7
+    },
+    "729": {
+      "name": "Brionne",
+      "slug": "brionne",
+      "generation": 7
+    },
+    "730": {
+      "name": "Primarina",
+      "slug": "primarina",
+      "generation": 7
+    },
+    "731": {
+      "name": "Pikipek",
+      "slug": "pikipek",
+      "generation": 7
+    },
+    "732": {
+      "name": "Trumbeak",
+      "slug": "trumbeak",
+      "generation": 7
+    },
+    "733": {
+      "name": "Toucannon",
+      "slug": "toucannon",
+      "generation": 7
+    },
+    "734": {
+      "name": "Yungoos",
+      "slug": "yungoos",
+      "generation": 7
+    },
+    "735": {
+      "name": "Gumshoos",
+      "slug": "gumshoos",
+      "generation": 7
+    },
+    "736": {
+      "name": "Grubbin",
+      "slug": "grubbin",
+      "generation": 7
+    },
+    "737": {
+      "name": "Charjabug",
+      "slug": "charjabug",
+      "generation": 7
+    },
+    "738": {
+      "name": "Vikavolt",
+      "slug": "vikavolt",
+      "generation": 7
+    },
+    "739": {
+      "name": "Crabrawler",
+      "slug": "crabrawler",
+      "generation": 7
+    },
+    "740": {
+      "name": "Crabominable",
+      "slug": "crabominable",
+      "generation": 7
+    },
+    "741": {
+      "name": "Oricorio",
+      "slug": "oricorio",
+      "generation": 7
+    },
+    "742": {
+      "name": "Cutiefly",
+      "slug": "cutiefly",
+      "generation": 7
+    },
+    "743": {
+      "name": "Ribombee",
+      "slug": "ribombee",
+      "generation": 7
+    },
+    "744": {
+      "name": "Rockruff",
+      "slug": "rockruff",
+      "generation": 7
+    },
+    "745": {
+      "name": "Lycanroc",
+      "slug": "lycanroc",
+      "generation": 7
+    },
+    "746": {
+      "name": "Wishiwashi",
+      "slug": "wishiwashi",
+      "generation": 7
+    },
+    "747": {
+      "name": "Mareanie",
+      "slug": "mareanie",
+      "generation": 7
+    },
+    "748": {
+      "name": "Toxapex",
+      "slug": "toxapex",
+      "generation": 7
+    },
+    "749": {
+      "name": "Mudbray",
+      "slug": "mudbray",
+      "generation": 7
+    },
+    "750": {
+      "name": "Mudsdale",
+      "slug": "mudsdale",
+      "generation": 7
+    },
+    "751": {
+      "name": "Dewpider",
+      "slug": "dewpider",
+      "generation": 7
+    },
+    "752": {
+      "name": "Araquanid",
+      "slug": "araquanid",
+      "generation": 7
+    },
+    "753": {
+      "name": "Fomantis",
+      "slug": "fomantis",
+      "generation": 7
+    },
+    "754": {
+      "name": "Lurantis",
+      "slug": "lurantis",
+      "generation": 7
+    },
+    "755": {
+      "name": "Morelull",
+      "slug": "morelull",
+      "generation": 7
+    },
+    "756": {
+      "name": "Shiinotic",
+      "slug": "shiinotic",
+      "generation": 7
+    },
+    "757": {
+      "name": "Salandit",
+      "slug": "salandit",
+      "generation": 7
+    },
+    "758": {
+      "name": "Salazzle",
+      "slug": "salazzle",
+      "generation": 7
+    },
+    "759": {
+      "name": "Stufful",
+      "slug": "stufful",
+      "generation": 7
+    },
+    "760": {
+      "name": "Bewear",
+      "slug": "bewear",
+      "generation": 7
+    },
+    "761": {
+      "name": "Bounsweet",
+      "slug": "bounsweet",
+      "generation": 7
+    },
+    "762": {
+      "name": "Steenee",
+      "slug": "steenee",
+      "generation": 7
+    },
+    "763": {
+      "name": "Tsareena",
+      "slug": "tsareena",
+      "generation": 7
+    },
+    "764": {
+      "name": "Comfey",
+      "slug": "comfey",
+      "generation": 7
+    },
+    "765": {
+      "name": "Oranguru",
+      "slug": "oranguru",
+      "generation": 7
+    },
+    "766": {
+      "name": "Passimian",
+      "slug": "passimian",
+      "generation": 7
+    },
+    "767": {
+      "name": "Wimpod",
+      "slug": "wimpod",
+      "generation": 7
+    },
+    "768": {
+      "name": "Golisopod",
+      "slug": "golisopod",
+      "generation": 7
+    },
+    "769": {
+      "name": "Sandygast",
+      "slug": "sandygast",
+      "generation": 7
+    },
+    "770": {
+      "name": "Palossand",
+      "slug": "palossand",
+      "generation": 7
+    },
+    "771": {
+      "name": "Pyukumuku",
+      "slug": "pyukumuku",
+      "generation": 7
+    },
+    "772": {
+      "name": "Type: Null",
+      "slug": "typenull",
+      "generation": 7
+    },
+    "773": {
+      "name": "Silvally",
+      "slug": "silvally",
+      "generation": 7,
+      "form_filter": "^(?!normal$)"
+    },
+    "774": {
+      "name": "Minior",
+      "slug": "minior",
+      "generation": 7
+    },
+    "775": {
+      "name": "Komala",
+      "slug": "komala",
+      "generation": 7,
+      "form_filter": "^(?!form-1$)"
+    },
+    "776": {
+      "name": "Turtonator",
+      "slug": "turtonator",
+      "generation": 7
+    },
+    "777": {
+      "name": "Togedemaru",
+      "slug": "togedemaru",
+      "generation": 7
+    },
+    "778": {
+      "name": "Mimikyu",
+      "slug": "mimikyu",
+      "generation": 7
+    },
+    "779": {
+      "name": "Bruxish",
+      "slug": "bruxish",
+      "generation": 7
+    },
+    "780": {
+      "name": "Drampa",
+      "slug": "drampa",
+      "generation": 7
+    },
+    "781": {
+      "name": "Dhelmise",
+      "slug": "dhelmise",
+      "generation": 7
+    },
+    "782": {
+      "name": "Jangmo-o",
+      "slug": "jangmoo",
+      "generation": 7
+    },
+    "783": {
+      "name": "Hakamo-o",
+      "slug": "hakamoo",
+      "generation": 7
+    },
+    "784": {
+      "name": "Kommo-o",
+      "slug": "kommoo",
+      "generation": 7
+    },
+    "785": {
+      "name": "Tapu Koko",
+      "slug": "tapukoko",
+      "generation": 7
+    },
+    "786": {
+      "name": "Tapu Lele",
+      "slug": "tapulele",
+      "generation": 7
+    },
+    "787": {
+      "name": "Tapu Bulu",
+      "slug": "tapubulu",
+      "generation": 7
+    },
+    "788": {
+      "name": "Tapu Fini",
+      "slug": "tapufini",
+      "generation": 7
+    },
+    "789": {
+      "name": "Cosmog",
+      "slug": "cosmog",
+      "generation": 7
+    },
+    "790": {
+      "name": "Cosmoem",
+      "slug": "cosmoem",
+      "generation": 7
+    },
+    "791": {
+      "name": "Solgaleo",
+      "slug": "solgaleo",
+      "generation": 7,
+      "sprite_size": 64
+    },
+    "792": {
+      "name": "Lunala",
+      "slug": "lunala",
+      "generation": 7,
+      "sprite_size": 64
+    },
+    "793": {
+      "name": "Nihilego",
+      "slug": "nihilego",
+      "generation": 7
+    },
+    "794": {
+      "name": "Buzzwole",
+      "slug": "buzzwole",
+      "generation": 7
+    },
+    "795": {
+      "name": "Pheromosa",
+      "slug": "pheromosa",
+      "generation": 7
+    },
+    "796": {
+      "name": "Xurkitree",
+      "slug": "xurkitree",
+      "generation": 7
+    },
+    "797": {
+      "name": "Celesteela",
+      "slug": "celesteela",
+      "generation": 7,
+      "sprite_size": 64
+    },
+    "798": {
+      "name": "Kartana",
+      "slug": "kartana",
+      "generation": 7
+    },
+    "799": {
+      "name": "Guzzlord",
+      "slug": "guzzlord",
+      "generation": 7,
+      "sprite_size": 64
+    },
+    "800": {
+      "name": "Necrozma",
+      "slug": "necrozma",
+      "generation": 7,
+      "sprite_size": 64
+    },
+    "801": {
+      "name": "Magearna",
+      "slug": "magearna",
+      "generation": 7
+    },
+    "802": {
+      "name": "Marshadow",
+      "slug": "marshadow",
+      "generation": 7
+    },
+    "803": {
+      "name": "Poipole",
+      "slug": "poipole",
+      "generation": 7
+    },
+    "804": {
+      "name": "Naganadel",
+      "slug": "naganadel",
+      "generation": 7
+    },
+    "805": {
+      "name": "Stakataka",
+      "slug": "stakataka",
+      "generation": 7
+    },
+    "806": {
+      "name": "Blacephalon",
+      "slug": "blacephalon",
+      "generation": 7
+    },
+    "807": {
+      "name": "Zeraora",
+      "slug": "zeraora",
+      "generation": 7
+    },
+    "808": {
+      "name": "Meltan",
+      "slug": "meltan",
+      "generation": 7
+    },
+    "809": {
+      "name": "Melmetal",
+      "slug": "melmetal",
+      "generation": 7
+    },
+    "810": {
+      "name": "Grookey",
+      "slug": "grookey",
+      "generation": 8
+    },
+    "811": {
+      "name": "Thwackey",
+      "slug": "thwackey",
+      "generation": 8
+    },
+    "812": {
+      "name": "Rillaboom",
+      "slug": "rillaboom",
+      "generation": 8
+    },
+    "813": {
+      "name": "Scorbunny",
+      "slug": "scorbunny",
+      "generation": 8
+    },
+    "814": {
+      "name": "Raboot",
+      "slug": "raboot",
+      "generation": 8
+    },
+    "815": {
+      "name": "Cinderace",
+      "slug": "cinderace",
+      "generation": 8
+    },
+    "816": {
+      "name": "Sobble",
+      "slug": "sobble",
+      "generation": 8
+    },
+    "817": {
+      "name": "Drizzile",
+      "slug": "drizzile",
+      "generation": 8
+    },
+    "818": {
+      "name": "Inteleon",
+      "slug": "inteleon",
+      "generation": 8
+    },
+    "819": {
+      "name": "Skwovet",
+      "slug": "skwovet",
+      "generation": 8
+    },
+    "820": {
+      "name": "Greedent",
+      "slug": "greedent",
+      "generation": 8
+    },
+    "821": {
+      "name": "Rookidee",
+      "slug": "rookidee",
+      "generation": 8
+    },
+    "822": {
+      "name": "Corvisquire",
+      "slug": "corvisquire",
+      "generation": 8
+    },
+    "823": {
+      "name": "Corviknight",
+      "slug": "corviknight",
+      "generation": 8
+    },
+    "824": {
+      "name": "Blipbug",
+      "slug": "blipbug",
+      "generation": 8
+    },
+    "825": {
+      "name": "Dottler",
+      "slug": "dottler",
+      "generation": 8
+    },
+    "826": {
+      "name": "Orbeetle",
+      "slug": "orbeetle",
+      "generation": 8
+    },
+    "827": {
+      "name": "Nickit",
+      "slug": "nickit",
+      "generation": 8
+    },
+    "828": {
+      "name": "Thievul",
+      "slug": "thievul",
+      "generation": 8
+    },
+    "829": {
+      "name": "Gossifleur",
+      "slug": "gossifleur",
+      "generation": 8
+    },
+    "830": {
+      "name": "Eldegoss",
+      "slug": "eldegoss",
+      "generation": 8
+    },
+    "831": {
+      "name": "Wooloo",
+      "slug": "wooloo",
+      "generation": 8
+    },
+    "832": {
+      "name": "Dubwool",
+      "slug": "dubwool",
+      "generation": 8
+    },
+    "833": {
+      "name": "Chewtle",
+      "slug": "chewtle",
+      "generation": 8
+    },
+    "834": {
+      "name": "Drednaw",
+      "slug": "drednaw",
+      "generation": 8
+    },
+    "835": {
+      "name": "Yamper",
+      "slug": "yamper",
+      "generation": 8
+    },
+    "836": {
+      "name": "Boltund",
+      "slug": "boltund",
+      "generation": 8
+    },
+    "837": {
+      "name": "Rolycoly",
+      "slug": "rolycoly",
+      "generation": 8
+    },
+    "838": {
+      "name": "Carkol",
+      "slug": "carkol",
+      "generation": 8
+    },
+    "839": {
+      "name": "Coalossal",
+      "slug": "coalossal",
+      "generation": 8
+    },
+    "840": {
+      "name": "Applin",
+      "slug": "applin",
+      "generation": 8
+    },
+    "841": {
+      "name": "Flapple",
+      "slug": "flapple",
+      "generation": 8
+    },
+    "842": {
+      "name": "Appletun",
+      "slug": "appletun",
+      "generation": 8
+    },
+    "843": {
+      "name": "Silicobra",
+      "slug": "silicobra",
+      "generation": 8
+    },
+    "844": {
+      "name": "Sandaconda",
+      "slug": "sandaconda",
+      "generation": 8
+    },
+    "845": {
+      "name": "Cramorant",
+      "slug": "cramorant",
+      "generation": 8
+    },
+    "846": {
+      "name": "Arrokuda",
+      "slug": "arrokuda",
+      "generation": 8
+    },
+    "847": {
+      "name": "Barraskewda",
+      "slug": "barraskewda",
+      "generation": 8
+    },
+    "848": {
+      "name": "Toxel",
+      "slug": "toxel",
+      "generation": 8
+    },
+    "849": {
+      "name": "Toxtricity",
+      "slug": "toxtricity",
+      "generation": 8
+    },
+    "850": {
+      "name": "Sizzlipede",
+      "slug": "sizzlipede",
+      "generation": 8
+    },
+    "851": {
+      "name": "Centiskorch",
+      "slug": "centiskorch",
+      "generation": 8
+    },
+    "852": {
+      "name": "Clobbopus",
+      "slug": "clobbopus",
+      "generation": 8
+    },
+    "853": {
+      "name": "Grapploct",
+      "slug": "grapploct",
+      "generation": 8
+    },
+    "854": {
+      "name": "Sinistea",
+      "slug": "sinistea",
+      "generation": 8,
+      "form_filter": "^(?!antique$)"
+    },
+    "855": {
+      "name": "Polteageist",
+      "slug": "polteageist",
+      "generation": 8,
+      "form_filter": "^(?!antique$)"
+    },
+    "856": {
+      "name": "Hatenna",
+      "slug": "hatenna",
+      "generation": 8
+    },
+    "857": {
+      "name": "Hattrem",
+      "slug": "hattrem",
+      "generation": 8
+    },
+    "858": {
+      "name": "Hatterene",
+      "slug": "hatterene",
+      "generation": 8
+    },
+    "859": {
+      "name": "Impidimp",
+      "slug": "impidimp",
+      "generation": 8
+    },
+    "860": {
+      "name": "Morgrem",
+      "slug": "morgrem",
+      "generation": 8
+    },
+    "861": {
+      "name": "Grimmsnarl",
+      "slug": "grimmsnarl",
+      "generation": 8
+    },
+    "862": {
+      "name": "Obstagoon",
+      "slug": "obstagoon",
+      "generation": 8
+    },
+    "863": {
+      "name": "Perrserker",
+      "slug": "perrserker",
+      "generation": 8
+    },
+    "864": {
+      "name": "Cursola",
+      "slug": "cursola",
+      "generation": 8
+    },
+    "865": {
+      "name": "Sirfetch'd",
+      "slug": "sirfetchd",
+      "generation": 8
+    },
+    "866": {
+      "name": "Mr. Rime",
+      "slug": "mrrime",
+      "generation": 8
+    },
+    "867": {
+      "name": "Runerigus",
+      "slug": "runerigus",
+      "generation": 8
+    },
+    "868": {
+      "name": "Milcery",
+      "slug": "milcery",
+      "generation": 8
+    },
+    "869": {
+      "name": "Alcremie",
+      "slug": "alcremie",
+      "generation": 8,
+      "form_filter": "^(?!vanilla-cream).*-strawberry-sweet$"
+    },
+    "870": {
+      "name": "Falinks",
+      "slug": "falinks",
+      "generation": 8
+    },
+    "871": {
+      "name": "Pincurchin",
+      "slug": "pincurchin",
+      "generation": 8
+    },
+    "872": {
+      "name": "Snom",
+      "slug": "snom",
+      "generation": 8
+    },
+    "873": {
+      "name": "Frosmoth",
+      "slug": "frosmoth",
+      "generation": 8
+    },
+    "874": {
+      "name": "Stonjourner",
+      "slug": "stonjourner",
+      "generation": 8
+    },
+    "875": {
+      "name": "Eiscue",
+      "slug": "eiscue",
+      "generation": 8
+    },
+    "876": {
+      "name": "Indeedee",
+      "slug": "indeedee",
+      "generation": 8
+    },
+    "877": {
+      "name": "Morpeko",
+      "slug": "morpeko",
+      "generation": 8
+    },
+    "878": {
+      "name": "Cufant",
+      "slug": "cufant",
+      "generation": 8
+    },
+    "879": {
+      "name": "Copperajah",
+      "slug": "copperajah",
+      "generation": 8
+    },
+    "880": {
+      "name": "Dracozolt",
+      "slug": "dracozolt",
+      "generation": 8
+    },
+    "881": {
+      "name": "Arctozolt",
+      "slug": "arctozolt",
+      "generation": 8
+    },
+    "882": {
+      "name": "Dracovish",
+      "slug": "dracovish",
+      "generation": 8
+    },
+    "883": {
+      "name": "Arctovish",
+      "slug": "arctovish",
+      "generation": 8
+    },
+    "884": {
+      "name": "Duraludon",
+      "slug": "duraludon",
+      "generation": 8
+    },
+    "885": {
+      "name": "Dreepy",
+      "slug": "dreepy",
+      "generation": 8
+    },
+    "886": {
+      "name": "Drakloak",
+      "slug": "drakloak",
+      "generation": 8
+    },
+    "887": {
+      "name": "Dragapult",
+      "slug": "dragapult",
+      "generation": 8
+    },
+    "888": {
+      "name": "Zacian",
+      "slug": "zacian",
+      "generation": 8,
+      "sprite_size": 64
+    },
+    "889": {
+      "name": "Zamazenta",
+      "slug": "zamazenta",
+      "generation": 8,
+      "sprite_size": 64
+    },
+    "890": {
+      "name": "Eternatus",
+      "slug": "eternatus",
+      "generation": 8,
+      "sprite_size": 64
+    },
+    "891": {
+      "name": "Kubfu",
+      "slug": "kubfu",
+      "generation": 8
+    },
+    "892": {
+      "name": "Urshifu",
+      "slug": "urshifu",
+      "generation": 8
+    },
+    "893": {
+      "name": "Zarude",
+      "slug": "zarude",
+      "generation": 8
+    },
+    "894": {
+      "name": "Regieleki",
+      "slug": "regieleki",
+      "generation": 8
+    },
+    "895": {
+      "name": "Regidrago",
+      "slug": "regidrago",
+      "generation": 8
+    },
+    "896": {
+      "name": "Glastrier",
+      "slug": "glastrier",
+      "generation": 8
+    },
+    "897": {
+      "name": "Spectrier",
+      "slug": "spectrier",
+      "generation": 8
+    },
+    "898": {
+      "name": "Calyrex",
+      "slug": "calyrex",
+      "generation": 8
+    },
+    "899": {
+      "name": "Wyrdeer",
+      "slug": "wyrdeer",
+      "generation": 8
+    },
+    "900": {
+      "name": "Kleavor",
+      "slug": "kleavor",
+      "generation": 8
+    },
+    "901": {
+      "name": "Ursaluna",
+      "slug": "ursaluna",
+      "generation": 8
+    },
+    "902": {
+      "name": "Basculegion",
+      "slug": "basculegion",
+      "generation": 8
+    },
+    "903": {
+      "name": "Sneasler",
+      "slug": "sneasler",
+      "generation": 8
+    },
+    "904": {
+      "name": "Overqwil",
+      "slug": "overqwil",
+      "generation": 8
+    },
+    "905": {
+      "name": "Enamorus",
+      "slug": "enamorus",
+      "generation": 8
+    },
+    "906": {
+      "name": "Sprigatito",
+      "slug": "sprigatito",
+      "generation": 9
+    },
+    "907": {
+      "name": "Floragato",
+      "slug": "floragato",
+      "generation": 9
+    },
+    "908": {
+      "name": "Meowscarada",
+      "slug": "meowscarada",
+      "generation": 9
+    },
+    "909": {
+      "name": "Fuecoco",
+      "slug": "fuecoco",
+      "generation": 9
+    },
+    "910": {
+      "name": "Crocalor",
+      "slug": "crocalor",
+      "generation": 9
+    },
+    "911": {
+      "name": "Skeledirge",
+      "slug": "skeledirge",
+      "generation": 9
+    },
+    "912": {
+      "name": "Quaxly",
+      "slug": "quaxly",
+      "generation": 9
+    },
+    "913": {
+      "name": "Quaxwell",
+      "slug": "quaxwell",
+      "generation": 9
+    },
+    "914": {
+      "name": "Quaquaval",
+      "slug": "quaquaval",
+      "generation": 9
+    },
+    "915": {
+      "name": "Lechonk",
+      "slug": "lechonk",
+      "generation": 9
+    },
+    "916": {
+      "name": "Oinkologne",
+      "slug": "oinkologne",
+      "generation": 9
+    },
+    "917": {
+      "name": "Tarountula",
+      "slug": "tarountula",
+      "generation": 9
+    },
+    "918": {
+      "name": "Spidops",
+      "slug": "spidops",
+      "generation": 9
+    },
+    "919": {
+      "name": "Nymble",
+      "slug": "nymble",
+      "generation": 9
+    },
+    "920": {
+      "name": "Lokix",
+      "slug": "lokix",
+      "generation": 9
+    },
+    "921": {
+      "name": "Pawmi",
+      "slug": "pawmi",
+      "generation": 9
+    },
+    "922": {
+      "name": "Pawmo",
+      "slug": "pawmo",
+      "generation": 9
+    },
+    "923": {
+      "name": "Pawmot",
+      "slug": "pawmot",
+      "generation": 9
+    },
+    "924": {
+      "name": "Tandemaus",
+      "slug": "tandemaus",
+      "generation": 9
+    },
+    "925": {
+      "name": "Maushold",
+      "slug": "maushold",
+      "generation": 9
+    },
+    "926": {
+      "name": "Fidough",
+      "slug": "fidough",
+      "generation": 9
+    },
+    "927": {
+      "name": "Dachsbun",
+      "slug": "dachsbun",
+      "generation": 9
+    },
+    "928": {
+      "name": "Smoliv",
+      "slug": "smoliv",
+      "generation": 9
+    },
+    "929": {
+      "name": "Dolliv",
+      "slug": "dolliv",
+      "generation": 9
+    },
+    "930": {
+      "name": "Arboliva",
+      "slug": "arboliva",
+      "generation": 9
+    },
+    "931": {
+      "name": "Squawkabilly",
+      "slug": "squawkabilly",
+      "generation": 9
+    },
+    "932": {
+      "name": "Nacli",
+      "slug": "nacli",
+      "generation": 9
+    },
+    "933": {
+      "name": "Naclstack",
+      "slug": "naclstack",
+      "generation": 9
+    },
+    "934": {
+      "name": "Garganacl",
+      "slug": "garganacl",
+      "generation": 9
+    },
+    "935": {
+      "name": "Charcadet",
+      "slug": "charcadet",
+      "generation": 9
+    },
+    "936": {
+      "name": "Armarouge",
+      "slug": "armarouge",
+      "generation": 9
+    },
+    "937": {
+      "name": "Ceruledge",
+      "slug": "ceruledge",
+      "generation": 9
+    },
+    "938": {
+      "name": "Tadbulb",
+      "slug": "tadbulb",
+      "generation": 9
+    },
+    "939": {
+      "name": "Bellibolt",
+      "slug": "bellibolt",
+      "generation": 9
+    },
+    "940": {
+      "name": "Wattrel",
+      "slug": "wattrel",
+      "generation": 9
+    },
+    "941": {
+      "name": "Kilowattrel",
+      "slug": "kilowattrel",
+      "generation": 9
+    },
+    "942": {
+      "name": "Maschiff",
+      "slug": "maschiff",
+      "generation": 9
+    },
+    "943": {
+      "name": "Mabosstiff",
+      "slug": "mabosstiff",
+      "generation": 9
+    },
+    "944": {
+      "name": "Shroodle",
+      "slug": "shroodle",
+      "generation": 9
+    },
+    "945": {
+      "name": "Grafaiai",
+      "slug": "grafaiai",
+      "generation": 9
+    },
+    "946": {
+      "name": "Bramblin",
+      "slug": "bramblin",
+      "generation": 9
+    },
+    "947": {
+      "name": "Brambleghast",
+      "slug": "brambleghast",
+      "generation": 9
+    },
+    "948": {
+      "name": "Toedscool",
+      "slug": "toedscool",
+      "generation": 9
+    },
+    "949": {
+      "name": "Toedscruel",
+      "slug": "toedscruel",
+      "generation": 9
+    },
+    "950": {
+      "name": "Klawf",
+      "slug": "klawf",
+      "generation": 9
+    },
+    "951": {
+      "name": "Capsakid",
+      "slug": "capsakid",
+      "generation": 9
+    },
+    "952": {
+      "name": "Scovillain",
+      "slug": "scovillain",
+      "generation": 9
+    },
+    "953": {
+      "name": "Rellor",
+      "slug": "rellor",
+      "generation": 9
+    },
+    "954": {
+      "name": "Rabsca",
+      "slug": "rabsca",
+      "generation": 9
+    },
+    "955": {
+      "name": "Flittle",
+      "slug": "flittle",
+      "generation": 9
+    },
+    "956": {
+      "name": "Espathra",
+      "slug": "espathra",
+      "generation": 9
+    },
+    "957": {
+      "name": "Tinkatink",
+      "slug": "tinkatink",
+      "generation": 9
+    },
+    "958": {
+      "name": "Tinkatuff",
+      "slug": "tinkatuff",
+      "generation": 9
+    },
+    "959": {
+      "name": "Tinkaton",
+      "slug": "tinkaton",
+      "generation": 9
+    },
+    "960": {
+      "name": "Wiglett",
+      "slug": "wiglett",
+      "generation": 9
+    },
+    "961": {
+      "name": "Wugtrio",
+      "slug": "wugtrio",
+      "generation": 9
+    },
+    "962": {
+      "name": "Bombirdier",
+      "slug": "bombirdier",
+      "generation": 9
+    },
+    "963": {
+      "name": "Finizen",
+      "slug": "finizen",
+      "generation": 9
+    },
+    "964": {
+      "name": "Palafin",
+      "slug": "palafin",
+      "generation": 9
+    },
+    "965": {
+      "name": "Varoom",
+      "slug": "varoom",
+      "generation": 9
+    },
+    "966": {
+      "name": "Revavroom",
+      "slug": "revavroom",
+      "generation": 9
+    },
+    "967": {
+      "name": "Cyclizar",
+      "slug": "cyclizar",
+      "generation": 9
+    },
+    "968": {
+      "name": "Orthworm",
+      "slug": "orthworm",
+      "generation": 9
+    },
+    "969": {
+      "name": "Glimmet",
+      "slug": "glimmet",
+      "generation": 9
+    },
+    "970": {
+      "name": "Glimmora",
+      "slug": "glimmora",
+      "generation": 9
+    },
+    "971": {
+      "name": "Greavard",
+      "slug": "greavard",
+      "generation": 9
+    },
+    "972": {
+      "name": "Houndstone",
+      "slug": "houndstone",
+      "generation": 9
+    },
+    "973": {
+      "name": "Flamigo",
+      "slug": "flamigo",
+      "generation": 9
+    },
+    "974": {
+      "name": "Cetoddle",
+      "slug": "cetoddle",
+      "generation": 9
+    },
+    "975": {
+      "name": "Cetitan",
+      "slug": "cetitan",
+      "generation": 9
+    },
+    "976": {
+      "name": "Veluza",
+      "slug": "veluza",
+      "generation": 9
+    },
+    "977": {
+      "name": "Dondozo",
+      "slug": "dondozo",
+      "generation": 9
+    },
+    "978": {
+      "name": "Tatsugiri",
+      "slug": "tatsugiri",
+      "generation": 9
+    },
+    "979": {
+      "name": "Annihilape",
+      "slug": "annihilape",
+      "generation": 9
+    },
+    "980": {
+      "name": "Clodsire",
+      "slug": "clodsire",
+      "generation": 9
+    },
+    "981": {
+      "name": "Farigiraf",
+      "slug": "farigiraf",
+      "generation": 9
+    },
+    "982": {
+      "name": "Dudunsparce",
+      "slug": "dudunsparce",
+      "generation": 9
+    },
+    "983": {
+      "name": "Kingambit",
+      "slug": "kingambit",
+      "generation": 9
+    },
+    "984": {
+      "name": "Great Tusk",
+      "slug": "greattusk",
+      "generation": 9
+    },
+    "985": {
+      "name": "Scream Tail",
+      "slug": "screamtail",
+      "generation": 9
+    },
+    "986": {
+      "name": "Brute Bonnet",
+      "slug": "brutebonnet",
+      "generation": 9
+    },
+    "987": {
+      "name": "Flutter Mane",
+      "slug": "fluttermane",
+      "generation": 9
+    },
+    "988": {
+      "name": "Slither Wing",
+      "slug": "slitherwing",
+      "generation": 9
+    },
+    "989": {
+      "name": "Sandy Shocks",
+      "slug": "sandyshocks",
+      "generation": 9
+    },
+    "990": {
+      "name": "Iron Treads",
+      "slug": "irontreads",
+      "generation": 9
+    },
+    "991": {
+      "name": "Iron Bundle",
+      "slug": "ironbundle",
+      "generation": 9
+    },
+    "992": {
+      "name": "Iron Hands",
+      "slug": "ironhands",
+      "generation": 9
+    },
+    "993": {
+      "name": "Iron Jugulis",
+      "slug": "ironjugulis",
+      "generation": 9
+    },
+    "994": {
+      "name": "Iron Moth",
+      "slug": "ironmoth",
+      "generation": 9
+    },
+    "995": {
+      "name": "Iron Thorns",
+      "slug": "ironthorns",
+      "generation": 9
+    },
+    "996": {
+      "name": "Frigibax",
+      "slug": "frigibax",
+      "generation": 9
+    },
+    "997": {
+      "name": "Arctibax",
+      "slug": "arctibax",
+      "generation": 9
+    },
+    "998": {
+      "name": "Baxcalibur",
+      "slug": "baxcalibur",
+      "generation": 9
+    },
+    "999": {
+      "name": "Gimmighoul",
+      "slug": "gimmighoul",
+      "generation": 9
+    },
+    "1000": {
+      "name": "Gholdengo",
+      "slug": "gholdengo",
+      "generation": 9
+    },
+    "1001": {
+      "name": "Wo-Chien",
+      "slug": "wochien",
+      "generation": 9
+    },
+    "1002": {
+      "name": "Chien-Pao",
+      "slug": "chienpao",
+      "generation": 9
+    },
+    "1003": {
+      "name": "Ting-Lu",
+      "slug": "tinglu",
+      "generation": 9
+    },
+    "1004": {
+      "name": "Chi-Yu",
+      "slug": "chiyu",
+      "generation": 9
+    },
+    "1005": {
+      "name": "Roaring Moon",
+      "slug": "roaringmoon",
+      "generation": 9
+    },
+    "1006": {
+      "name": "Iron Valiant",
+      "slug": "ironvaliant",
+      "generation": 9
+    },
+    "1007": {
+      "name": "Koraidon",
+      "slug": "koraidon",
+      "generation": 9,
+      "sprite_size": 64
+    },
+    "1008": {
+      "name": "Miraidon",
+      "slug": "miraidon",
+      "generation": 9,
+      "sprite_size": 64
+    },
+    "1009": {
+      "name": "Walking Wake",
+      "slug": "walkingwake",
+      "generation": 9
+    },
+    "1010": {
+      "name": "Iron Leaves",
+      "slug": "ironleaves",
+      "generation": 9
+    },
+    "1011": {
+      "name": "Dipplin",
+      "slug": "dipplin",
+      "generation": 9
+    },
+    "1012": {
+      "name": "Poltchageist",
+      "slug": "poltchageist",
+      "generation": 9,
+      "form_filter": "^(?!artisan$)"
+    },
+    "1013": {
+      "name": "Sinistcha",
+      "slug": "sinistcha",
+      "generation": 9,
+      "form_filter": "^(?!masterpiece$)"
+    },
+    "1014": {
+      "name": "Okidogi",
+      "slug": "okidogi",
+      "generation": 9
+    },
+    "1015": {
+      "name": "Munkidori",
+      "slug": "munkidori",
+      "generation": 9
+    },
+    "1016": {
+      "name": "Fezandipiti",
+      "slug": "fezandipiti",
+      "generation": 9
+    },
+    "1017": {
+      "name": "Ogerpon",
+      "slug": "ogerpon",
+      "generation": 9
+    },
+    "1018": {
+      "name": "Archaludon",
+      "slug": "archaludon",
+      "generation": 9
+    },
+    "1019": {
+      "name": "Hydrapple",
+      "slug": "hydrapple",
+      "generation": 9
+    },
+    "1020": {
+      "name": "Gouging Fire",
+      "slug": "gougingfire",
+      "generation": 9
+    },
+    "1021": {
+      "name": "Raging Bolt",
+      "slug": "ragingbolt",
+      "generation": 9
+    },
+    "1022": {
+      "name": "Iron Boulder",
+      "slug": "ironboulder",
+      "generation": 9
+    },
+    "1023": {
+      "name": "Iron Crown",
+      "slug": "ironcrown",
+      "generation": 9
+    },
+    "1024": {
+      "name": "Terapagos",
+      "slug": "terapagos",
+      "generation": 9
+    },
+    "1025": {
+      "name": "Pecharunt",
+      "slug": "pecharunt",
+      "generation": 9
+    }
+  }
+}

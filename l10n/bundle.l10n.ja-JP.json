@@ -31,5 +31,12 @@
   "You must have a folder or workspace open to export pokemonCollection.": "ポケモンコレクションをエクスポートするには、フォルダーまたはワークスペースを開いている必要があります。",
   "Failed to import pokemon: {0}": "ポケモンのインポートに失敗しました：{0}",
   "default": "デフォルト",
-  "shiny": "色違い"
+  "shiny": "色違い",
+  "Currently selected": "現在選択中",
+  "Choose the item to feed (Ctrl/Cmd+click in the Pokemon view drops it)": "あげるアイテムを選択（ポケモンビューで Ctrl/Cmd+クリックすると落とせます）",
+  "Feeding {0} - Ctrl/Cmd+click in the Pokemon view to drop one": "{0} をあげます – ポケモンビューで Ctrl/Cmd+クリックで落とせます",
+  "There is nobody here to feed - spawn a Pokemon first!": "あげる相手がいません – まずポケモンを出してください！",
+  "Whoever is closest": "いちばん近いポケモン",
+  "Who gets the {0}?": "{0} をだれにあげますか？",
+  "Feed pokemon": "ポケモンにエサをあげる"
 }

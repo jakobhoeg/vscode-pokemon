@@ -1,4 +1,5 @@
 import { PokemonColor, PokemonType } from '../common/types';
+import type { IFoodItem, ItemOutcome, PokemonStats } from './feeding';
 
 export interface IPokemonType {
   nextFrame(): void;
@@ -8,6 +9,27 @@ export interface IPokemonType {
   canChase: boolean;
   swipe(): void;
   chase(ballState: BallState, canvas: HTMLCanvasElement): void;
+
+  // Feeding
+  canFeed: boolean;
+  isFeeding: boolean;
+  feed(item: IFoodItem): void;
+  onItemEaten: ((item: IFoodItem, outcome: ItemOutcome) => void) | undefined;
+
+  // Evolution (item based, see common/evolutions.ts)
+  onEvolve: ((item: IFoodItem, toType: string) => void) | undefined;
+  isEvolving: boolean;
+  beginEvolution(): void;
+  changeForm(
+    type: string,
+    pokemonRoot: string,
+    originalSpriteSize: number,
+  ): void;
+  endEvolution(): void;
+  pokemonRoot: string;
+  label: string;
+  stats: PokemonStats;
+  recoverStats(stats: Partial<PokemonStats> | undefined): void;
   speed: number;
   isMoving: boolean;
   hello: string;
@@ -50,6 +72,9 @@ export class PokemonElementState {
   elBottom: string | undefined;
   pokemonName: string | undefined;
   pokemonFriend: string | undefined;
+  pokemonLevel: number | undefined;
+  pokemonHappiness: number | undefined;
+  pokemonSpeedBoost: number | undefined;
 }
 
 export class PokemonPanelState {
@@ -80,6 +105,7 @@ export const enum States {
   chaseFriend = 'chase-friend',
   standRight = 'stand-right',
   standLeft = 'stand-left',
+  feed = 'feed',
 }
 
 export enum FrameResult {
