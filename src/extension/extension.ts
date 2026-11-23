@@ -22,7 +22,25 @@ import {
   Theme,
   WebviewMessage,
 } from '../common/types';
+import { getEvolutions, pickEvolution } from '../common/evolutions';
+import {
+  afterEvolution,
+  cooldownRemaining,
+  feed,
+  GrowthRules,
+  growthRulesFromSettings,
+  growthScale,
+  GrowthSyncEntry,
+  isHungry,
+} from '../common/growth';
 import { availableColors, normalizeColor } from '../panel/pokemon-collection';
+import {
+  GROWTH_KEY,
+  loadGrowth,
+  pruneGrowth,
+  sanitizeGrowth,
+  saveGrowth,
+} from './growth-store';
 
 const EXTRA_POKEMON_KEY = 'vscode-pokemon.extra-pokemon';
 const EXTRA_POKEMON_KEY_TYPES = EXTRA_POKEMON_KEY + '.types';
@@ -98,6 +116,52 @@ function getConfiguredShinyOdds(): number {
     .getConfiguration('vscode-pokemon')
     .get<number>('shinyOdds', 8192);
 }
+
+function getGrowthRules(): GrowthRules {
+  const config = vscode.workspace.getConfiguration('vscode-pokemon');
+  return growthRulesFromSettings(
+    config.get<unknown>('feedCooldownMinutes'),
+    config.get<unknown>('feedsToEvolve'),
+  );
+}
+
+function minutesUntil(ms: number): number {
+  return Math.ceil(ms / 60_000);
+}
+
+/** Hunger is time-based, so the webview needs a periodic refresh, not just one after each feed. */
+const GROWTH_SYNC_INTERVAL_MS = 60_000;
+
+/** Sends each pokemon's hunger and size to the webview. The extension stays the source of truth. */
+function syncGrowth(context: vscode.ExtensionContext): void {
+  const panel = getPokemonPanel();
+  if (!panel) {
+    return;
+  }
+  const rules = getGrowthRules();
+  const now = Date.now();
+  const entries: GrowthSyncEntry[] = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  ).map(({ name }) => {
+    const growth = loadGrowth(context.globalState, name);
+    return {
+      name,
+      hungry: isHungry(growth, now, rules),
+      scale: growthScale(growth, rules),
+      xp: growth.xp,
+      feedsToEvolve: rules.feedsToEvolve,
+    };
+  });
+  try {
+    panel.syncGrowth(entries);
+  } catch {
+    // The explorer view isn't open yet; its 'ready' message triggers a sync when it is.
+  }
+}
+
+/** Fed by handleWebviewMessage; activate() subscribes to the messages that need `context`. */
+const webviewMessages = new vscode.EventEmitter<WebviewMessage>();
 
 function maybeMakeShiny(possibleColors: PokemonColor[]): PokemonColor {
   if (possibleColors.includes(PokemonColor.shiny)) {
@@ -361,6 +425,7 @@ export async function storeCollectionAsMemento(
     EXTRA_POKEMON_KEY_TYPES,
     EXTRA_POKEMON_KEY_COLORS,
     EXTRA_POKEMON_KEY_NAMES,
+    GROWTH_KEY,
   ]);
 }
 
@@ -398,6 +463,96 @@ function waitForPokemonList(webview: vscode.Webview): Promise<IPokemonInfo[]> {
   });
 }
 
+/** Feeds one pokemon and evolves it once it has eaten enough. */
+async function feedAndMaybeEvolve(
+  context: vscode.ExtensionContext,
+  panel: IPokemonPanel,
+  pokemon: IPokemonInfo,
+): Promise<void> {
+  const rules = getGrowthRules();
+  const now = Date.now();
+  const before = loadGrowth(context.globalState, pokemon.name);
+  const { state, outcome } = feed(before, now, rules);
+  if (outcome === 'full') {
+    void vscode.window.showInformationMessage(
+      vscode.l10n.t(
+        '{0} is full. Try again in {1} min.',
+        pokemon.name,
+        minutesUntil(cooldownRemaining(before, now, rules)),
+      ),
+    );
+    return;
+  }
+
+  panel.feedPokemon(pokemon.name);
+  const target =
+    outcome === 'ready'
+      ? pickEvolution(getEvolutions(pokemon.type))
+      : undefined;
+
+  if (target === undefined) {
+    await saveGrowth(context.globalState, pokemon.name, state);
+    syncGrowth(context); // no longer hungry, and a little bigger
+    void vscode.window.showInformationMessage(
+      outcome === 'ready'
+        ? vscode.l10n.t('{0} ate a berry! It is fully evolved.', pokemon.name)
+        : vscode.l10n.t(
+            '{0} ate a berry! (XP {1}/{2})',
+            pokemon.name,
+            state.xp,
+            rules.feedsToEvolve,
+          ),
+    );
+    return;
+  }
+
+  await saveGrowth(context.globalState, pokemon.name, afterEvolution(state));
+  const evolved = new PokemonSpecification(
+    normalizeColor(pokemon.color, target), // shiny only if the new form has shiny sprites
+    target,
+    getConfiguredSize(),
+    pokemon.name,
+  );
+  const collection = PokemonSpecification.collectionFromMemento(
+    context,
+    getConfiguredSize(),
+  );
+  const index = collection.findIndex((spec) => spec.name === pokemon.name);
+  if (index === -1) {
+    collection.push(evolved);
+  } else {
+    collection[index] = evolved;
+  }
+  await storeCollectionAsMemento(context, collection);
+  panel.evolvePokemon(evolved);
+  syncGrowth(context);
+  void vscode.window.showInformationMessage(
+    vscode.l10n.t(
+      '{0} ate a berry and evolved into {1}!',
+      pokemon.name,
+      localize.getLocalizedPokemonName(target),
+    ),
+  );
+}
+
+/** Double-click feeding: the webview only knows the name, so look up type and color from its list. */
+async function feedByName(
+  context: vscode.ExtensionContext,
+  name: string,
+): Promise<void> {
+  const panel = getPokemonPanel();
+  const webview = getWebview();
+  if (!panel || !webview) {
+    return;
+  }
+  const listPromise = waitForPokemonList(webview);
+  panel.listPokemon();
+  const pokemon = (await listPromise).find((item) => item.name === name);
+  if (pokemon) {
+    await feedAndMaybeEvolve(context, panel, pokemon);
+  }
+}
+
 function getPokemonPanel(): IPokemonPanel | undefined {
   if (
     getConfigurationPosition() === ExtPosition.explorer &&
@@ -425,6 +580,25 @@ function getWebview(): vscode.Webview | undefined {
 export function activate(context: vscode.ExtensionContext) {
   // Reset the Pokemon translations cache at startup to load the correct language
   localize.resetPokemonTranslationsCache();
+
+  const growthTimer = setInterval(
+    () => syncGrowth(context),
+    GROWTH_SYNC_INTERVAL_MS,
+  );
+  context.subscriptions.push(
+    { dispose: () => clearInterval(growthTimer) },
+    webviewMessages,
+    webviewMessages.event((message) => {
+      switch (message.command) {
+        case 'ready': // a (re)created webview has lost everything it was told
+          syncGrowth(context);
+          return;
+        case 'feed-request':
+          void feedByName(context, message.text);
+          return;
+      }
+    }),
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-pokemon.start', async () => {
@@ -547,9 +721,71 @@ export function activate(context: vscode.ExtensionContext) {
               );
             });
           await storeCollectionAsMemento(context, collection);
+          await pruneGrowth(
+            context.globalState,
+            collection.map((item) => item.name),
+          );
         }
       },
     ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('vscode-pokemon.feed-pokemon', async () => {
+      const panel = getPokemonPanel();
+      if (panel === undefined) {
+        await createPokemonPlayground(context);
+        return;
+      }
+      if (getConfigurationPosition() === ExtPosition.explorer) {
+        // The explorer webview only exists once its view has been shown.
+        await vscode.commands.executeCommand('pokemonView.focus');
+      }
+      const webview = getWebview();
+      if (!webview) {
+        return;
+      }
+      const listPromise = waitForPokemonList(webview);
+      panel.listPokemon();
+      const pokemonList = await listPromise;
+
+      if (!pokemonList.length) {
+        await vscode.window.showErrorMessage(
+          vscode.l10n.t('There are no pokemon to feed.'),
+        );
+        return;
+      }
+
+      const rules = getGrowthRules();
+      const now = Date.now();
+      const picked = await vscode.window.showQuickPick<PokemonQuickPickItem>(
+        pokemonList.map((val) => {
+          const item = new PokemonQuickPickItem(val.name, val.type, val.color);
+          const growth = loadGrowth(context.globalState, val.name);
+          const wait = cooldownRemaining(growth, now, rules);
+          item.detail =
+            wait > 0
+              ? vscode.l10n.t(
+                  'XP {0}/{1} · full for {2} min',
+                  growth.xp,
+                  rules.feedsToEvolve,
+                  minutesUntil(wait),
+                )
+              : vscode.l10n.t('XP {0}/{1}', growth.xp, rules.feedsToEvolve);
+          return item;
+        }),
+        { placeHolder: vscode.l10n.t('Select the pokemon to feed.') },
+      );
+      if (!picked) {
+        return;
+      }
+
+      await feedAndMaybeEvolve(context, panel, {
+        name: picked.name,
+        type: picked.type as PokemonType,
+        color: picked.color as PokemonColor,
+      });
+    }),
   );
 
   context.subscriptions.push(
@@ -560,6 +796,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (panel !== undefined) {
           panel.resetPokemon();
           await storeCollectionAsMemento(context, []);
+          await pruneGrowth(context.globalState, []);
         } else {
           await createPokemonPlayground(context);
           await vscode.window.showInformationMessage(
@@ -725,7 +962,14 @@ export function activate(context: vscode.ExtensionContext) {
           context,
           getConfiguredSize(),
         );
-        const pokemonJson = JSON.stringify(pokemonCollection, null, 2);
+        const pokemonJson = JSON.stringify(
+          pokemonCollection.map((spec) => ({
+            ...spec,
+            growth: loadGrowth(context.globalState, spec.name),
+          })),
+          null,
+          2,
+        );
         const fileName = `pokemonCollection-${Date.now()}.json`;
         if (!vscode.workspace.workspaceFolders) {
           await vscode.window.showErrorMessage(
@@ -794,8 +1038,17 @@ export function activate(context: vscode.ExtensionContext) {
               if (panel !== undefined) {
                 panel.spawnPokemon(pokemonSpec);
               }
+              // Files exported before feeding existed have no growth; they start fresh.
+              if (pokemon.growth !== undefined) {
+                await saveGrowth(
+                  context.globalState,
+                  pokemonSpec.name,
+                  sanitizeGrowth(pokemon.growth),
+                );
+              }
             }
             await storeCollectionAsMemento(context, collection);
+            syncGrowth(context);
           } catch (e: any) {
             await vscode.window.showErrorMessage(
               vscode.l10n.t('Failed to import pokemon: {0}', e?.message),
@@ -1181,6 +1434,9 @@ interface IPokemonPanel {
   resetPokemon(): void;
   spawnPokemon(spec: PokemonSpecification): void;
   deletePokemon(pokemonName: string): void;
+  feedPokemon(pokemonName: string): void;
+  evolvePokemon(spec: PokemonSpecification): void;
+  syncGrowth(entries: GrowthSyncEntry[]): void;
   listPokemon(): void;
   rollCall(): void;
   themeKind(): vscode.ColorThemeKind;
@@ -1330,6 +1586,31 @@ class PokemonWebviewContainer implements IPokemonPanel {
     });
   }
 
+  public feedPokemon(pokemonName: string) {
+    void this.getWebview().postMessage({
+      command: 'feed-pokemon',
+      name: pokemonName,
+    });
+  }
+
+  public syncGrowth(entries: GrowthSyncEntry[]) {
+    void this.getWebview().postMessage({
+      command: 'growth-sync',
+      pokemon: entries,
+    });
+  }
+
+  public evolvePokemon(spec: PokemonSpecification) {
+    void this.getWebview().postMessage({
+      command: 'evolve-pokemon',
+      name: spec.name,
+      type: spec.type,
+      color: spec.color,
+      generation: spec.generation,
+      originalSpriteSize: spec.originalSpriteSize,
+    });
+  }
+
   protected getWebview(): vscode.Webview {
     throw new Error('Not implemented');
   }
@@ -1441,6 +1722,8 @@ function handleWebviewMessage(message: WebviewMessage) {
     case 'info':
       void vscode.window.showInformationMessage(message.text);
       return;
+    default:
+      webviewMessages.fire(message);
   }
 }
 

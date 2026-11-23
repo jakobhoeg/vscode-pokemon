@@ -33,8 +33,16 @@ export interface IPokemonType {
   makeFriendsWith(friend: IPokemonType): boolean;
   isPlaying: boolean;
 
-  showSpeechBubble(duration: number, friend: boolean): void;
+  showSpeechBubble(duration?: number, bubble?: SpeechBubble): void;
+
+  // Feed & grow
+  evolve(type: string, root: string, originalSpriteSize: number): void;
+  setGrowthScale(scale: number): void;
+  applySpriteSize(): void;
 }
+
+/** Image names in /media (e.g. 'heart' -> heart.png). */
+export type SpeechBubble = 'happy' | 'heart' | 'hungry' | 'berry';
 
 export class PokemonInstanceState {
   currentStateEnum: States | undefined;

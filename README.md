@@ -62,6 +62,23 @@ Run the "Start Pokemon coding session" command (`vscode-pokemon.start`) to see a
 
 Enjoy interacting with your favourite Pokémon!
 
+## Feeding, growing and evolving
+
+Your Pokémon get hungry over time: a hungry Pokémon shows a fork-and-knife bubble every now and then. To feed one, do any of the following:
+
+- Click the berry icon in the title bar of the VS Code Pokémon view
+- Run **`Pokemon Coding: Feed pokemon`** from the command palette
+- Double-click the Pokémon
+
+Each meal gives 1 XP and makes the Pokémon a little bigger, but never bigger than the view. After eating, a Pokémon stays full for a while before it can be fed again. Once it has eaten enough, it evolves into its next form. Pokémon with several possible evolutions, like Eevee, pick one at random. XP is saved between sessions, synced with Settings Sync, and included when you export your Pokémon list.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `vscode-pokemon.feedCooldownMinutes` | `30` | Minutes a Pokémon stays full after eating. `0` turns the cooldown off. |
+| `vscode-pokemon.feedsToEvolve` | `5` | Meals needed to evolve into the next form. |
+
+A Pokémon gets hungry 2 hours after its last meal, or when its cooldown ends if that's longer. A few Pokémon can't evolve yet because the extension doesn't have sprites for their next form.
+
 ## Keyboard Shortcuts
 
 VS Code Pokémon comes with default keyboard shortcuts to make managing your Pokémon quick and easy:

@@ -19,6 +19,7 @@ import {
 } from './pokemon-collection';
 import { PokemonElementState, PokemonPanelState } from './states';
 import { getRandomPokemonConfig } from '../common/pokemon-data';
+import { GrowthSyncEntry } from '../common/growth';
 
 /* This is how the VS Code API can be invoked from the panel */
 declare global {
@@ -31,6 +32,9 @@ declare global {
 }
 
 export var allPokemon: IPokemonCollection = new PokemonCollection();
+
+const HUNGRY_BUBBLE_EVERY_MS = 30_000;
+const HUNGRY_BUBBLE_MS = 3_000;
 var pokemonCounter: number;
 
 function normalizePokemonCounter(counter: number | undefined): number {
@@ -105,6 +109,9 @@ function startAnimations(
   }
 
   collision.addEventListener('mouseover', handleMouseOver);
+  collision.addEventListener('dblclick', () => {
+    stateApi?.postMessage({ command: 'feed-request', text: pokemon.name });
+  });
   setInterval(() => {
     var updates = allPokemon.seekNewFriends();
     updates.forEach((message) => {
@@ -588,15 +595,53 @@ export function pokemonPanelApp(
         // go through every single
         // pokemon and then print out their name
         pokemonCollection.forEach((pokemon) => {
+          const growth = pokemon.growth
+            ? ` XP ${pokemon.growth.xp}/${pokemon.growth.feedsToEvolve}${
+                pokemon.growth.hungry ? ', hungry' : ''
+              }.`
+            : '';
           stateApi?.postMessage({
             command: 'info',
-            text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}): ${pokemon.pokemon.hello}`,
+            text: `${pokemon.pokemon.emoji} ${pokemon.pokemon.name} (${pokemon.color} ${pokemon.type}): ${pokemon.pokemon.hello}${growth}`,
           });
         });
         break;
       case 'delete-pokemon':
         removePokemonFromPanel(message, stateApi);
         break;
+      case 'feed-pokemon':
+        allPokemon
+          .locate(message.name)
+          ?.pokemon.showSpeechBubble(2000, 'berry');
+        break;
+      case 'growth-sync':
+        (message.pokemon as GrowthSyncEntry[]).forEach((entry) => {
+          const element = allPokemon.locate(entry.name);
+          if (element) {
+            element.growth = entry;
+            element.pokemon.setGrowthScale(entry.scale);
+          }
+        });
+        break;
+      case 'evolve-pokemon': {
+        const evolving = allPokemon.locate(message.name);
+        if (!evolving) {
+          break;
+        }
+        evolving.evolve(
+          message.type,
+          message.color,
+          message.generation,
+          message.originalSpriteSize,
+          `${basePokemonUri}/${message.generation}/${message.type}/${message.color}`,
+        );
+        // Remove-then-add restarts the flash if it evolves again quickly.
+        evolving.el.classList.remove('evolve-flash');
+        void evolving.el.offsetWidth;
+        evolving.el.classList.add('evolve-flash');
+        saveState(stateApi);
+        break;
+      }
       case 'reset-pokemon':
         var pokemonToRemove = [...allPokemon.pokemonCollection];
         pokemonToRemove.forEach((pokemon) => {
@@ -615,7 +660,22 @@ export function pokemonPanelApp(
         break;
     }
   });
+
+  setInterval(() => {
+    allPokemon.pokemonCollection.forEach((element) => {
+      if (element.growth?.hungry) {
+        element.pokemon.showSpeechBubble(HUNGRY_BUBBLE_MS, 'hungry');
+      }
+    });
+  }, HUNGRY_BUBBLE_EVERY_MS);
+
+  // Ask for hunger/size now: a recreated webview has lost what it was told.
+  stateApi?.postMessage({ command: 'ready', text: '' });
 }
 window.addEventListener('resize', function () {
   initCanvas();
+  // Re-apply the pane cap so grown pokemon shrink to fit (or grow back).
+  allPokemon.pokemonCollection.forEach((element) =>
+    element.pokemon.applySpriteSize(),
+  );
 });

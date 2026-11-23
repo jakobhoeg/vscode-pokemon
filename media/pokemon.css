@@ -307,3 +307,19 @@ img.pokemon {
 	filter: saturate(0) brightness(3) contrast(1);
   }
 }
+/* Evolution: the sprite glows white, then fades back to normal colors. */
+.pokemon.evolve-flash {
+  animation: pokemon-evolve 1.2s ease-out;
+}
+
+@keyframes pokemon-evolve {
+  0% { filter: brightness(1); }
+  25%, 60% { filter: brightness(0) invert(1); }
+  100% { filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pokemon.evolve-flash {
+    animation: none;
+  }
+}

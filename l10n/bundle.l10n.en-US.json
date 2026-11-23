@@ -31,5 +31,13 @@
   "You must have a folder or workspace open to export pokemonCollection.": "You must have a folder or workspace open to export pokemonCollection.",
   "Failed to import pokemon: {0}": "Failed to import pokemon: {0}",
   "default": "Default",
-  "shiny": "Shiny"
+  "shiny": "Shiny",
+  "There are no pokemon to feed.": "There are no pokemon to feed.",
+  "Select the pokemon to feed.": "Select the pokemon to feed.",
+  "XP {0}/{1} · full for {2} min": "XP {0}/{1} · full for {2} min",
+  "XP {0}/{1}": "XP {0}/{1}",
+  "{0} is full. Try again in {1} min.": "{0} is full. Try again in {1} min.",
+  "{0} ate a berry! It is fully evolved.": "{0} ate a berry! It is fully evolved.",
+  "{0} ate a berry! (XP {1}/{2})": "{0} ate a berry! (XP {1}/{2})",
+  "{0} ate a berry and evolved into {1}!": "{0} ate a berry and evolved into {1}!"
 }

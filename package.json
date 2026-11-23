@@ -34,6 +34,7 @@
         "onCommand:vscode-pokemon.spawn-pokemon",
         "onCommand:vscode-pokemon.spawn-random-pokemon",
         "onCommand:vscode-pokemon.delete-pokemon",
+        "onCommand:vscode-pokemon.feed-pokemon",
         "onCommand:vscode-pokemon.remove-all-pokemon",
         "onCommand:vscode-pokemon.roll-call",
         "onCommand:vscode-pokemon.export-pokemon-list",
@@ -72,9 +73,14 @@
                     "group": "navigation@2"
                 },
                 {
-                    "command": "vscode-pokemon.delete-pokemon",
+                    "command": "vscode-pokemon.feed-pokemon",
                     "when": "view == pokemonView",
                     "group": "navigation@3"
+                },
+                {
+                    "command": "vscode-pokemon.delete-pokemon",
+                    "when": "view == pokemonView",
+                    "group": "navigation@4"
                 }
             ]
         },
@@ -119,6 +125,15 @@
                 "icon": {
                     "dark": "media/icon/dark-trash.svg",
                     "light": "media/icon/light-trash.svg"
+                }
+            },
+            {
+                "command": "vscode-pokemon.feed-pokemon",
+                "title": "Feed pokemon",
+                "category": "Pokemon Coding",
+                "icon": {
+                    "dark": "media/icon/dark-feed.svg",
+                    "light": "media/icon/light-feed.svg"
                 }
             },
             {
@@ -252,6 +267,18 @@
                         ],
                         "default": "auto",
                         "description": "Language for Pokemon names. 'auto' uses VS Code's language, or you can choose a specific language (e.g., 'fr-FR' for French, 'en-US' for English, 'de-DE' for German, 'ja-JP' for Japanese). Only official Pokemon languages are supported."
+                    },
+                    "vscode-pokemon.feedCooldownMinutes": {
+                        "type": "number",
+                        "default": 30,
+                        "minimum": 0,
+                        "description": "Minutes a Pokémon stays full after eating before it can be fed again. 0 = no cooldown."
+                    },
+                    "vscode-pokemon.feedsToEvolve": {
+                        "type": "integer",
+                        "default": 5,
+                        "minimum": 1,
+                        "description": "Number of feeds a Pokémon needs before it evolves into its next form."
                     }
                 }
             }
