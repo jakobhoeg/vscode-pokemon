@@ -17,6 +17,7 @@ import {
   HorizontalDirection,
   FrameResult,
   IPokemonType,
+  SpeechBubble,
 } from './states';
 
 export class InvalidStateError extends Error {
@@ -55,6 +56,9 @@ export abstract class BasePokemonType implements IPokemonType {
   private _size: PokemonSize;
   private _generation: string;
   private _originalSpriteSize: number;
+  private _animationSrc: string | undefined;
+  private _growthScale = 1;
+  private _spriteWidth = 0;
 
   constructor(
     spriteElement: HTMLImageElement,
@@ -78,12 +82,12 @@ export abstract class BasePokemonType implements IPokemonType {
     this._left = left;
     this._bottom = bottom;
     this._originalSpriteSize = originalSpriteSize;
+    this._size = size;
     this.initSprite(size, left, bottom, originalSpriteSize);
     this.currentStateEnum = this.sequence.startingState;
     this.currentState = resolveState(this.currentStateEnum, this);
 
     this._name = name;
-    this._size = size;
     this._baseSpeed = this.randomizeSpeed(speed);
     this._generation = generation;
 
@@ -97,28 +101,58 @@ export abstract class BasePokemonType implements IPokemonType {
     bottom: number,
     originalSpriteSize: number,
   ) {
-    const spriteSize = this.calculateSpriteWidth(
-      pokemonSize,
-      originalSpriteSize,
-    );
+    this._size = pokemonSize;
+    this._originalSpriteSize = originalSpriteSize;
+    this._left = left;
+    this._bottom = bottom;
 
     this.el.style.left = `${left}px`;
     this.el.style.bottom = `${bottom}px`;
-    this.el.style.width = `${spriteSize}px`;
-    this.el.style.height = `${spriteSize}px`;
 
     // Remove 'auto' since it gave issues with sizing
     this.el.style.maxWidth = 'none';
     this.el.style.maxHeight = 'none';
 
-    this.collision.style.left = `${left}px`;
-    this.collision.style.bottom = `${bottom}px`;
-    this.collision.style.width = `${spriteSize}px`;
-    this.collision.style.height = `${spriteSize}px`;
-
-    this.speech.style.left = `${left}px`;
-    this.speech.style.bottom = `${bottom + spriteSize}px`;
+    this.applySpriteSize();
     this.hideSpeechBubble();
+  }
+
+  /** Growth multiplier from feeding; the pane cap is applied in spriteWidth(). */
+  setGrowthScale(scale: number) {
+    this._growthScale = scale;
+    this.applySpriteSize();
+  }
+
+  /** Sizes sprite and hitbox and repositions the bubble. Call again when the pane resizes. */
+  applySpriteSize() {
+    this._spriteWidth = this.spriteWidth();
+    for (const box of [this.el, this.collision]) {
+      box.style.width = `${this._spriteWidth}px`;
+      box.style.height = `${this._spriteWidth}px`;
+    }
+    // Growing widens the sprite to the right; pull it back inside the pane.
+    const maxLeft = Math.max(0, window.innerWidth - this._spriteWidth);
+    if (this._left > maxLeft) {
+      this.positionLeft(maxLeft);
+    } else {
+      this.repositionAccompanyingElements();
+    }
+  }
+
+  private spriteWidth(): number {
+    const normal = this.calculateSpriteWidth(
+      this._size,
+      this._originalSpriteSize,
+    );
+    // The bubble sits on top of the sprite and is square; pokemon.css sizes it
+    // at 15px per size step (.bubble-nano 15px ... .bubble-large 37.5px).
+    const bubble = this.calculateSpriteWidth(this._size, 15);
+    const fitsPane = Math.min(
+      window.innerWidth,
+      window.innerHeight - this._floor - bubble,
+    );
+    // Growth never pushes past the pane, and never shrinks below normal size.
+    return Math.max(normal, Math.min(normal * this._growthScale, fitsPane));
   }
 
   get left(): number {
@@ -133,10 +167,7 @@ export abstract class BasePokemonType implements IPokemonType {
     this.collision.style.left = `${this._left}px`;
     this.collision.style.bottom = `${this._bottom}px`;
     this.speech.style.left = `${this._left}px`;
-    this.speech.style.bottom = `${
-      this._bottom +
-      this.calculateSpriteWidth(this._size, this._originalSpriteSize)
-    }px`;
+    this.speech.style.bottom = `${this._bottom + this._spriteWidth}px`;
   }
 
   calculateSpriteWidth(size: PokemonSize, originalSpriteSize: number): number {
@@ -236,16 +267,12 @@ export abstract class BasePokemonType implements IPokemonType {
     return !isStateAboveGround(this.currentStateEnum) && this.isMoving;
   }
 
-  showSpeechBubble(duration: number = 3000, friend: boolean = false) {
+  showSpeechBubble(duration: number = 3000, bubble: SpeechBubble = 'happy') {
     // Extract the media folder
     const segments = this.pokemonRoot.split('/');
     const basePath = segments.slice(0, segments.length - 3).join('/');
 
-    if (friend) {
-      this.speech.src = `${basePath}/heart.png`;
-    } else {
-      this.speech.src = `${basePath}/happy.png`;
-    }
+    this.speech.src = `${basePath}/${bubble}.png`;
 
     this.speech.style.display = 'block';
     setTimeout(() => {
@@ -284,11 +311,28 @@ export abstract class BasePokemonType implements IPokemonType {
   setAnimation(face: string, hasLeftFacingSprite: boolean | undefined) {
     const validFace =
       !hasLeftFacingSprite && face === 'walk_left' ? 'walk' : face;
+    const src = `${this.pokemonRoot}_${validFace}_8fps.gif`;
 
-    if (this.el.src.endsWith(`_${validFace}_8fps.gif`)) {
+    // Compare with what we last assigned, not el.src's suffix: after evolving,
+    // the old species' URL ends the same way, so the sprite would never swap.
+    if (this._animationSrc === src) {
       return;
     }
-    this.el.src = `${this.pokemonRoot}_${validFace}_8fps.gif`;
+    this._animationSrc = src;
+    this.el.src = src;
+  }
+
+  /** Turns into another species in place, keeping name, position, friend and state. */
+  evolve(type: string, root: string, originalSpriteSize: number) {
+    // Bubble offsets are tuned per sprite size in pokemon.css (b-32 / b-64).
+    this.speech.classList.replace(
+      `b-${this._originalSpriteSize}`,
+      `b-${originalSpriteSize}`,
+    );
+    this.label = type;
+    this.pokemonRoot = root;
+    this._originalSpriteSize = originalSpriteSize;
+    this.initSprite(this._size, this._left, this._bottom, originalSpriteSize);
   }
 
   chooseNextState(fromState: States): States {

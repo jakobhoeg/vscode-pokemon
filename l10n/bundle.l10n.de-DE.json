@@ -31,5 +31,13 @@
   "You must have a folder or workspace open to export pokemonCollection.": "Du musst einen Ordner oder Arbeitsbereich geöffnet haben, um die Pokemon-Sammlung zu exportieren.",
   "Failed to import pokemon: {0}": "Fehler beim Importieren von Pokemon: {0}",
   "default": "Standard",
-  "shiny": "Schillernd"
+  "shiny": "Schillernd",
+  "There are no pokemon to feed.": "Es gibt keine Pokemon zum Füttern.",
+  "Select the pokemon to feed.": "Wähle das Pokemon zum Füttern",
+  "XP {0}/{1} · full for {2} min": "EP {0}/{1} · noch {2} Min. satt",
+  "XP {0}/{1}": "EP {0}/{1}",
+  "{0} is full. Try again in {1} min.": "{0} ist satt. Versuche es in {1} Min. erneut.",
+  "{0} ate a berry! It is fully evolved.": "{0} hat eine Beere gegessen! Es ist voll entwickelt.",
+  "{0} ate a berry! (XP {1}/{2})": "{0} hat eine Beere gegessen! (EP {1}/{2})",
+  "{0} ate a berry and evolved into {1}!": "{0} hat eine Beere gegessen und sich zu {1} entwickelt!"
 }

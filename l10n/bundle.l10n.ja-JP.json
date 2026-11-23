@@ -31,5 +31,13 @@
   "You must have a folder or workspace open to export pokemonCollection.": "ポケモンコレクションをエクスポートするには、フォルダーまたはワークスペースを開いている必要があります。",
   "Failed to import pokemon: {0}": "ポケモンのインポートに失敗しました：{0}",
   "default": "デフォルト",
-  "shiny": "色違い"
+  "shiny": "色違い",
+  "There are no pokemon to feed.": "えさをあげるポケモンがいません。",
+  "Select the pokemon to feed.": "えさをあげるポケモンを選択",
+  "XP {0}/{1} · full for {2} min": "経験値 {0}/{1} · あと{2}分はおなかいっぱい",
+  "XP {0}/{1}": "経験値 {0}/{1}",
+  "{0} is full. Try again in {1} min.": "{0}はおなかいっぱいです。{1}分後にもう一度あげてください。",
+  "{0} ate a berry! It is fully evolved.": "{0}はきのみを食べた！ もう進化しません。",
+  "{0} ate a berry! (XP {1}/{2})": "{0}はきのみを食べた！（経験値 {1}/{2}）",
+  "{0} ate a berry and evolved into {1}!": "{0}はきのみを食べて{1}に進化した！"
 }

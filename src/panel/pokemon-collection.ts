@@ -4,18 +4,21 @@ import {
   PokemonSpeed,
   PokemonType,
 } from '../common/types';
+import { GrowthSyncEntry } from '../common/growth';
 import { Pokemon } from './pokemon';
 import { IPokemonType } from './states';
 
 export class PokemonElement {
   el: HTMLImageElement;
   collision: HTMLDivElement;
-  speech: HTMLDivElement;
+  speech: HTMLImageElement;
   pokemon: IPokemonType;
   color: PokemonColor;
   type: PokemonType;
   generation: string;
   originalSpriteSize: number;
+  /** Latest hunger/size from the extension; undefined until the first sync. */
+  growth: GrowthSyncEntry | undefined;
   remove() {
     this.el.remove();
     this.collision.remove();
@@ -26,7 +29,7 @@ export class PokemonElement {
   constructor(
     el: HTMLImageElement,
     collision: HTMLDivElement,
-    speech: HTMLDivElement,
+    speech: HTMLImageElement,
     pokemon: IPokemonType,
     color: PokemonColor,
     type: PokemonType,
@@ -41,6 +44,22 @@ export class PokemonElement {
     this.type = type;
     this.generation = generation;
     this.originalSpriteSize = originalSpriteSize;
+  }
+
+  // These fields are what saveState persists, so they must follow the evolution
+  // or reopening the panel would bring back the old species.
+  evolve(
+    type: PokemonType,
+    color: PokemonColor,
+    generation: string,
+    originalSpriteSize: number,
+    root: string,
+  ) {
+    this.type = type;
+    this.color = color;
+    this.generation = generation;
+    this.originalSpriteSize = originalSpriteSize;
+    this.pokemon.evolve(type, root, originalSpriteSize);
   }
 }
 
@@ -134,8 +153,8 @@ export class PokemonCollection implements IPokemonCollection {
           if (
             pokemonInCollection.pokemon.makeFriendsWith(potentialFriend.pokemon)
           ) {
-            potentialFriend.pokemon.showSpeechBubble(2000, true);
-            pokemonInCollection.pokemon.showSpeechBubble(2000, true);
+            potentialFriend.pokemon.showSpeechBubble(2000, 'heart');
+            pokemonInCollection.pokemon.showSpeechBubble(2000, 'heart');
           }
         }
       });

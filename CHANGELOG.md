@@ -2,6 +2,12 @@
 
 All notable changes to the "vscode-pokemon" extension will be documented in this file.
 
+## [Unreleased]
+
+- feat: feed your Pokémon: they get hungry over time, grow with each meal and evolve into their next form
+- feat: feed from the view's title bar, the command palette, or by double-clicking a Pokémon
+- feat: `feedCooldownMinutes` and `feedsToEvolve` settings
+
 ## [5.0.2]
 
 - fix: Galvantual assets

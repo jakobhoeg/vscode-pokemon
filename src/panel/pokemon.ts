@@ -77,8 +77,9 @@ export class Pokemon extends BasePokemonType {
     return this.config.id;
   }
 
-  showSpeechBubble(duration: number = 3000, friend: boolean) {
-    super.showSpeechBubble(duration, friend);
+  evolve(type: string, root: string, originalSpriteSize: number) {
+    super.evolve(type, root, originalSpriteSize);
+    this.config = POKEMON_DATA[type] || this.config;
   }
 
   static getPokemonData(type: string): PokemonConfig | undefined {

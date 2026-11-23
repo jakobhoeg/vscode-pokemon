@@ -33,5 +33,13 @@
 	"Use VS Code language": "Utiliser la langue de VS Code",
 	"You must have a folder or workspace open to export pokemonCollection.": "Vous devez avoir un dossier ou un espace de travail ouvert pour exporter la collection de Pokémon.",
 	"default": "Par défaut",
-	"shiny": "Chromatique"
+	"shiny": "Chromatique",
+	"There are no pokemon to feed.": "Il n'y a aucun Pokémon à nourrir.",
+	"Select the pokemon to feed.": "Sélectionner le Pokémon à nourrir",
+	"XP {0}/{1} · full for {2} min": "Exp. {0}/{1} · rassasié pendant {2} min",
+	"XP {0}/{1}": "Exp. {0}/{1}",
+	"{0} is full. Try again in {1} min.": "{0} est rassasié. Réessayez dans {1} min.",
+	"{0} ate a berry! It is fully evolved.": "{0} a mangé une baie ! Il a atteint sa forme finale.",
+	"{0} ate a berry! (XP {1}/{2})": "{0} a mangé une baie ! (Exp. {1}/{2})",
+	"{0} ate a berry and evolved into {1}!": "{0} a mangé une baie et a évolué en {1} !"
 }
